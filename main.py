@@ -12,9 +12,12 @@ import pytz
 from itertools import cycle
 import json
 from keep_alive import keep_alive
+from cryptography.fernet import Fernet
 
 #Define variables to make the rest run
-token = os.environ['TOKEN']
+key = bytes(os.environ["KEY"],"utf-8")
+token_bytes = Fernet(key).decrypt(bytes(os.environ['TOKEN'],"utf-8"))
+token = str(token_bytes)[2:-1]
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!')
 

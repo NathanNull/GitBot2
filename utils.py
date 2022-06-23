@@ -27,8 +27,8 @@ def check_config(type):
     return decorator
 
 @tasks.loop(minutes=5)
-async def save(self):
+async def save():
     with open("configure_bot/levels.json", "w") as file:
-        json.dump(self.levels, file, sort_keys=True, indent=4)
+        json.dump(server_config, file, sort_keys=True, indent=4)
     print("save (config)")
-save.start() 
+save.start()

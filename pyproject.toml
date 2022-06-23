@@ -15,6 +15,7 @@ pytz = "^2022.1"
 spotify-dl = "^8.3.0"
 discord = "^1.7.3"
 MarkupSafe = "^2.1.1"
+cryptography = "^37.0.3"
 
 [tool.poetry.dev-dependencies]
 
