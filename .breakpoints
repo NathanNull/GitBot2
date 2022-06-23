@@ -1,0 +1,20 @@
+{
+  "files": {
+    "cogs/level_bot.py": [
+      {
+        "id": "54f4f8da-5fd8-4b81-b92b-e74c9dc1311e",
+        "line": 33,
+        "version": 4022,
+        "index": 923
+      }
+    ],
+    "configure_bot/cursewords.json": [
+      {
+        "id": "ebc8327c-a93e-4fe6-9edf-6d5fd7f4b21e",
+        "line": 4,
+        "version": 206,
+        "index": 147
+      }
+    ]
+  }
+}
