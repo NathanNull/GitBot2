@@ -12,6 +12,7 @@ import pytz
 from itertools import cycle
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
+import ffmpeg
 
 #Define variables to make the rest run
 load_dotenv()
