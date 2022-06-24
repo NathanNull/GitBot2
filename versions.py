@@ -1,11 +1,10 @@
 import discord
 import youtube_dl
-import markupsafe
 import os
 import sys
 
 def test_versions():
-    to_test = [(discord,"2.0.0b4","py-cord"), (youtube_dl,"2021.12.17","youtube-dl"),(markupsafe,"2.0.1","markupsafe")]
+    to_test = [(discord,"2.0.0b4","py-cord"), (youtube_dl,"2021.12.17","youtube-dl"),]
     updated = []
     for module, target_ver, pkg_name in to_test:
         current_ver = get_version(module)

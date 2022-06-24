@@ -10,11 +10,11 @@ import os
 import datetime
 import pytz
 from itertools import cycle
-import json
-from keep_alive import keep_alive
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 
 #Define variables to make the rest run
+load_dotenv()
 key = bytes(os.environ["KEY"],"utf-8")
 token_bytes = Fernet(key).decrypt(bytes(os.environ['TOKEN'],"utf-8"))
 token = str(token_bytes)[2:-1]
@@ -93,5 +93,4 @@ print("hi")
 bot.load_extension('cogs.music_bot')
 bot.load_extension('cogs.level_bot')
 bot.load_extension('cogs.mod_bot')
-keep_alive()
 bot.run(token)
