@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from versions import test_versions
-test_versions()
+import ensure_libs
+ensure_libs.ready()
 
 #Imports the packages
 import discord
@@ -12,7 +12,6 @@ import pytz
 from itertools import cycle
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import ffmpeg
 
 #Define variables to make the rest run
 load_dotenv()

@@ -1,9 +1,11 @@
-import discord
-import youtube_dl
 import os
 import sys
+import shutil
+from pathlib import Path
 
 def test_versions():
+    import discord
+    import youtube_dl
     to_test = [(discord,"2.0.0b4","py-cord"), (youtube_dl,"2021.12.17","youtube-dl"),]
     updated = []
     for module, target_ver, pkg_name in to_test:
@@ -22,3 +24,11 @@ def get_version(module):
         return module.__version__
     except Exception:
         return module.version.__version__
+
+def place_ffmpeg():
+    os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+    print(f"{shutil.which('ffmpeg.exe')} exists")
+    
+def ready():
+    test_versions()
+    place_ffmpeg()
