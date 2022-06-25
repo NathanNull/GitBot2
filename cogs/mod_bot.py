@@ -9,7 +9,7 @@ class Mod(commands.Cog):
         self.bot = bot
         with open("configure_bot/cursewords.json", "r") as file:
             self.cursewords = json.load(file)
-            print(self.cursewords)
+            print(list(self.cursewords.keys()))
           
     @commands.Cog.listener()
     async def on_message(self, message):
