@@ -24,43 +24,13 @@ bot = commands.Bot(command_prefix='!')
 #Slash commands
 @bot.slash_command()
 async def time(ctx):
-    await ctx.respond(getTime())
+    await ctx.respond(f"<t:{round(datetime.datetime.utcnow().timestamp())}:F>")
 
 
 @bot.slash_command()
 async def ping(ctx):
     rounded_ping = round((bot.latency * 1000), 5)
     await ctx.respond(f"Pong! Latency is {rounded_ping} ms")
-
-
-def getTime():
-    #set time zone
-    t = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(
-        pytz.timezone("America/Los_Angeles"))
-
-    #Converts the day of the week from integer to day
-    days = [
-        "Monday", "Tuesday", "Wednesday", "Thursday", "Thursday", "Friday",
-        "Saturday", "Sunday"
-    ]
-    weekday = days[t.weekday()]
-
-    #Convert the time to am or pm
-    if t.hour < 12:
-        hour = t.hour
-        ampm = 'am'
-    elif t.hour == 12:
-        hour = t.hour
-        ampm = 'pm'
-    elif t.hour > 12:
-        hour = t.hour - 12
-        ampm = 'pm'
-    else:
-        hour = 'ERR'
-        ampm = 'OR'
-
-    #gets the month, day, and time from datetime
-    return t.strftime(f'{weekday}, %B %d, {hour}:%M{ampm}')
 
 
 status = cycle([
