@@ -90,7 +90,8 @@ async def on_connect():
 
 print("hi")
 #Runs the bot
-bot.load_extension('cogs.music_bot')
-bot.load_extension('cogs.level_bot')
-bot.load_extension('cogs.mod_bot')
+for cog in os.listdir("cogs"):
+    if os.path.isfile("cogs/"+cog):
+        bot.load_extension('cogs.' + cog[:-3])
+        print(f"loaded cog {cog}")
 bot.run(token)
