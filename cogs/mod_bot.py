@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import json
-from utils import guild_only, check_config
 
 
 class Mod(commands.Cog):
@@ -26,7 +25,7 @@ class Mod(commands.Cog):
 
     def is_swear(self, text, guild_id):
         gid = str(guild_id)
-        if self.config[gid]["moderation"] == "false":
+        if not self.config[gid]["moderation"]:
             return
         text = text.lower()
         return str(guild_id) in self.cursewords\

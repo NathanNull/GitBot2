@@ -24,7 +24,8 @@ bot = commands.Bot(command_prefix='!')
 #Slash commands
 @bot.slash_command()
 async def time(ctx):
-    await ctx.respond(f"<t:{round(datetime.datetime.utcnow().timestamp())}:F>")
+    timestamp = round(datetime.datetime.utcnow().timestamp())
+    await ctx.respond(f"<t:{timestamp}:F> (<t:{timestamp}:R>)")
 
 
 @bot.slash_command()
@@ -56,7 +57,7 @@ async def on_connect():
     try:
         await super(type(bot),bot).on_connect()
     except discord.errors.HTTPException as e:
-        print(f"had error {e.code}, was fine")
+        print(f"had error {e.code} ({e.text}), was fine")
 
 print("hi")
 #Runs the bot

@@ -5,7 +5,8 @@ from youtube_dl import YoutubeDL
 from discord.utils import get
 import requests
 import time
-from utils import guild_only, check_config
+from utils import guild_only
+from configuration import requires
 
 FFMPEG_OPTIONS = {
     'before_options':
@@ -66,7 +67,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
-    @check_config
+    @requires.music
     async def play(self, ctx, *, query):
         await ctx.defer() #very useful much nice
         voice = ctx.author.voice.channel
@@ -101,6 +102,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def play_playlist(self, ctx, *, url):
         await ctx.defer() #very useful much nice
         voice = ctx.author.voice.channel
@@ -132,6 +134,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def joinvc(self, ctx):
         voice = ctx.author.voice.channel
         if not voice:
@@ -144,11 +147,13 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def checkvolume(self, ctx):
         await ctx.respond(f"The Volume of the music is at {self.volume*100}%")
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def changevolume(self, ctx, thevolume: discord.Option(
         float,
         "What Do You Want The Volume At?",
@@ -165,6 +170,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def loopsong(self, ctx, set: discord.Option(str,choices=[
         discord.OptionChoice("This song", "song"),
         discord.OptionChoice("The queue", "queue"),
@@ -180,6 +186,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.music
     async def queue(self, ctx):
         if len(queue) == 0:
             await ctx.respond("There is nothing in the queue")

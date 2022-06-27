@@ -4,6 +4,7 @@ import json
 import random
 from time import time
 from utils import guild_only
+from configuration import requires
 
 class Level(commands.Cog):
     def __init__(self, bot):
@@ -11,13 +12,15 @@ class Level(commands.Cog):
         with open("configure_bot/levels.json", "r") as file:
             self.levels = json.load(file)
             print(self.levels)
+        self.config = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot\
             or message.content.startswith(self.bot.command_prefix)\
-            or not message.guild:
+            or not message.guild\
+            or (str(message.guild.id) in self.config and not self.config[str(message.guild.id)]["level"]):
             
             return
 
@@ -44,6 +47,7 @@ class Level(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.level
     async def rank(self, ctx, *, user:discord.Option(discord.User, required=False)):
         user = user if user else ctx.author
         
@@ -63,6 +67,7 @@ class Level(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.level
     async def reset_server(self, ctx):
         for user in self.levels[str(ctx.guild.id)]:
             self.levels[str(ctx.guild.id)][user].update({"level": 0,"xp": 0})
@@ -71,6 +76,7 @@ class Level(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.level
     async def reset_user(self, ctx, *, user:discord.Option(discord.User)):
         self.levels[str(ctx.guild.id)][str(user.id)].update({"level": 0,"xp": 0})
         await self.save()
@@ -78,6 +84,7 @@ class Level(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @requires.level
     async def give_xp(self, ctx, *, amount:discord.Option(int), user:discord.Option(discord.User)):
         user_data = self.levels[str(ctx.guild.id)][str(user.id)]
         user_data["xp"] += amount
@@ -91,7 +98,7 @@ class Level(commands.Cog):
     async def save(self):
         with open("configure_bot/levels.json", "w") as file:
             json.dump(self.levels, file, sort_keys=True, indent=4)
-        print("save")
+        print("save levels")
 
 def xp_to_level(level):
     return (5 * (level ** 2)) + (25 * level) - 10
