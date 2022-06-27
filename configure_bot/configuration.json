@@ -1,3 +1,7 @@
 {
-  "serverid":{"music":true,"mod":true,"level":true}
+    "977331948890521620": {
+        "level": "false",
+        "moderation": "true",
+        "music": "false"
+    }
 }

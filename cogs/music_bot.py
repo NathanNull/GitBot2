@@ -5,7 +5,7 @@ from youtube_dl import YoutubeDL
 from discord.utils import get
 import requests
 import time
-from utils import guild_only
+from utils import guild_only, check_config
 
 FFMPEG_OPTIONS = {
     'before_options':
@@ -66,6 +66,7 @@ class Music(commands.Cog):
 
     @discord.slash_command()
     @guild_only
+    @check_config
     async def play(self, ctx, *, query):
         await ctx.defer() #very useful much nice
         voice = ctx.author.voice.channel

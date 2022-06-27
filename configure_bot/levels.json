@@ -1,7 +1,17 @@
 {
-    "serverid": {
-        "level": true,
-        "mod": true,
-        "music": true
+    "977331948890521620": {
+        "634189650608652310": {
+            "last_timestamp": 1656296215,
+            "level": 0,
+            "xp": 9
+        },
+        "701878045413474314": {
+            "last_timestamp": 1656296216,
+            "level": 0,
+            "xp": 17
+        },
+        "level": "true",
+        "moderation": "true",
+        "music": "true"
     }
 }
