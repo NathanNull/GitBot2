@@ -1,7 +1,7 @@
 {
     "977331948890521620": {
         "level": true,
-        "moderation": false,
-        "music": false
+        "moderation": true,
+        "music": true
     }
 }
