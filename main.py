@@ -10,14 +10,12 @@ import os
 import datetime
 import pytz
 from itertools import cycle
-from cryptography.fernet import Fernet
+from encryption import decrypt
 from dotenv import load_dotenv
 
 #Define variables to make the rest run
 load_dotenv()
-key = bytes(os.environ["KEY"],"utf-8")
-token_bytes = Fernet(key).decrypt(bytes(os.environ['TOKEN'],"utf-8"))
-token = str(token_bytes)[2:-1]
+token = decrypt(os.environ["TOKEN"], os.environ["KEY"])
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!')
 
