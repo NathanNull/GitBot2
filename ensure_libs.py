@@ -1,7 +1,7 @@
 import os
 import sys
 import shutil
-from pathlib import Path
+from types import ModuleType
 
 def test_versions():
     import discord
@@ -19,7 +19,7 @@ def test_versions():
         print(f"Had to update packages {updated}, please rerun to use updated versions")
         sys.exit(0)
 
-def get_version(module):
+def get_version(module:ModuleType):
     try:
         return module.__version__
     except Exception:

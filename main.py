@@ -21,13 +21,13 @@ bot = commands.Bot(command_prefix='!')
 
 #Slash commands
 @bot.slash_command()
-async def time(ctx):
+async def time(ctx:discord.ApplicationContext):
     timestamp = round(datetime.datetime.utcnow().timestamp())
     await ctx.respond(f"<t:{timestamp}:F> (<t:{timestamp}:R>)")
 
 
 @bot.slash_command()
-async def ping(ctx):
+async def ping(ctx:discord.ApplicationContext):
     rounded_ping = round((bot.latency * 1000), 5)
     await ctx.respond(f"Pong! Latency is {rounded_ping} ms")
 

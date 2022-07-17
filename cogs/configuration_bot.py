@@ -2,14 +2,15 @@ import discord
 from discord.ext import commands, tasks
 import json
 from functools import wraps
+from typing import Callable
 from utils import guild_only
 
 class Configuration(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot):
         self.bot = bot
 
         with open("configure_bot/configuration.json", "r") as file:
-            self.configuration = json.load(file)
+            self.configuration:dict[str, dict[str, bool]] = json.load(file)
             print(list(self.configuration.keys()))
         
         global config
@@ -19,7 +20,7 @@ class Configuration(commands.Cog):
 
     @discord.slash_command()
     @guild_only
-    async def config_bot(self, ctx, *, 
+    async def config_bot(self, ctx:discord.ApplicationContext, *, 
             setting: discord.Option(str,choices=[
                 discord.OptionChoice("Level", "level"),
                 discord.OptionChoice("Music", "music"),
@@ -27,6 +28,7 @@ class Configuration(commands.Cog):
             ]),
             enable: discord.Option(bool, "Turn on or off?")
         ):
+        setting:str; enable:bool
 
         gid = str(ctx.guild.id)
         print(enable, self.configuration[gid][setting])
@@ -48,10 +50,10 @@ class Configuration(commands.Cog):
             json.dump(self.configuration, file, sort_keys=True, indent=4)
         print("save config")
 
-def check_config(type_):
-    def decorator(cmd):
+def check_config(type_:str):
+    def decorator(cmd:Callable):
         @wraps(cmd)
-        async def wrapper(me, ctx, *args, **kwargs):
+        async def wrapper(me:commands.Cog, ctx:discord.ApplicationContext, *args, **kwargs):
             global config
             if str(ctx.guild.id) in config and not config[str(ctx.guild.id)][type_]:
                 await ctx.respond(f"{type_.capitalize()} commands have been disabled in this server")
@@ -60,5 +62,5 @@ def check_config(type_):
         return wrapper
     return decorator
 
-def setup(bot):
+def setup(bot:commands.Bot):
     bot.add_cog(Configuration(bot))

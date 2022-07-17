@@ -1,15 +1,13 @@
 from functools import wraps
-import json
-from discord.ext import tasks
+from typing import Callable
+from discord.commands import Cog
+import discord
 
-def guild_only(cmd):
+def guild_only(cmd:Callable):
     @wraps(cmd)
-    async def wrapper(me, ctx, *args, **kwargs):
+    async def wrapper(me:Cog, ctx:discord.ApplicationContext, *args, **kwargs):
         if not ctx.guild:
             await ctx.respond("This command isn't enabled in DMs")
             return
         await cmd(me, ctx, *args, **kwargs)
     return wrapper
-
-with open("configure_bot/configuration.json", "r") as file:
-    server_config = json.load(file)
