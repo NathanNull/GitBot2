@@ -4,19 +4,19 @@ import json
 import random
 from time import time
 from utils import guild_only
-from configuration import requires
+from configuration import requires, config_type
 
 class Level(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot):
         self.bot = bot
         with open("configure_bot/levels.json", "r") as file:
-            self.levels = json.load(file)
+            self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
             print(self.levels)
-        self.config = self.bot.get_cog("Configuration").configuration
+        self.config:config_type = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
         if message.author.bot\
             or message.content.startswith(self.bot.command_prefix)\
             or not message.guild\
@@ -48,8 +48,8 @@ class Level(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.level
-    async def rank(self, ctx, *, user:discord.Option(discord.User, required=False)):
-        user = user if user else ctx.author
+    async def rank(self, ctx:discord.ApplicationContext, *, user:discord.Option(discord.User, required=False)):
+        user:discord.User = user if user else ctx.author
         
         gid = str(ctx.guild.id)
         uid = str(user.id)
@@ -68,7 +68,7 @@ class Level(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.level
-    async def reset_server(self, ctx):
+    async def reset_server(self, ctx:discord.ApplicationContext):
         for user in self.levels[str(ctx.guild.id)]:
             self.levels[str(ctx.guild.id)][user].update({"level": 0,"xp": 0})
         await self.save()
@@ -77,7 +77,8 @@ class Level(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.level
-    async def reset_user(self, ctx, *, user:discord.Option(discord.User)):
+    async def reset_user(self, ctx:discord.ApplicationContext, *, user:discord.Option(discord.User)):
+        user:discord.User
         self.levels[str(ctx.guild.id)][str(user.id)].update({"level": 0,"xp": 0})
         await self.save()
         await ctx.respond(f"Cleared levels for user {user}")
@@ -85,7 +86,9 @@ class Level(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.level
-    async def give_xp(self, ctx, *, amount:discord.Option(int), user:discord.Option(discord.User)):
+    async def give_xp(self, ctx:discord.ApplicationContext, *, amount:discord.Option(int), user:discord.Option(discord.User)):
+        amount:int; user:discord.User
+
         user_data = self.levels[str(ctx.guild.id)][str(user.id)]
         user_data["xp"] += amount
         next_amount = xp_to_level(user_data["level"]+1)
@@ -100,10 +103,10 @@ class Level(commands.Cog):
             json.dump(self.levels, file, sort_keys=True, indent=4)
         print("save levels")
 
-def xp_to_level(level):
+def xp_to_level(level:int):
     return (5 * (level ** 2)) + (25 * level) - 10
 
-def xp_bar(xp, level, length=20):
+def xp_bar(xp:int, level:int, length:int=20):
     to_next = xp_to_level(level+1)
     num_blocks = clamp(round(length*xp/to_next),1,length-1)
 

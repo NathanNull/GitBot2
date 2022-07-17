@@ -5,3 +5,5 @@ class requires:
     level = check_config("level")
     moderation = check_config("moderation")
     music = check_config("music")
+
+config_type = dict[str, dict[str, bool]]

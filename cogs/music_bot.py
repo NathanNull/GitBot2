@@ -17,20 +17,20 @@ FFMPEG_OPTIONS = {
 #no touchy touchy (I touched it)
 
 class Music(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot):
         self.bot = bot
-        self.do_loop = "none"
+        self.do_loop:str = "none"
         self.volume = 1.0
 
-        self.now_playing = None
+        self.now_playing = None #TODO: use this maybe idk
 
-        self.skipped = False
+        self.skipped:bool = False
 
-    def is_connected(self, ctx):
-        voice_client = get(self.bot.voice_clients, guild=ctx.guild)
+    def is_connected(self, ctx:discord.ApplicationContext):
+        voice_client:discord.VoiceClient = get(self.bot.voice_clients, guild=ctx.guild)
         return voice_client and voice_client.is_connected()
 
-    async def when_done(self, ctx, video, source, when_started):
+    async def when_done(self, ctx:discord.ApplicationContext, video:dict, source:str, when_started:int):
         print("running")
         stopped_prematurely = (video["duration"] > (time.time()-when_started)) and not self.skipped
         self.skipped = False
@@ -46,7 +46,7 @@ class Music(commands.Cog):
             print("Not looping")
         await self.check_queue(ctx)
 
-    async def play_song(self, ctx, vc, video, source, embed=True):
+    async def play_song(self, ctx:discord.ApplicationContext, vc:discord.VoiceClient, video:dict, source:str, embed=True):
         if embed:
             await ctx.send(embed=make_song_embed(video), view=View(self.bot, self))
 
@@ -57,7 +57,7 @@ class Music(commands.Cog):
                         self.when_done(ctx, video, source, current_time)))
         
 
-    async def check_queue(self, ctx, embed=True):
+    async def check_queue(self, ctx:discord.ApplicationContext, embed:bool=True):
         if len(queue) != 0:
             vc = ctx.guild.voice_client
             video, source = queue.pop(0)
@@ -68,7 +68,7 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def play(self, ctx, *, query):
+    async def play(self, ctx:discord.ApplicationContext, *, query:str):
         await ctx.defer() #very useful much nice
         voice = ctx.author.voice.channel
 
@@ -103,7 +103,7 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def play_playlist(self, ctx, *, url):
+    async def play_playlist(self, ctx:discord.ApplicationContext, *, url:str):
         await ctx.defer() #very useful much nice
         voice = ctx.author.voice.channel
 
@@ -135,7 +135,7 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def joinvc(self, ctx):
+    async def joinvc(self, ctx:discord.ApplicationContext):
         voice = ctx.author.voice.channel
         if not voice:
             await ctx.respond("You aren't in a voice channel!")
@@ -148,18 +148,19 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def checkvolume(self, ctx):
+    async def checkvolume(self, ctx:discord.ApplicationContext):
         await ctx.respond(f"The Volume of the music is at {self.volume*100}%")
 
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def changevolume(self, ctx, thevolume: discord.Option(
+    async def changevolume(self, ctx:discord.ApplicationContext, thevolume: discord.Option(
         float,
         "What Do You Want The Volume At?",
         min_value=0,
         max_value=100,
         default=100)):
+        thevolume:float
         self.volume = thevolume / 100
 
         if ctx.guild.voice_client:
@@ -171,11 +172,12 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def loopsong(self, ctx, set: discord.Option(str,choices=[
+    async def loopsong(self, ctx:discord.ApplicationContext, set: discord.Option(str,choices=[
         discord.OptionChoice("This song", "song"),
         discord.OptionChoice("The queue", "queue"),
         discord.OptionChoice("Off", "none"),
     ])):
+        set:str
         self.do_loop = set
         if set == "song":
             await ctx.respond("Looping...")
@@ -187,7 +189,7 @@ class Music(commands.Cog):
     @discord.slash_command()
     @guild_only
     @requires.music
-    async def queue(self, ctx):
+    async def queue(self, ctx:discord.ApplicationContext):
         if len(queue) == 0:
             await ctx.respond("There is nothing in the queue")
             return
@@ -199,14 +201,14 @@ class Music(commands.Cog):
         await ctx.respond(embed=embed)
 
 
-def make_song_embed(video):
+def make_song_embed(video:dict[str,]) -> discord.Embed:
     duration = f"{int(video['duration']//60):02d}:{int(video['duration']%60):02d}"
     embed = discord.Embed(title="Now playing:", description=video['title'])
     embed.add_field(name="Length", value=duration, inline=True)
     return embed
 
 
-def search(query):
+def search(query:str) -> tuple[dict, str]:
     with YoutubeDL({'format': 'bestaudio', 'noplaylist': 'True'}) as ydl:
         try:
             requests.get(query)
@@ -217,7 +219,7 @@ def search(query):
             info = ydl.extract_info(query, download=False)
     return (info, info['formats'][0]['url'])
 
-def get_playlist(url):
+def get_playlist(url) -> list[tuple[dict, str]]:
     with YoutubeDL({'format': 'bestaudio', 'yesplaylist': 'True', 'playlist-end': '50'}) as ydl:
         info = ydl.extract_info(url, download=False)["entries"]
         return [(v, v['formats'][0]['url']) for v in info]
