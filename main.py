@@ -63,4 +63,5 @@ for cog in os.listdir("cogs"):
     if os.path.isfile("cogs/"+cog):
         bot.load_extension('cogs.' + cog[:-3])
         print(f"loaded cog {cog}")
-bot.run(token)
+#bot.run(token)
+bot.run('MTAwOTkwMzg0MTcxMTUwOTUxNQ.G-gu1M.2iuFands6VTDnNszsY7A3ffUkSC77y2bHullYw')
