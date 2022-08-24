@@ -5,39 +5,60 @@ body {
 }
 
 /* Add a black background color to the top navigation */
-.navbar {
+#navbar {
     background-color: #0e1134;
     overflow: hidden;
+    display: flex;
+    height: 10%;
+    align-items: center;
+    padding: 0px 10px;
+}
+
+#navbar .menuicon {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+}
+
+#navbar h1 {
+    margin: 0px;
+    padding-left: 20px;
+    align-content: center;
 }
 
 /* Style the links inside the navigation bar */
-.navbar #login {
-    float: right;
+#navbar #login {
     color: #e0e0e0;
     text-align: center;
-    padding: 14px 16px;
+    padding: 0px 16px;
+    height: 100%;
     text-decoration: none;
     font-size: 17px;
     border: 1px#25273b;
 }
 
-.navbar .text {
-    float: right;
+#navbar .text {
+    margin-left: auto;
     color: #e0e0e0;
     text-align: center;
-    padding: 14px 16px;
+    padding: 0px 16px;
     text-decoration: none;
     font-size: 17px;
 }
 
 /* Change the color of links on hover */
-.navbar #login:hover {
+#navbar #login:hover {
     background-color: #2065a9;
     color: #ddd;
 }
 
 /* Add a color to the active/current link */
-.navbar #login:active {
+#navbar #login:active {
     background-color: #0e1134;
     color: white;
+}
+
+h1 {
+    font-family: comic-sans;
 }

@@ -14,6 +14,11 @@ def decrypt(encrypted:str, key:str) -> str:
     return str(token_bytes)[2:-1]
 
 if __name__ == "__main__":
-    k, e = encrypt(input("Enter token to encrypt: "))
-    print(f"Key: {k}")
-    print(f"Encrypted: {e}")
+    if input("Decrypt? ")[0].lower() == "y":
+        e = input("Enter token to decrypt: ")
+        k = input("Enter key to use: ")
+        print(f"Decrypted: {decrypt(e, k)}")
+    else:
+        k, e = encrypt(input("Enter token to encrypt: "))
+        print(f"Key: {k}")
+        print(f"Encrypted: {e}")

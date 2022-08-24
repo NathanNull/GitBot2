@@ -3,7 +3,7 @@ from browser.local_storage import storage
 from browser.object_storage import ObjectStorage
 from urllib.parse import urlparse
 
-nav = document.select(".navbar")[0]
+nav = document.select("#navbar")[0]
 store = ObjectStorage(storage)
 
 def try_idx(s:str, char:str, idx:int):
