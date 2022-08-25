@@ -1,34 +1,43 @@
-function check_until_ready(is_ready, when_ready)
-{
-    if (is_ready())
-        when_ready()
-    else
-        setTimeout(() => {
-            check_until_ready(is_ready, when_ready)
-        }, 1000);
-}
+import { check_until_ready } from "./utils.js"
+import { bot_auth } from "./config.js"
 
-let token = null
+/**
+ * @typedef {{id: string, name: string, permissions: string}} guild
+ */
 
-function get_guilds()
+/**
+ * @typedef
+ * @param { string } access_token authorization token/type for discord's api
+ * @returns { guild[] } a list of guilds that the token's user is a part of
+ */
+async function all_guilds(access_token)
 {
-    console.log("hey it's me")
-    authorization = window.sessionStorage.getItem("discord_token")
-    console.log(authorization)
-    fetch("https://discord.com/api/users/@me/guilds", {
+    let result = await fetch("https://discord.com/api/users/@me/guilds", {
         headers: {
-            authorization
+            authorization: access_token
         },
-    }).then(result=>result.json()).then(json=>{
-        const perm_id = 0x20
-        let managed_guilds = []
-        json.forEach(partial=>
-        {
-            if ((parseInt(partial.permissions) & perm_id) != 0)
-                managed_guilds.push(partial)
-        })
-        console.log(managed_guilds.map(g=>g.name))
-    })
+    }).then(result=>result.json())
+    return result
 }
 
-check_until_ready(()=>"discord_token" in window.sessionStorage, get_guilds)
+async function get_guilds()
+{
+    // Get all guilds the user is in
+    let auth = sessionStorage.getItem("discord_token")
+    let guilds = await all_guilds(auth)
+
+    // Get bot guild names
+    let bot_guilds = await all_guilds(bot_auth)
+
+    // Select guilds where user has "Manage Server" perms
+    let settable_guilds = guilds.filter(
+        g=>((parseInt(g.permissions) & 0x28) != 0) && bot_guilds.some(b_g=>b_g.id == g.id)
+    )
+
+    settable_guilds.forEach(guild => {
+        
+    });
+    console.log(settable_guilds.map(g=>g.name))
+}
+
+check_until_ready(()=>"discord_token" in sessionStorage, get_guilds)

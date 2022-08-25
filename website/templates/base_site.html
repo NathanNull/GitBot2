@@ -6,11 +6,7 @@
         <link type="text/css" rel="stylesheet" href="{{ getpath('css/index.css') }}">
     </head>
     <body>
-        <script type="text/javascript" src="{{ getpath('base.js') }}" defer></script>
-        <script type="text/javascript" src="{{ getpath('guilds.js') }}" defer></script>
         {% include 'navbar.html' %}
-        <div id="content">
-            <h1>Servery listy thingy</h1>
-        </div>
+        {% include page_content %}
     </body>
 </html>

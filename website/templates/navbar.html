@@ -1,7 +1,10 @@
 <div id="navbar">
     <img class="menuicon" src="{{ getpath('favicon.ico') }}"> 
     <h1>SurfBot</h1>
-    <div class="text" id="info">You aren't logged in yet</div>
-    <a id="login" style="display: none;" href="{{ login }}">Login</a>
-    <img id="pfp" style="display: none; border-radius: 50%;" src="{{ getpath('favicon.ico') }}">
+    <a id="addbot" class="button" href="{{ invite }}">Add SurfBot to your server</a>
+    <a id="login" class="button" style="display: none;" href="{{ login }}">Login</a>
+    <div id="user-details">
+        <div class="text" id="info">You aren't logged in yet</div>
+        <img id="pfp" style="display: none; border-radius: 50%;" src="{{ getpath('favicon.ico') }}">
+    </div>
 </div>

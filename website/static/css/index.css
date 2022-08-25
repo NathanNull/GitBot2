@@ -1,7 +1,7 @@
 body {
     background-color: #25273b;
     color: #e0e0e0;
-    font-family: "Lucida Console";
+    font-family: "Lucida Console MS", "Lucida Console", "Arial MS", "Arial";
 }
 
 /* Add a black background color to the top navigation */
@@ -9,9 +9,20 @@ body {
     background-color: #0e1134;
     overflow: hidden;
     display: flex;
+    vertical-align: middle;
     height: 10%;
-    align-items: center;
+    align-items: stretch;
     padding: 0px 10px;
+}
+
+#navbar #user-details
+{
+    align-items: center;
+    display: flex;
+}
+
+#navbar #addbot {
+    margin-left: auto;
 }
 
 #navbar .menuicon {
@@ -22,24 +33,27 @@ body {
 }
 
 #navbar h1 {
+    display: flex;
+    align-items: center;
     margin: 0px;
     padding-left: 20px;
     align-content: center;
 }
 
 /* Style the links inside the navigation bar */
-#navbar #login {
+#navbar .button {
+    display: flex;
+    align-items: center;
     color: #e0e0e0;
-    text-align: center;
-    padding: 0px 16px;
-    height: 100%;
+    vertical-align: middle;
+    padding-left: 16px;
+    padding-right: 16px;
     text-decoration: none;
     font-size: 17px;
     border: 1px#25273b;
 }
 
 #navbar .text {
-    margin-left: auto;
     color: #e0e0e0;
     text-align: center;
     padding: 0px 16px;
@@ -48,17 +62,23 @@ body {
 }
 
 /* Change the color of links on hover */
-#navbar #login:hover {
+#navbar .button:hover {
     background-color: #2065a9;
     color: #ddd;
 }
 
 /* Add a color to the active/current link */
-#navbar #login:active {
+#navbar .button:active {
     background-color: #0e1134;
     color: white;
 }
 
-h1 {
-    font-family: comic-sans;
+#pfp {
+    width: 48px;
+    aspect-ratio: 1 1;
+}
+
+#content {
+    font-family: "Webdings MS", "Webdings", "Arial MS", "Arial";
+    /* fixed it */
 }
