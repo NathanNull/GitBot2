@@ -3,13 +3,12 @@ from discord.ext import commands, tasks
 import json
 from functools import wraps
 from typing import Callable
-from utils import guild_only
-
+from utils import guild_only, basepath
 class Configuration(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
 
-        with open("configure_bot/configuration.json", "r") as file:
+        with open(basepath+"configure_bot/configuration.json", "r") as file:
             self.configuration:dict[str, dict[str, bool]] = json.load(file)
             print(list(self.configuration.keys()))
         
@@ -46,7 +45,7 @@ class Configuration(commands.Cog):
 
     @tasks.loop(minutes=20)
     async def save(self):
-        with open("configure_bot/configuration.json", "w") as file:
+        with open(basepath+"configure_bot/configuration.json", "w") as file:
             json.dump(self.configuration, file, sort_keys=True, indent=4)
         print("save config")
 
@@ -63,4 +62,5 @@ def check_config(type_:str):
     return decorator
 
 def setup(bot:commands.Bot):
+    print("stuff")
     bot.add_cog(Configuration(bot))

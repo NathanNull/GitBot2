@@ -1,5 +1,6 @@
-import { check_until_ready } from "./utils.js"
+import { get_element } from "./utils.js"
 import { bot_auth } from "./config.js"
+import { token } from "./auth.js"
 
 /**
  * @typedef {{id: string, name: string, permissions: string}} guild
@@ -20,11 +21,10 @@ async function all_guilds(access_token)
     return result
 }
 
-async function get_guilds()
+if (token)
 {
     // Get all guilds the user is in
-    let auth = sessionStorage.getItem("discord_token")
-    let guilds = await all_guilds(auth)
+    let guilds = await all_guilds(token)
 
     // Get bot guild names
     let bot_guilds = await all_guilds(bot_auth)
@@ -34,10 +34,15 @@ async function get_guilds()
         g=>((parseInt(g.permissions) & 0x28) != 0) && bot_guilds.some(b_g=>b_g.id == g.id)
     )
 
+    let content = get_element(["#content"])
+    let serverlist = document.createElement("div")
+    serverlist.id = "serverlist"
+    content.appendChild(serverlist)
+
     settable_guilds.forEach(guild => {
-        
+        let display = document.createElement("div")
+        display.textContent = guild.name
+        content.appendChild(display)
     });
     console.log(settable_guilds.map(g=>g.name))
 }
-
-check_until_ready(()=>"discord_token" in sessionStorage, get_guilds)

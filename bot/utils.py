@@ -1,6 +1,7 @@
 from functools import wraps
 from typing import Callable
-from discord.commands import Cog
+import os
+from discord.ext.commands import Cog
 import discord
 
 def guild_only(cmd:Callable):
@@ -11,3 +12,5 @@ def guild_only(cmd:Callable):
             return
         await cmd(me, ctx, *args, **kwargs)
     return wrapper
+
+basepath = os.path.dirname(__file__)+os.sep

@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands, tasks
 import json
+from utils import basepath
 
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot:discord.Bot):
 		self.bot = bot
-		with open("configure_bot/reactions.json", "r", encoding='utf-8') as file:
+		with open(basepath+"configure_bot/reactions.json", "r", encoding='utf-8') as file:
 			self.reaction : dict[str, dict[str, dict[str, int]]] = json.load(file)
 			print(self.reaction)
 		self.save.start()
@@ -83,7 +84,7 @@ class ReactionRoles(commands.Cog):
 
 	@tasks.loop(minutes=5)
 	async def save(self):
-		with open("configure_bot/reactions.json", "w") as file:
+		with open(basepath+"configure_bot/reactions.json", "w") as file:
 			json.dump(self.reaction, file, sort_keys=False, indent=4)
 		print("save reactions")
 

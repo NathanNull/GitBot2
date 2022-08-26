@@ -3,13 +3,13 @@ from discord.ext import commands, tasks
 import json
 import random
 from time import time
-from utils import guild_only
+from utils import guild_only, basepath
 from configuration import requires, config_type
 
 class Level(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
-        with open("configure_bot/levels.json", "r") as file:
+        with open(basepath+"configure_bot/levels.json", "r") as file:
             self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
             print(self.levels)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
@@ -99,7 +99,7 @@ class Level(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def save(self):
-        with open("configure_bot/levels.json", "w") as file:
+        with open(basepath+"configure_bot/levels.json", "w") as file:
             json.dump(self.levels, file, sort_keys=True, indent=4)
         print("save levels")
 

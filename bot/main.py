@@ -21,7 +21,7 @@ bot = commands.Bot(command_prefix='!')
 #Slash commands
 @bot.slash_command()
 async def time(ctx:discord.ApplicationContext):
-    timestamp = round(datetime.datetime.utcnow().timestamp())
+    timestamp = round(datetime.datetime.now().timestamp())
     await ctx.respond(f"<t:{timestamp}:F> (<t:{timestamp}:R>)")
 
 @bot.slash_command()
@@ -52,8 +52,17 @@ async def on_connect():
     except discord.errors.HTTPException as e:
         print(f"had error {e.code} ({e.text}), was fine")
 
+print("hey look guys it's me doin the stuff")
 #Runs the bot
-for cog in ["1configuration_bot", "audit_logs_bot", "level_bot", "mod_bot", "music_bot", "reaction_bot"]:
-    bot.load_extension('cogs.' + cog[:-3])
+for cog in [
+    "configuration_bot",
+    "audit_logs_bot",
+    "level_bot",
+    "mod_bot",
+    "music_bot",
+    "reaction_bot"
+]:
+    bot.load_extension('cogs.' + cog)
     print(f"loaded cog {cog}")
+print(bot.extensions)
 bot.run(token)

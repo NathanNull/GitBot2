@@ -7,6 +7,7 @@
     </head>
     <body>
         {% include 'navbar.html' %}
-        {% include page_content %}
+        <link type="text/css" rel="stylesheet" href="{{ getstyle(pagename) }}">
+        {% include pagename+".html" %}
     </body>
 </html>

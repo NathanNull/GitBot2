@@ -20,4 +20,5 @@ def get_env():
 def main():
     backend.run(port=3001)
 
-main()
+if __name__ == "__main__":
+    main()

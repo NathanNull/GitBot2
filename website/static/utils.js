@@ -25,4 +25,4 @@ function check_until_ready(is_ready, when_ready)
         }, 1000);
 }
 
-export { get_element, check_until_ready }
+export { get_element }

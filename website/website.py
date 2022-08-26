@@ -16,22 +16,26 @@ invite_link = \
 def getpath(static_path: str):
     return url_for("static", filename=static_path)
 
+def getstyle(name: str):
+    return getpath("css/"+name+".css")
+
 def make_page(template_name: str):
-    return render_template("base_site.html", **PARAMS, page_content=template_name)
+    return render_template("base_site.html", **PARAMS, pagename=template_name)
 
 PARAMS = {
     "login": discord_login,
     "getpath": getpath,
+    "getstyle": getstyle,
     "invite": invite_link
 }
 
 @app.route("/")
 def home():
-    return render_template_string(make_page("index.html"), **PARAMS)
+    return render_template_string(make_page("home"), **PARAMS)
 
 @app.route("/serverlist")
 def serverlist():
-    return render_template_string(make_page("serverlist.html"), **PARAMS)
+    return render_template_string(make_page("serverlist"), **PARAMS)
 
 def main():
     app.run(host)
