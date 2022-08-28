@@ -63,6 +63,7 @@ for cog in [
     "reaction_bot"
 ]:
     bot.load_extension('cogs.' + cog)
-    print(f"loaded cog {cog}")
-print(bot.extensions)
+
+if len(bot.extensions) != 6:
+    raise Exception("Cog problem idk")
 bot.run(token)

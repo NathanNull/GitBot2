@@ -16,14 +16,16 @@ def run_file(input_):
         if proc.returncode is not None: break
 
         # Log stdout with prefix
-        print(prefix+line.decode("UTF-8"), end="")
+        print(f"{prefix:>7}{line.decode('UTF-8')}", end="")
+
 
 def main():
     proc_names = [
-        ("website/w_backend.py", "backend says "),
-        ("website/website.py", "frontend says "),
-        ("bot/main.py", "bot says ")
+        ("website/w_backend.py", "API: "),
+        ("website/website.py", "FRONT: "),
+        ("bot/main.py", "BOT: ")
     ]
+
     try:
         with Pool(len(proc_names)) as pool:
             pool.map(run_file, proc_names)

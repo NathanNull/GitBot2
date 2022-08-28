@@ -1,5 +1,5 @@
 import { get_element } from "./utils.js"
-import { bot_auth } from "./config.js"
+import { bot_servers } from "./config.js"
 import { token } from "./auth.js"
 
 /**
@@ -26,12 +26,9 @@ if (token)
     // Get all guilds the user is in
     let guilds = await all_guilds(token)
 
-    // Get bot guild names
-    let bot_guilds = await all_guilds(bot_auth)
-
     // Select guilds where user has "Manage Server" perms
     let settable_guilds = guilds.filter(
-        g=>((parseInt(g.permissions) & 0x28) != 0) && bot_guilds.some(b_g=>b_g.id == g.id)
+        g=>((parseInt(g.permissions) & 0x28) != 0) && bot_servers.some(b_g=>b_g.id == g.id)
     )
 
     let content = get_element(["#content"])

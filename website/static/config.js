@@ -1,5 +1,7 @@
-let bot_auth = await fetch(`http://${location.hostname}:3001/token`)
+/**
+ * @type {import("./guilds").guild[]}
+ */
+let bot_servers = await fetch(`http://${location.hostname}:3001/botservers`)
     .then(result => result.json())
-    .then(json => `Bot ${json.token}`)
 
-export { bot_auth }
+export { bot_servers }
