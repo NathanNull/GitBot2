@@ -1,11 +1,12 @@
 from multiprocessing import Pool
 from subprocess import Popen, PIPE, STDOUT
+from sys import platform
 
-python = ".venv/Scripts/python.exe"
+python = ".venv/Scripts/python.exe" if platform not in ["linux", "linux2"] else ".venv/bin/python"
 
 def run_file(input_):
     path, prefix = input_
-    proc = Popen(f"{python} {path}", stdout=PIPE, stderr=STDOUT)
+    proc = Popen([python, path], stdout=PIPE, stderr=STDOUT)
     while True:
         # Get line
         try: line = proc.stdout.readline()
@@ -17,7 +18,6 @@ def run_file(input_):
 
         # Log stdout with prefix
         print(f"{prefix:>7}{line.decode('UTF-8')}", end="")
-
 
 def main():
     proc_names = [

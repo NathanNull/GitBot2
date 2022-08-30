@@ -1,17 +1,28 @@
 from flask import Flask, url_for, render_template_string, render_template
+from check_prod import is_prod
 
 host = "localhost"
 
 app = Flask(__name__)
 
-discord_login = \
-    r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
-    r"redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fserverlist&response_type="+\
-    r"token&scope=identify%20guilds%20guilds.members.read"
+if is_prod:
+    discord_login = \
+        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
+        r"redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fserverlist&response_type="+\
+        r"token&scope=identify%20guilds%20guilds.members.read"
+    
+    invite_link = \
+        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
+        r"permissions=1644971949559&scope=bot%20applications.commands"
+else:
+    discord_login = \
+        r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
+        r"redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fserverlist&response_type="+\
+        r"token&scope=identify%20guilds%20guilds.members.read"
 
-invite_link = \
-    r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
-    r"permissions=1644971949559&scope=bot%20applications.commands"
+    invite_link = \
+        r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
+        r"permissions=1644971949559&scope=bot%20applications.commands"
 
 def getpath(static_path: str):
     return url_for("static", filename=static_path)

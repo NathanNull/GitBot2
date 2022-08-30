@@ -14,3 +14,11 @@ def guild_only(cmd:Callable):
     return wrapper
 
 basepath = os.path.dirname(__file__)+os.sep
+
+def make_config():
+    config = {
+        "level": True,
+        "music": True,
+        "moderation": True
+    }
+    return config

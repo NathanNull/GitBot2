@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import json
 
-from utils import guild_only, basepath
+from utils import guild_only, basepath, make_config
 from configuration import requires, config_type
 cursewords = "cursewords"
 
@@ -66,7 +66,9 @@ class Mod(commands.Cog):
 
     def is_swear(self, text:str, guild_id:int) -> bool:
         gid = str(guild_id)
-        if not self.config[gid]["moderation"]:
+        if gid not in self.config:
+            self.config[gid] = make_config()
+        if "moderation" in self.config[gid] and not self.config[gid]["moderation"]:
             return
         text = text.lower().replace(" ", "")
         return str(guild_id) in self.cursewords\
