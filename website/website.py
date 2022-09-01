@@ -30,8 +30,8 @@ def getpath(static_path: str):
 def getstyle(name: str):
     return getpath("css/"+name+".css")
 
-def make_page(template_name: str):
-    return render_template("base_site.html", **PARAMS, pagename=template_name)
+def make_page(template_name: str, **local_params: dict):
+    return render_template("base_site.html", **PARAMS, **local_params, pagename=template_name)
 
 PARAMS = {
     "login": discord_login,
@@ -42,11 +42,15 @@ PARAMS = {
 
 @app.route("/")
 def home():
-    return render_template_string(make_page("home"), **PARAMS)
+    return make_page("home")
 
 @app.route("/serverlist")
 def serverlist():
-    return render_template_string(make_page("serverlist"), **PARAMS)
+    return make_page("serverlist")
+
+@app.route("/console/<serverid>")
+def console(serverid):
+    return make_page("console", serverid=serverid)
 
 def main():
     app.run(host)

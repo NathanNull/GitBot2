@@ -1,3 +1,7 @@
-#content #serverlisttop {
+#serverlisttop {
     font-family: "Lucida Console MS", "Lucida Console", "Arial MS", "Arial";
+}
+#serverlist {
+    display: flex;
+    flex-direction: column;
 }
