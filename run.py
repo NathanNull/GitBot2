@@ -7,11 +7,12 @@ python = ".venv/Scripts/python.exe" if platform not in ["linux", "linux2"] else 
 def run_file(input_):
     path, prefix = input_
     proc = Popen([python, path], stdout=PIPE, stderr=STDOUT)
+    print(f"{prefix:>7}Started.")
     while True:
         # Get line
         try: line = proc.stdout.readline()
 
-        # Check end cases:
+        # Check end cases
         except KeyboardInterrupt: break
         if not line: break
         if proc.returncode is not None: break
@@ -21,11 +22,10 @@ def run_file(input_):
 
 def main():
     proc_names = [
+        ("bot/main.py", "BOT: "),
         ("website/w_backend.py", "API: "),
         ("website/website.py", "FRONT: "),
-        ("bot/main.py", "BOT: ")
     ]
-
     try:
         with Pool(len(proc_names)) as pool:
             pool.map(run_file, proc_names)

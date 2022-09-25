@@ -1,3 +1,4 @@
+print("test\n")
 #Make sure libraries and such are up to date
 import ensure_libs
 ensure_libs.ready()
@@ -5,11 +6,19 @@ ensure_libs.ready()
 #Imports the packages
 import discord
 from discord.ext import commands, tasks
-import os
+import os, sys
 import datetime
 from itertools import cycle
 from encryption import decrypt
 from dotenv import load_dotenv
+
+# Need this so run.py can log the prints properly.
+# Otherwise subprocess.Popen doesn't count them as
+# 'real' stdout lines
+@tasks.loop(seconds=3)
+async def flush_prints():
+    sys.stdout.flush()
+flush_prints.start()
 
 #Define variables to make the rest run
 load_dotenv()
@@ -28,6 +37,7 @@ async def time(ctx:discord.ApplicationContext):
 async def ping(ctx:discord.ApplicationContext):
     rounded_ping = round((bot.latency * 1000), 5)
     await ctx.respond(f"Pong! Latency is {rounded_ping} ms")
+    print("whee")
 
 status = cycle([
     discord.Activity(type=discord.ActivityType.listening, name="song"),
@@ -66,4 +76,5 @@ for cog in [
 
 if len(bot.extensions) != 6:
     raise Exception("Cog problem idk")
+
 bot.run(token)
