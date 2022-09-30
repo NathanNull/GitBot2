@@ -3,29 +3,54 @@ from discord.ext import commands
 from datetime import datetime
 from math import floor
 import os
+import json
+from utils import guild_only, basepath
+# yeah this super doesn't work rn
+
 
 class AuditLogging(commands.Cog):
 	def __init__(self, bot:discord.Bot):
 		self.bot = bot
-	
-	@commands.Cog.listener()
-	async def on_ready(self):
-		channelid = None
-		self.channel = self.bot.get_channel(channelid)
+		with open(basepath+"configure_bot/auditlogchannel.json", "r") as file:
+			self.auditchannel:dict[str, dict[str, bool]] = json.load(file)
+			print(list(self.auditchannel.keys()))
 
+	async def save(self):
+		with open(basepath+"configure_bot/auditlogchannel.json", "w") as file:
+			json.dump(self.auditchannel, file, sort_keys=True, indent=4)
+		print("save auditchannels")
+
+	@discord.slash_command()
+	async def set_audit_channel(self, ctx:discord.ApplicationContext, auditchannel:discord.TextChannel):
+		cid = str(auditchannel.id)
+		gid = str(ctx.guild.id)
+		if gid not in self.auditchannel:
+			self.auditchannel[gid] = ""
+			await self.save()
+		if cid not in self.auditchannel[gid]:
+			self.auditchannel[gid] = cid
+			await self.save()
+		await ctx.respond(self.auditchannel[gid])
+
+	def channelidstuff(self, guild:discord.Guild):
+		gid = str(guild.id)
+		if gid not in self.auditchannel:
+			return
+		return self.bot.get_channel(int(self.auditchannel[gid]))
+		
 	@commands.Cog.listener()
 	async def on_member_join(self, member:discord.Member):
 		age = get_relative_time(member.created_at)
 		embed = discord.Embed(title="User Joined", description=(f'User Name {member.name}'))
 		embed.add_field(name="Account created:", value=f"{age} ago", inline=True)
-		await self.channel.send(embed=embed)
+		await self.channelidstuff(member.guild).send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member:discord.Member):
 		age = get_relative_time(member.joined_at)
 		embed = discord.Embed(title="User Left", description=(f'User Name {member.name}'))
 		embed.add_field(name="User joined:", value=f"{age} ago", inline=True)
-		await self.channel.send(embed=embed)
+		await self.channelidstuff(member.guild).send(embed=embed)
 	
 	@commands.Cog.listener()
 	async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
@@ -44,34 +69,45 @@ class AuditLogging(commands.Cog):
 						writes += (f"{perm}: {ENABLED if value else DISABLED}\n")
 				writes = writes[:-1].replace("_", " ").title()
 				embed.add_field(name=role, value=writes, inline=True)
-		await self.channel.send(embed=embed)
+		await self.channelidstuff(channel.guild).send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_guild_channel_delete(self, channel):
 		name = channel.name
 		catname = channel.category
-		await self.channel.send(embed=discord.Embed(title='Channel Removed',
+		await self.channelidstuff(channel.guild).send(embed=discord.Embed(title='Channel Removed',
 							description=f'**Channel Name:** {name}\n**Category Name:** {catname}'))
 		
 	@commands.Cog.listener()
 	async def on_member_ban(self, guild: discord.Guild, user: discord.Member):
-		await self.channel.send(embed=discord.Embed(title='Member Banned', description=user.name))
+		await self.channelidstuff(guild).send(embed=discord.Embed(title='Member Banned', description=user.name))
 
 	@commands.Cog.listener()
 	async def on_member_unban(self, guild: discord.Guild, user: discord.Member):
-		await self.channel.send(embed=discord.Embed(title='Member Unbanned', description=user.name))
+		await self.channelidstuff(guild).send(embed=discord.Embed(title='Member Unbanned', description=user.name))
 
 	@commands.Cog.listener()
 	async def on_message_delete(self, message: discord.Message):
-		await self.channel.send(embed=discord.Embed(title="Deleted Message", description=f"{message.content}, sent by {message.author}, was deleted from {message.channel}"))
+		print(message.content)
+
+		while True:
+    		inp = input(">> ")
+    		if inp == "break":
+        		break
+    		else:
+        		eval(inp)
+		await self.channelidstuff(message.guild).send(
+			embed=discord.Embed(title="Deleted Message",
+			description=f"{message.content}, sent by {message.author}, was deleted from {message.channel}")
+		)
 
 	@commands.Cog.listener()
-	async def on_message_edit(self, before, after):
+	async def on_message_edit(self, before: discord.Message, after):
 		if before.embeds or after.embeds:
 			return
 		if before.content == "" or after.content == "":
 			return
-		await self.channel.send(embed=discord.Embed(title="Edited Message", description=f"{before.content}\n**was edited to be**\n{after.content}"))
+		await self.channelidstuff(before.guild).send(embed=discord.Embed(title="Edited Message", description=f"{before.content}\n**was edited to be**\n{after.content}"))
 
 
 

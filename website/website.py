@@ -1,4 +1,4 @@
-from flask import Flask, url_for, render_template_string, render_template
+from flask import Flask, url_for, render_template
 from check_prod import is_prod
 
 host = "localhost"

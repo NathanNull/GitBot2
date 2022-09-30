@@ -3,11 +3,10 @@ import { bot_servers } from "./config.js"
 import { token } from "./auth.js"
 
 /**
- * @typedef {{id: string, name: string, permissions: string}} guild
+ * @typedef {{id: string, name: string, permissions: string, icon: string}} guild
  */
 
 /**
- * @typedef
  * @param { string } access_token authorization token/type for discord's api
  * @returns { guild[] } a list of guilds that the token's user is a part of
  */
@@ -19,6 +18,33 @@ async function all_guilds(access_token)
         },
     }).then(result=>result.json())
     return result
+}
+
+/**
+ * @param { guild } guild the guild to make a bar for
+ * @returns { HTMLDivElement } the bar it made
+ */
+function make_server_bar(guild)
+{
+    // Server icon (defaults to random ms paint image)
+    let img = document.createElement("img")
+    img.classList.add("server-icon")
+    if (guild.icon)
+        img.src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+    else
+        img.src = "/static/default_server_icon.png"
+    
+    // Server name
+    let txt = document.createElement("div")
+    txt.textContent = guild.name
+
+    // Put it all together
+    let display = document.createElement("div")
+    display.classList.add("server")
+    display.appendChild(img)
+    display.appendChild(txt)
+    display.onclick = ev => location.href = `/console/${guild.id}`
+    return display
 }
 
 if (token)
@@ -34,9 +60,7 @@ if (token)
 
     let serverlist = get_element(["#serverlist"])
     settable_guilds.forEach(guild => {
-        let display = document.createElement("div")
-        display.textContent = guild.name
-        serverlist.appendChild(display)
+        serverlist.appendChild(make_server_bar(guild))
     });
     console.log(settable_guilds.map(g=>g.name))
 }
