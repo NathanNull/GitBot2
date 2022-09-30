@@ -2,8 +2,11 @@ from multiprocessing import Pool
 from subprocess import Popen, PIPE, STDOUT
 from sys import platform
 
-# requires that you have a venv set up, so the script knows where to run python files from
-python = ".venv/Scripts/python.exe" if platform not in ["linux", "linux2"] else ".venv/bin/python"
+# requires that you have a venv set up, so
+# the script knows where to run python files from
+python = ".venv/Scripts/python.exe"\
+    if platform not in ["linux", "linux2"]\
+    else ".venv/bin/python"
 
 def run_file(input_):
     path, prefix = input_
