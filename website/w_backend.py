@@ -1,3 +1,4 @@
+import sys, random
 from flask import Flask, jsonify
 from requests import get
 
@@ -25,6 +26,19 @@ def get_env():
 
     response = jsonify(*guilds)
     response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+@backend.route("/notify-bot/<notif>")
+def notify_bot(notif):
+    #notif = json.dumps(request.json)
+    print(notif)
+    with open(f"./bot/notif/{random.randint(10000,99999)}.json", "x") as file:
+        file.write(notif)
+    
+    response = jsonify({"yeah":"ok"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    print(response.access_control_allow_headers)
+    sys.stdout.flush()
     return response
 
 def main():

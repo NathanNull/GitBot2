@@ -1,0 +1,9 @@
+select {
+    font-family: sans-serif;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    padding: 16px 30px;
+    margin: 5px 0px;
+    background-color: aqua;
+}

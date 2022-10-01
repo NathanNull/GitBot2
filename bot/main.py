@@ -11,7 +11,7 @@ from itertools import cycle
 from encryption import decrypt
 from dotenv import load_dotenv
 from watchdog.observers import Observer
-from utils import NotifDetector
+from utils import NotifDetector, basepath
 
 # Need this so run.py can log the prints properly.
 # Otherwise subprocess.Popen doesn't count them as
@@ -74,7 +74,8 @@ all_cogs = [
     "level_bot",
     "mod_bot",
     "music_bot",
-    "reaction_bot"
+    "reaction_bot",
+    "help_command_bot"
 ]
 for cog in all_cogs:
     bot.load_extension('cogs.' + cog)
@@ -84,7 +85,7 @@ if len(bot.extensions) != len(all_cogs):
 
 o = Observer()
 handler = NotifDetector()
-o.schedule(handler, ".", recursive=True)
+o.schedule(handler, basepath, recursive=True)
 o.start()
 try:
     bot.run(token)

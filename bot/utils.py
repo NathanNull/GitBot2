@@ -25,33 +25,35 @@ def make_config():
     }
     return config
 
-class SingleFileEventHandler(PatternMatchingEventHandler):
+class SingleFolderEventHandler(PatternMatchingEventHandler):
     def __init__(self, filepath, encoding="UTF-8"):
-        super().__init__([filepath], None, False, False)
-        self.filepath = filepath
+        super().__init__(["."+filepath], None, False, False)
+        self.filepath = basepath+filepath
         self.encoding = encoding
-        self.last_timestamp = time.time()
     def on_any_event(self, event:FileSystemEvent):
-        if self.last_timestamp + 0.2 < time.time():
-            self.last_timestamp = time.time()
-            
-            if event.event_type == "deleted":
-                self.file_update("", True)
+        print(event.event_type, event.src_path)
+        match event.event_type:
+            case "deleted":
+                self.file_update(event.src_path, "", True)
+            case "created":
+                with open(event.src_path, encoding=self.encoding) as file:
+                    contents = file.read()
+                self.file_update(event.src_path, contents)
+            case _:
                 return
-            with open(self.filepath, encoding=self.encoding) as file:
-                contents = file.read()
-            self.file_update(contents)
             
     def file_update(self, contents, deleted=False):
         pass
 
-class NotifDetector(SingleFileEventHandler):
+class NotifDetector(SingleFolderEventHandler):
     def __init__(self):
-        super().__init__("./bot/notif.json")
-    def file_update(self, contents, deleted=False):
+        super().__init__("/notif/*.json")
+    def file_update(self, path, contents, deleted=False):
         print("heyyyyy, update")
         if deleted:
             return
         print(json.loads(contents))
-        os.remove("./bot/notif.json")
+        
+        print(path)
+        os.remove(path)
         

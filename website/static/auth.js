@@ -30,7 +30,7 @@ let main = async () => {
         //window.sessionStorage.setItem("discord_user_data", JSON.stringify(json))
         userdata = json
     })
-    //window.sessionStorage.setItem("discord_token", `${token_type} ${access_token}`)
+    sessionStorage.setItem("discord_token", `${token_type} ${access_token}`)
     token = `${token_type} ${access_token}`
 }
 
