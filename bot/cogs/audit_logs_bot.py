@@ -89,13 +89,6 @@ class AuditLogging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_message_delete(self, message: discord.Message):
 		print(message.content)
-
-		while True:
-    		inp = input(">> ")
-    		if inp == "break":
-        		break
-    		else:
-        		eval(inp)
 		await self.channelidstuff(message.guild).send(
 			embed=discord.Embed(title="Deleted Message",
 			description=f"{message.content}, sent by {message.author}, was deleted from {message.channel}")
