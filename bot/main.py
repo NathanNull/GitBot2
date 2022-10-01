@@ -68,17 +68,18 @@ async def on_connect():
 
 print("hey look guys it's me doin the stuff")
 #Runs the bot
-for cog in [
+all_cogs = [
     "configuration_bot",
     "audit_logs_bot",
     "level_bot",
     "mod_bot",
     "music_bot",
     "reaction_bot"
-]:
+]
+for cog in all_cogs:
     bot.load_extension('cogs.' + cog)
 
-if len(bot.extensions) != 6:
+if len(bot.extensions) != len(all_cogs):
     raise Exception("Cog problem idk")
 
 o = Observer()
