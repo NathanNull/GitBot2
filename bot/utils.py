@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Callable
 from discord.ext.commands import Cog
 import discord
-import os, time, json
+import os, json
 
 def guild_only(cmd:Callable):
     @wraps(cmd)

@@ -1,9 +1,21 @@
 console.log(serverid)
 
-async function notify_bot()
+async function enable_disable()
 {
-    data = JSON.stringify({test: 1212})
-    let url = `http://${location.hostname}:3001/notify-bot/${data}`
-    let res = await fetch(url)
+    
+}
+
+async function notify_bot(type, info)
+{
+    let data = {type,gid:serverid,info}
+    let url = `http://${location.hostname}:3001/notify-bot`
+    let res = await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(data)
+    })
     console.log(await res.text())
 }
+
