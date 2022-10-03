@@ -1,15 +1,28 @@
 <script>
     let serverid = '{{ serverid }}'
 </script>
-<script src="{{ getpath('console.js') }}"></script>
+<script type="module" src="{{ getpath('console.js') }}"></script>
 <div id="content">
-    <select name="audit" id="audit">
-        <optgroup label="here's this">
-            <option value="test">Hey</option>
-            <option value="test2">Hey 2</option>
-        </optgroup>
-        <option value="test3">Hey 3</option>
-        <option value="test4">Hey 4</option>
+    <input type="checkbox" id="music">
+    <label for="music">Music Button</label>
+    <input type="checkbox" id="moderation">
+    <label for="moderation">Moderation Button</label>
+    <input type="checkbox" id="level">
+    <label for="level">Level Button</label>
+    <input type="checkbox" id="reaction_roles">
+    <label for="reaction_roles">Level Button</label>
+
+    <button id="config-apply">Apply</button>
+
+    <select name="audit-channel" id="audit-channel">
+        <option value="-default">Select a channel for the audit logs</option>
     </select>
-    <button onclick="notify_bot('this', {whee:457})">Click me</button>
+
+    <button id="audit-apply">Apply</button><br>
+
+    Banned Words
+    <ul id="bannedwords"></ul>
+    <input type="text" id="banword-input">
+    <label for="banword-input">Input a word to ban</label>
+    <button id="banword-confirm">Enter word</button>
 </div>

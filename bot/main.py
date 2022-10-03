@@ -29,7 +29,7 @@ token = decrypt(
     os.environ["KEY" if prod else "DEVKEY"]
 )
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 #Slash commands
 @bot.slash_command()
@@ -84,7 +84,7 @@ if len(bot.extensions) != len(all_cogs):
     raise Exception("Cog problem idk")
 
 o = Observer()
-handler = NotifDetector()
+handler = NotifDetector(bot)
 o.schedule(handler, basepath, recursive=True)
 o.start()
 try:

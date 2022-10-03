@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Callable
 from discord.ext.commands import Cog
 import discord
-import os, json
+import os, json, asyncio
 
 def guild_only(cmd:Callable):
     @wraps(cmd)
@@ -21,7 +21,8 @@ def make_config():
     config = {
         "level": True,
         "music": True,
-        "moderation": True
+        "moderation": True,
+        "reaction_roles": True
     }
     return config
 
@@ -46,14 +47,32 @@ class SingleFolderEventHandler(PatternMatchingEventHandler):
         pass
 
 class NotifDetector(SingleFolderEventHandler):
-    def __init__(self):
+    def __init__(self, bot:discord.Bot):
         super().__init__("/notif/*.json")
+        self.bot = bot
     def file_update(self, path, contents, deleted=False):
         print("heyyyyy, update")
         if deleted:
             return
-        print(json.loads(contents))
-        
+        info = json.loads(contents)
+        gid = info["gid"]
+        if info["type"] == 'config':
+            cog = self.bot.get_cog("Configuration")
+            if gid not in cog.configuration:
+                cog.configuration[gid] = make_config()
+            cog.configuration[gid]["music"] = info["info"]["music"]
+            cog.configuration[gid]["level"] = info["info"]["level"]
+            cog.configuration[gid]["moderation"] = info["info"]["moderation"]
+            cog.configuration[gid]["reaction_roles"] = info["info"]["reaction_roles"]
+            asyncio.run(cog.save())
+        elif info["type"] == 'auditchannel':
+            cog = self.bot.get_cog("AuditLogging")
+            cog.auditchannel[gid] = info["info"]
+            asyncio.run(cog.save())
+        elif info["type"] == 'bannedwords':
+            cog = self.bot.get_cog("Mod")
+            cog.cursewords[gid] = info["info"]
+            asyncio.run(cog.save())
         print(path)
         os.remove(path)
         

@@ -1,4 +1,5 @@
-import sys, random, json
+import random, json
+from typing import Any
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 from requests import get
@@ -9,6 +10,10 @@ from cryptography.fernet import Fernet
 load_dotenv()
 from check_prod import is_prod
 
+basedir = os.path.dirname(__file__)
+basepath = os.path.abspath(os.path.join(basedir, os.pardir))
+botpath = basepath+"/bot"
+
 backend = Flask(__name__)
 CORS(backend)
 
@@ -17,34 +22,62 @@ encrypted = bytes(os.environ["TOKEN" if is_prod else "DEVTOKEN"],"utf-8")
 token_bytes = Fernet(key).decrypt(encrypted)
 token = str(token_bytes)[2:-1]
 
-@backend.route("/botservers")
-def get_env():
-    guilds: list = get(
-        "https://discord.com/api/users/@me/guilds",
-        headers={
+def api_get_request(url):
+    return get(
+        url, headers={
             "Authorization": "Bot "+token
         }
     ).json()
 
-    response = jsonify(*guilds)
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+@backend.route("/botservers")
+@cross_origin()
+def get_env():
+    return api_get_request("https://discord.com/api/users/@me/guilds")
+
+@backend.route("/server/<gid>")
+@cross_origin()
+def get_server(gid):
+    return api_get_request(f"https://discord.com/api/guilds/{gid}")
+
+@backend.route("/channels/<gid>")
+@cross_origin()
+def get_channels(gid):
+    return api_get_request(f"https://discord.com/api/guilds/{gid}/channels")
 
 @backend.route("/notify-bot", methods=["POST"])
 @cross_origin()
 def notify_bot():
     notif = json.dumps(request.json)
-    with open(f"./bot/notif/{random.randint(10000,99999)}.json", "x") as file:
+    with open(botpath+f"/notif/{random.randint(10000,99999)}.json", "x") as file:
         file.write(notif)
     
     response = jsonify(notif)
     return response
 
 @backend.route("/bot-info/<guildid>/<infotype>")
-def bot_info(guildid, infotype):
+@cross_origin()
+def bot_info(guildid:str, infotype:str):
     match infotype:
         case "config":
-            response = jsonify()
+            filename = botpath+"/configure_bot/configuration.json"
+            process = lambda c:c
+            default = {"music":True, "moderation":True, "level":True, "reaction_roles":True}
+        case "auditchannel":
+            filename = botpath+"/configure_bot/auditlogchannel.json"
+            process = lambda c:str(c)
+            default = "NotSet"
+        case "bannedwords":
+            filename = botpath+"/configure_bot/cursewords.json"
+            process = lambda w:w
+            default = []
+        case _:
+            return "Invalid info type", 400
+    with open(filename) as file:
+        data:dict[str,Any] = json.load(file)
+        if guildid in data:
+            return process(data[guildid])
+        else:
+            return process(default)
 
 def main():
     backend.run(port=3001)

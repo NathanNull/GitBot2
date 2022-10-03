@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands, tasks
 import json
-from utils import basepath
+from utils import basepath, guild_only
+from configuration import requires
 
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot:discord.Bot):
@@ -12,6 +13,8 @@ class ReactionRoles(commands.Cog):
 		self.save.start()
 
 	@discord.slash_command()
+	@guild_only
+	@requires.reaction_roles
 	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessageid: str, emoji, theroleid: str): # can't use message as argument type, :(
 		mid = themessageid
 		rid = int(theroleid)
@@ -40,6 +43,7 @@ class ReactionRoles(commands.Cog):
 		guildw = self.bot.get_guild(int(gid))
 		membera = guildw.get_member(int(uid))
 		print(gid)
+		print(uid)
 		if gid in self.reaction:
 			print("1 third there")
 			print(f"message id is {mid}")

@@ -7,3 +7,8 @@ select {
     margin: 5px 0px;
     background-color: aqua;
 }
+
+#bannedwords li:not(:hover){
+    color:black;
+    background-color: black;
+}

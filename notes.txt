@@ -1,6 +1,3 @@
 Things we need:
-- Audit Log channel
-- enable/disable music, level, etc
 - reaction role setup
-- banned words
 - change nickname43
