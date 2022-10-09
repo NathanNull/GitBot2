@@ -3,36 +3,90 @@
 </script>
 <script type="module" src="{{ getpath('console.js') }}"></script>
 <div id="content">
-    <input type="checkbox" id="music">
-    <label for="music">Music Button</label>
-    <input type="checkbox" id="moderation">
-    <label for="moderation">Moderation Button</label>
-    <input type="checkbox" id="level">
-    <label for="level">Level Button</label>
-    <input type="checkbox" id="reaction_roles">
-    <label for="reaction_roles">Level Button</label>
+    <div class="box">
+        <div class="box-title">Enable/Disable Sections</div>
 
-    <button id="config-apply">Apply</button>
+        <div class="box-row">
+            <div class="box-col row-itm set-c">
+                <div class="subhead">Music</div>
+                <input type="checkbox" id="music">
+            </div>
 
-    <select name="audit-channel" id="audit-channel">
-        <option value="-default">Select a channel for the audit logs</option>
-    </select>
+            <div class="box-col row-itm set-c">
+                <div class="subhead">Automod</div>
+                <input type="checkbox" id="moderation">
+            </div>
+        </div>
 
-    <button id="audit-apply">Apply</button><br>
+        <div class="box-row">
+            <div class="box-col set-c">
+                <div class="subhead">Levels</div>
+                <input type="checkbox" id="level">
+            </div>
 
-    Banned Words
-    <ul id="bannedwords"></ul>
-    <input type="text" id="banword-input">
-    <label for="banword-input">Input a word to ban</label>
-    <button id="banword-confirm">Enter word</button>
+            <div class="box-col set-c">
+                <div class="subhead">Reaction Roles</div>
+                <input type="checkbox" id="reaction_roles">
+            </div>
+        </div>
 
-    <input type="text" id="react-msg">
-    <input type="text" id="react-emoji">
-    <select name="react-role" id="react-role">
-        <option value="-default">Select a role for the reaction to give</option>
-    </select>
-    <select name="react-channel" id="react-channel">
-        <option value="-default">Select a channel for the message to send in</option>
-    </select>
-    <button id="react-activate">Add Reaction Role</button>
+        <div class="box-row set-c">
+            <button id="config-apply">Apply Changes</button>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">Change Audit-logging Channel</div>
+
+        <select name="audit-channel" id="audit-channel">
+            <option value="-default">Select a channel for the audit logs</option>
+        </select>
+
+        <div class="box-row set-c">
+            <button id="audit-apply">Apply</button><br>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">Change banned words</div>
+
+        <div class="box-row set-l w-100">
+            <div class="subhead" style="width:auto">Current Banned Words</div>
+            <ul id="bannedwords"></ul>
+        </div>
+
+        <div class="box-row set-l">
+            <div class="subhead" style="width:auto">Add a Banned Word</div>
+            <input type="text" id="banword-input" style="flex-grow: 1">
+        </div>
+        
+        <div class="box-row set-c">
+            <button id="banword-confirm">Confirm</button>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-title">Add Reaction Roles</div>
+
+        <div class="box-row set-c">
+            <div class="box-row w-50 set-c">
+                <label for="react-msg">The message to send </label>
+                <input type="text" id="react-msg" style="flex-grow:1">
+            </div>
+            
+            <div class="box-row w-50 set-c">
+                <label for="react-emoji">The emoji </label>
+                <input type="text" id="react-emoji" style="flex-grow:1">
+            </div>
+        </div>
+
+        <select name="react-role" id="react-role">
+            <option value="-default">Select a role for the reaction to give</option>
+        </select>
+        <select name="react-channel" id="react-channel">
+            <option value="-default">Select a channel for the message to send in</option>
+        </select>
+
+        <button id="react-activate">Add Reaction Role</button>
+    </div>
 </div>

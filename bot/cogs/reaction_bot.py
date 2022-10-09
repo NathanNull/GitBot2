@@ -11,17 +11,22 @@ class ReactionRoles(commands.Cog):
 			self.reaction : dict[str, dict[str, dict[str, int]]] = json.load(file)
 			print(self.reaction)
 		self.save.start()
+		self.update_info = {}
+		self.check_updates.start()
 
 	@discord.slash_command()
 	@guild_only
 	@requires.reaction_roles
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: str, channel: discord.TextChannel): # can't use message as argument type, :(
-		rid = int(theroleid)
-		gid = str(ctx.guild.id)
+	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: int, channel: discord.TextChannel): # can't use message as argument type, :(
+		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
+	
+	async def rxn_raw(self, rid:int, cid:int, themessage:str, emoji:str, send=None):
+		channel = self.bot.get_channel(cid)
+		if send is None:
+			send = channel.send
+		gid = str(channel.guild.id)
 		message = await channel.send(themessage)
-		print("got here, rest not implemented")
 		mid = message.id
-		print(mid)
 		if gid not in self.reaction:
 			self.reaction[gid] = {}
 		if mid not in self.reaction[gid]:
@@ -31,63 +36,47 @@ class ReactionRoles(commands.Cog):
 			self.reaction[gid][mid][emoji] = rid
 
 		else:
-			await ctx.respond('that is already a reaction role')
+			await send('that is already a reaction role')
 			return
 		await self.save()
-		await ctx.respond(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
+		await send(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
+	
+	@tasks.loop(seconds=10)
+	async def check_updates(self):
+		if len(self.update_info) != 0:
+			for _, val in self.update_info.items():
+				await self.rxn_raw(*val)
+			self.update_info = {}
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
 		mid = int(reaction.message.id)
-		print(mid)
 		emoji = reaction.emoji
 		gid = str(user.guild.id)
 		uid = user.id
 		guildw = self.bot.get_guild(int(gid))
 		membera = guildw.get_member(int(uid))
-		print(gid)
-		print(uid)
 		if gid in self.reaction:
-			print("1 third there")
-			print(f"message id is {mid}")
 			if mid in self.reaction[gid]:
-				print('2 thirds there')
 				if str(emoji) in self.reaction[gid][mid]:
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
-				else:
-					print("No emoji")
-			else:
-				print("no mid")
-		else:
-			print("no gid")
 	
 	@commands.Cog.listener()
 	async def on_reaction_remove(self, reaction: discord.Reaction, user: discord.User):
-		mid = str(reaction.message.id)
-		print(mid)
+		mid = int(reaction.message.id)
 		emoji = reaction.emoji
 		gid = str(user.guild.id)
 		uid = user.id
 		guildw = self.bot.get_guild(int(gid))
 		membera = guildw.get_member(int(uid))
-		print(gid)
 		if gid in self.reaction:
-			print("1 third there")
-			print(f"message id is {mid}")
 			if mid in self.reaction[gid]:
-				print('2 thirds there')
 				if str(emoji) in self.reaction[gid][mid]:
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.remove_roles(therole, reason=None, atomic=True)
-				else:
-					print("No emoji")
-			else:
-				print("no mid")
-		else:
-			print("no gid")
 
 	@tasks.loop(minutes=5)
 	async def save(self):

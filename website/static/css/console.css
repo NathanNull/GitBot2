@@ -8,7 +8,81 @@ select {
     background-color: aqua;
 }
 
-#bannedwords li:not(:hover){
+#bannedwords li:not(:hover) {
     color:black;
     background-color: black;
+}
+
+#bannedwords li:not(:hover) button{
+    color:black;
+    background-color: black;
+}
+
+.box {
+    border: 1px solid rgb(113, 113, 113);
+    border-radius: 20px;
+    padding-bottom: 20px;
+    background-color: rgb(28, 32, 71);
+    margin-bottom: 1.5rem;
+}
+
+.box .box-title:first-child {
+    border-bottom: 1px solid rgb(113, 113, 113);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: rgb(7, 0, 73);
+    font-size: x-large;
+    font-weight: 800;
+    text-align: center;
+}
+
+.box-row {
+    height: 50%;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid rgb(113, 113, 113);
+}
+
+.box-col {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgb(113, 113, 113);
+}
+
+.set-l.box-col {
+    align-items: flex-start;
+}
+.set-r.box-col {
+    align-items: flex-end;
+}
+.set-c.box-col {
+    align-items: center;
+}
+
+.set-l.box-row {
+    justify-content: flex-start;
+}
+.set-r.box-row {
+    justify-content: flex-end;
+}
+.set-c.box-row {
+    justify-content: center;
+}
+
+.subhead {
+    font-size: large;
+    font-weight: bold;
+}
+
+.borderless {
+    border: none;
+}
+
+.w-50 {
+    width: 50%;
+}
+
+.w-100 {
+    width: 100%;
 }

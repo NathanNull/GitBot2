@@ -1,1 +1,10 @@
-{"type": "config", "gid": "977331948890521620", "info": {"music": true, "level": false, "moderation": true, "reaction_roles": true}}
+{
+    "type": "config",
+    "gid": "977331948890521620",
+    "info": {
+        "music": true,
+        "level": false,
+        "moderation": true,
+        "reaction_roles": true
+    }
+}

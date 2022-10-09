@@ -75,7 +75,8 @@ all_cogs = [
     "mod_bot",
     "music_bot",
     "reaction_bot",
-    "help_command_bot"
+    "help_command_bot",
+    "application_bot"
 ]
 for cog in all_cogs:
     bot.load_extension('cogs.' + cog)

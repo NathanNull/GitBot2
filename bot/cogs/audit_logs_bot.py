@@ -1,12 +1,12 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from datetime import datetime
 from math import floor
-import os
+import asyncio
 import json
 from utils import guild_only, basepath
+import random
 # yeah this super doesn't work rn
-
 
 class AuditLogging(commands.Cog):
 	def __init__(self, bot:discord.Bot):
@@ -14,6 +14,9 @@ class AuditLogging(commands.Cog):
 		with open(basepath+"configure_bot/auditlogchannel.json", "r") as file:
 			self.auditchannel:dict[str, dict[str, bool]] = json.load(file)
 			print(list(self.auditchannel.keys()))
+		
+		self.update_info = {}
+		self.check_updates.start()
 
 	async def save(self):
 		with open(basepath+"configure_bot/auditlogchannel.json", "w") as file:
@@ -23,29 +26,33 @@ class AuditLogging(commands.Cog):
 	@discord.slash_command()
 	async def set_audit_channel(self, ctx:discord.ApplicationContext, auditchannel:discord.TextChannel):
 		cid = int(auditchannel.id)
-		gid = int(ctx.guild.id)
-		if gid not in self.auditchannel:
-			self.auditchannel[gid] = ""
-			await self.save()
-		if cid not in self.auditchannel[gid]:
-			self.auditchannel[gid] = cid
-			await self.save()
+		gid = str(ctx.guild.id)
+		self.auditchannel[gid] = cid
+		await self.save()
 		await ctx.respond(self.auditchannel[gid])
+		await self.botupdate(gid)
 
 	def channelidstuff(self, guild: discord.Guild):
-		return self.cidraw(str(guild.id))
+		return self.cid_raw(str(guild.id))
 
-	def cidraw(self, gid):
+	def cid_raw(self, gid):
 		if gid not in self.auditchannel:
 			return
 		return self.bot.get_channel(int(self.auditchannel[gid]))
 	
 	async def botupdate(self, gid):
-		print(gid)
-		channel = self.cidraw(gid)
-		print(channel)
-		await channel.send("yay things worked")
+		self.update_info[random.randint(10000,99999)] = [gid]
 
+	@tasks.loop(seconds=10)
+	async def check_updates(self):
+		if len(self.update_info) != 0:
+			for _, val in self.update_info.items():
+				gid = val[0]
+				print(gid)
+				channel = self.cid_raw(gid)
+				print(channel)
+				await channel.send("yay things worked")
+			self.update_info = {}
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member:discord.Member):
@@ -97,6 +104,8 @@ class AuditLogging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message_delete(self, message: discord.Message):
+		if message.guild is None:
+			return
 		print(message.content)
 		await self.channelidstuff(message.guild).send(
 			embed=discord.Embed(title="Deleted Message",
@@ -105,6 +114,8 @@ class AuditLogging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before: discord.Message, after):
+		if before.guild is None:
+			return
 		if before.embeds or after.embeds:
 			return
 		if before.content == "" or after.content == "":

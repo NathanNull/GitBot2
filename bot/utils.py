@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Callable
 from discord.ext.commands import Cog
 import discord
-import os, json, asyncio
+import os, json, asyncio, random
 
 def guild_only(cmd:Callable):
     @wraps(cmd)
@@ -78,10 +78,10 @@ class NotifDetector(SingleFolderEventHandler):
         elif info["type"] == 'reaction':
             cog = self.bot.get_cog("ReactionRoles")
             themessage = info['info']['message']
-            theroleid = info['info']['role']
+            rid = int(info['info']['role'])
             emoji = info['info']['emoji']
-            channel = self.bot.get_channel(int(info['info']['channel']))
-            asyncio.run(cog.reactionsetup(themessage, theroleid, emoji, channel))
+            cid = int(info['info']['channel'])
+            cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
             asyncio.run(cog.save())
             
         print(path)

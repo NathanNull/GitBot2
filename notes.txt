@@ -1,6 +1,2 @@
 Things we need on the website:
-- reaction role setup
-- change nickname43
-
-Reaction bot:
-- needs: message, role, emoji
+- change nickname
