@@ -56,6 +56,7 @@ class NotifDetector(SingleFolderEventHandler):
             return
         info = json.loads(contents)
         gid = info["gid"]
+        audit = self.bot.get_cog("AuditLogging")
         if info["type"] == 'config':
             cog = self.bot.get_cog("Configuration")
             if gid not in cog.configuration:
@@ -64,15 +65,25 @@ class NotifDetector(SingleFolderEventHandler):
             cog.configuration[gid]["level"] = info["info"]["level"]
             cog.configuration[gid]["moderation"] = info["info"]["moderation"]
             cog.configuration[gid]["reaction_roles"] = info["info"]["reaction_roles"]
+            asyncio.run(audit.botupdate(gid))
             asyncio.run(cog.save())
         elif info["type"] == 'auditchannel':
             cog = self.bot.get_cog("AuditLogging")
-            cog.auditchannel[gid] = info["info"]
+            cog.auditchannel[gid] = int(info["info"])
             asyncio.run(cog.save())
         elif info["type"] == 'bannedwords':
             cog = self.bot.get_cog("Mod")
             cog.cursewords[gid] = info["info"]
             asyncio.run(cog.save())
+        elif info["type"] == 'reaction':
+            cog = self.bot.get_cog("ReactionRoles")
+            themessage = info['info']['message']
+            theroleid = info['info']['role']
+            emoji = info['info']['emoji']
+            channel = self.bot.get_channel(int(info['info']['channel']))
+            asyncio.run(cog.reactionsetup(themessage, theroleid, emoji, channel))
+            asyncio.run(cog.save())
+            
         print(path)
         os.remove(path)
         

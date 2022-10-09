@@ -6,7 +6,7 @@ from types import ModuleType
 def test_versions():
     import discord
     import youtube_dl
-    to_test = [(discord,"2.2.2","py-cord"), (youtube_dl,"2021.12.17","youtube-dl"),]
+    to_test = [(discord,"2.2.1","py-cord"), (youtube_dl,"2021.12.17","youtube-dl"),]
     updated = []
     for module, target_ver, pkg_name in to_test:
         current_ver = get_version(module)

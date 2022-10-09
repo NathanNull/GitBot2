@@ -44,6 +44,11 @@ def get_server(gid):
 def get_channels(gid):
     return api_get_request(f"https://discord.com/api/guilds/{gid}/channels")
 
+@backend.route("/roles/<gid>")
+@cross_origin()
+def get_roles(gid):
+    return api_get_request(f"https://discord.com/api/guilds/{gid}/roles")
+
 @backend.route("/notify-bot", methods=["POST"])
 @cross_origin()
 def notify_bot():

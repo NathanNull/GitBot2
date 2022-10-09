@@ -1,5 +1,7 @@
+import * as Types from "./types.js"
+
 /**
- * @type {import("./guilds").guild[]}
+ * @type {Types.guild[]}
  */
 let bot_servers = await fetch(`http://${location.hostname}:3001/botservers`)
     .then(result => result.json())

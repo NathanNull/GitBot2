@@ -1,9 +1,8 @@
-from pickle import NONE
 import pycord_cogsbyserver as pcs
 import discord, youtube_dl, requests
 from discord.utils import get
 import asyncio
-import views
+import music_embeds
 
 FFMPEG_OPTIONS = {
     'before_options':
@@ -45,7 +44,7 @@ class Music(pcs.ServerCog):
         if vc.is_playing():
             self.queue.append((v_info, url))
             await ctx.respond("Song added to queue")
-            await views.send_song_embed(v_info, self.queue, vc, ctx, self)
+            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
         else:
             if self.leave_timer != None:
                 self.leave_timer.cancel()
@@ -83,7 +82,7 @@ class Music(pcs.ServerCog):
     async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
         self.audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self.when_done(vc, ctx)))
-        await views.send_song_embed(v_info, self.queue, vc, ctx, self)
+        await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
     
     async def leave_if_inactive(self, vc: discord.VoiceClient):
         await asyncio.sleep(300)

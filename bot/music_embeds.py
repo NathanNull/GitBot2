@@ -1,6 +1,5 @@
 import discord
 from discord import ui, ButtonStyle, Interaction, ApplicationContext
-from discord.utils import get
 
 res_args = {"delete_after": 3}
 

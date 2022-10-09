@@ -22,8 +22,8 @@ class AuditLogging(commands.Cog):
 
 	@discord.slash_command()
 	async def set_audit_channel(self, ctx:discord.ApplicationContext, auditchannel:discord.TextChannel):
-		cid = str(auditchannel.id)
-		gid = str(ctx.guild.id)
+		cid = int(auditchannel.id)
+		gid = int(ctx.guild.id)
 		if gid not in self.auditchannel:
 			self.auditchannel[gid] = ""
 			await self.save()
@@ -32,12 +32,21 @@ class AuditLogging(commands.Cog):
 			await self.save()
 		await ctx.respond(self.auditchannel[gid])
 
-	def channelidstuff(self, guild:discord.Guild):
-		gid = str(guild.id)
+	def channelidstuff(self, guild: discord.Guild):
+		return self.cidraw(str(guild.id))
+
+	def cidraw(self, gid):
 		if gid not in self.auditchannel:
 			return
 		return self.bot.get_channel(int(self.auditchannel[gid]))
-		
+	
+	async def botupdate(self, gid):
+		print(gid)
+		channel = self.cidraw(gid)
+		print(channel)
+		await channel.send("yay things worked")
+
+
 	@commands.Cog.listener()
 	async def on_member_join(self, member:discord.Member):
 		age = get_relative_time(member.created_at)

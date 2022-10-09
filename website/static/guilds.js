@@ -1,14 +1,11 @@
 import { get_element } from "./utils.js"
 import { bot_servers } from "./config.js"
 import { token } from "./auth.js"
-
-/**
- * @typedef {{id: string, name: string, permissions: string, icon: string}} guild
- */
+import * as Types from "./types.js"
 
 /**
  * @param { string } access_token authorization token/type for discord's api
- * @returns { guild[] } a list of guilds that the token's user is a part of
+ * @returns { Types.guild[] } a list of guilds that the token's user is a part of
  */
 async function all_guilds(access_token)
 {
@@ -21,7 +18,7 @@ async function all_guilds(access_token)
 }
 
 /**
- * @param { guild } guild the guild to make a bar for
+ * @param { Types.guild } guild the guild to make a bar for
  * @returns { HTMLDivElement } the bar it made
  */
 function make_server_bar(guild)
