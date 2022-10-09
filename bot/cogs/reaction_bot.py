@@ -15,29 +15,30 @@ class ReactionRoles(commands.Cog):
 	@discord.slash_command()
 	@guild_only
 	@requires.reaction_roles
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: int, channel: discord.TextChannel): # can't use message as argument type, :(
+	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: str, channel: discord.TextChannel): # can't use message as argument type, :(
 		rid = int(theroleid)
 		gid = str(ctx.guild.id)
 		message = await channel.send(themessage)
 		print("got here, rest not implemented")
+		mid = message.id
+		print(mid)
+		if gid not in self.reaction:
+			self.reaction[gid] = {}
+		if mid not in self.reaction[gid]:
+			self.reaction[gid][mid] = {}
+		if emoji not in self.reaction[gid][mid]:
+			await self.bot.get_message(int(mid)).add_reaction(emoji)
+			self.reaction[gid][mid][emoji] = rid
 
-		# if gid not in self.reaction:
-		# 	self.reaction[gid] = {}
-		# if mid not in self.reaction[gid]:
-		# 	self.reaction[gid][mid] = {}
-		# if emoji not in self.reaction[gid][mid]:
-		# 	await self.bot.get_message(int(themessageid)).add_reaction(emoji)
-		# 	self.reaction[gid][mid][emoji] = rid
-
-		# else:
-		# 	await ctx.respond('that is already a reaction role')
-		# 	return
-		# await ctx.respond(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
+		else:
+			await ctx.respond('that is already a reaction role')
+			return
 		await self.save()
+		await ctx.respond(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
-		mid = str(reaction.message.id)
+		mid = int(reaction.message.id)
 		print(mid)
 		emoji = reaction.emoji
 		gid = str(user.guild.id)

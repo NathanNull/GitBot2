@@ -1,12 +1,9 @@
-import discord
-from discord.ext import commands
-from views import View, queue
-from youtube_dl import YoutubeDL
+from pickle import NONE
+import pycord_cogsbyserver as pcs
+import discord, youtube_dl, requests
 from discord.utils import get
-import requests
-import time
-from utils import guild_only
-from configuration import requires
+import asyncio
+import views
 
 FFMPEG_OPTIONS = {
     'before_options':
@@ -14,216 +11,95 @@ FFMPEG_OPTIONS = {
     'options': '-vn'
 }
 
-#no touchy touchy (I touched it)
+class Music(pcs.ServerCog):
+    def __init__(self, *args):
+        super().__init__(*args)
 
-class Music(commands.Cog):
-    def __init__(self, bot:commands.Bot):
-        self.bot = bot
-        self.do_loop:str = "none"
-        self.volume = 1.0
+        self.do_loop = "none"
+        self.vol = 1.0
+        self.queue = []
+        self.leave_timer = None
+        self.audio = None
 
-        self.now_playing = None #TODO: use this maybe idk
+    @pcs.ServerCog.listener()
+    async def on_ready(self):
+        print(f"Ready in {self.guild}")
+    
+    @pcs.ServerCog.slash_command()
+    async def play(self, ctx: discord.ApplicationContext, *, query):
+        await ctx.defer()
 
-        self.skipped:bool = False
-
-    def is_connected(self, ctx:discord.ApplicationContext):
-        voice_client:discord.VoiceClient = get(self.bot.voice_clients, guild=ctx.guild)
-        return voice_client and voice_client.is_connected()
-
-    async def when_done(self, ctx:discord.ApplicationContext, video:dict, source:str, when_started:int):
-        print("running")
-        stopped_prematurely = (video["duration"] > (time.time()-when_started)) and not self.skipped
-        self.skipped = False
-        if stopped_prematurely:
-            await ctx.send("The song had an error, try again later")
-        if self.do_loop == "song":
-            print("looping")
-            queue.insert(0, (video, source))
-        elif self.do_loop == "queue":
-            print("queue loop")
-            queue.append((video, source))
-        elif self.do_loop == "none":
-            print("Not looping")
-        await self.check_queue(ctx)
-
-    async def play_song(self, ctx:discord.ApplicationContext, vc:discord.VoiceClient, video:dict, source:str, embed=True):
-        if embed:
-            await ctx.send(embed=make_song_embed(video), view=View(self.bot, self))
-
-        audio = discord.PCMVolumeTransformer(
-            (discord.FFmpegPCMAudio(source, **FFMPEG_OPTIONS)), self.volume)
-        current_time = time.time()
-        vc.play(audio, after=lambda e: self.bot.loop.create_task(
-                        self.when_done(ctx, video, source, current_time)))
-        
-
-    async def check_queue(self, ctx:discord.ApplicationContext, embed:bool=True):
-        if len(queue) != 0:
-            vc = ctx.guild.voice_client
-            video, source = queue.pop(0)
-            await self.play_song(ctx, vc, video, source, embed)
+        vc:discord.VoiceClient = None
+        if get(self.bot.voice_clients, guild=self.guild) is not None:
+            # Bot is in VC in the guild that this command was run in
+            vc = get(self.bot.voice_clients, guild=self.guild)
+        elif ctx.author.voice != None:
+            # Bot isn't in a vc, but the command's user is, so join that one
+            vc = await ctx.author.voice.channel.connect()
         else:
-            await ctx.send("No songs in queue")
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def play(self, ctx:discord.ApplicationContext, *, query:str):
-        await ctx.defer() #very useful much nice
-        voice = ctx.author.voice.channel
-
-        if self.is_connected(ctx):
-            print("hello")
-            vc = get(self.bot.voice_clients, guild=ctx.guild)
-
-        else:
-            print(voice)
-            vc = await voice.connect()
-            print("connected")
-
-        dur_seconds = sum([int(v['duration']) for (v, s) in queue])
-        
-        video, source = search(query)
-        queue.append((video, source))
-        print("Finished downloading")
-
-        if vc.is_playing():
-            print(dur_seconds)
-            cs_duration = f"{int(video['duration']//60):02d}, {int(video['duration']%60):02d}"
-            print(cs_duration)
-            time_to_play = f"{dur_seconds//60:02d}:{int(dur_seconds%60):02d}"
-            print(time_to_play)
-            embed = discord.Embed(title="Added song to queue",description=f"The song {video['title']} is now in the queue. Estimated time until it plays: {time_to_play}")
-            await ctx.followup.send(embed=embed)
-        else:
-            await ctx.followup.send(embed=make_song_embed(video),
-                                    view=View(self.bot, self))
-            await self.check_queue(ctx, False)
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def play_playlist(self, ctx:discord.ApplicationContext, *, url:str):
-        await ctx.defer() #very useful much nice
-        voice = ctx.author.voice.channel
-
-        if self.is_connected(ctx):
-            print("hello")
-            vc = get(self.bot.voice_clients, guild=ctx.guild)
-
-        else:
-            print(voice)
-            vc = await voice.connect()
-            print("connected")
-
-        dur_seconds = sum([v['duration'] for (v, s) in queue])#need to do this before adding new elements
-        
-        vids = get_playlist(url)
-        for video, source in vids:
-            queue.append((video, source))
-        print("Finished downloading")
-
-        if vc.is_playing():
-            time_to_play = f"{dur_seconds//60:02d}:{dur_seconds%60:02d}"
-            embed = discord.Embed(title="Added song to queue",description=f"The playlist is now in the queue. Estimated time until it plays: {time_to_play}")
-            await ctx.followup.send(embed=embed)
-        else:
-            await ctx.followup.send(embed=make_song_embed(video),
-                                    view=View(self.bot, self))
-            await self.check_queue(ctx, False)
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def joinvc(self, ctx:discord.ApplicationContext):
-        voice = ctx.author.voice.channel
-        if not voice:
-            await ctx.respond("You aren't in a voice channel!")
-        if not self.is_connected(ctx):
-            print("trying to connect")
-            await voice.connect()
-            print("connected")
-            await ctx.respond('joined vc')
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def checkvolume(self, ctx:discord.ApplicationContext):
-        await ctx.respond(f"The Volume of the music is at {self.volume*100}%")
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def changevolume(self, ctx:discord.ApplicationContext, thevolume: discord.Option(
-        float,
-        "What Do You Want The Volume At?",
-        min_value=0,
-        max_value=100,
-        default=100)):
-        thevolume:float
-        self.volume = thevolume / 100
-
-        if ctx.guild.voice_client:
-            vc = ctx.guild.voice_client
-            vc.source.volume = self.volume
-
-        await ctx.respond(f"The Volume Is Now Set To {self.volume*100}%")
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def loopsong(self, ctx:discord.ApplicationContext, set: discord.Option(str,choices=[
-        discord.OptionChoice("This song", "song"),
-        discord.OptionChoice("The queue", "queue"),
-        discord.OptionChoice("Off", "none"),
-    ])):
-        set:str
-        self.do_loop = set
-        if set == "song":
-            await ctx.respond("Looping...")
-        elif set == "queue":
-            await ctx.respond("Looping queue")
-        elif set == "none":
-            await ctx.respond("No more loop")
-
-    @discord.slash_command()
-    @guild_only
-    @requires.music
-    async def queue(self, ctx:discord.ApplicationContext):
-        if len(queue) == 0:
-            await ctx.respond("There is nothing in the queue")
+            await ctx.respond("Neither of us are in a voice channel.")
             return
+        
+        v_info, url = self.search(query)
 
-        embed = discord.Embed(title="Queue:")
-        for video, source in queue:
-            duration = f"{int(video['duration']//60):02d}:{int(video['duration']%60):02d}"
-            embed.add_field(name=video["title"], value=duration, inline=False)
-        await ctx.respond(embed=embed)
-
-
-def make_song_embed(video:dict[str,]) -> discord.Embed:
-    duration = f"{int(video['duration']//60):02d}:{int(video['duration']%60):02d}"
-    embed = discord.Embed(title="Now playing:", description=video['title'])
-    embed.add_field(name="Length", value=duration, inline=True)
-    return embed
-
-
-def search(query:str) -> tuple[dict, str]:
-    with YoutubeDL({'format': 'bestaudio', 'noplaylist': 'True'}) as ydl:
-        try:
-            requests.get(query)
-        except:
-            info = ydl.extract_info(f"ytsearch:{query}",
-                                    download=False)['entries'][0]
+        if vc.is_playing():
+            self.queue.append((v_info, url))
+            await ctx.respond("Song added to queue")
+            await views.send_song_embed(v_info, self.queue, vc, ctx, self)
         else:
-            info = ydl.extract_info(query, download=False)
-    return (info, info['formats'][0]['url'])
+            if self.leave_timer != None:
+                self.leave_timer.cancel()
+                self.leave_timer = None
+            await self.raw_play(v_info, url, vc, ctx)
+    
+    def adjust_volume(self, change):
+        self.vol += change
+        newvol = max(0, min(1, self.vol))
 
-def get_playlist(url) -> list[tuple[dict, str]]:
-    with YoutubeDL({'format': 'bestaudio', 'yesplaylist': 'True', 'playlist-end': '50'}) as ydl:
-        info = ydl.extract_info(url, download=False)["entries"]
-        return [(v, v['formats'][0]['url']) for v in info]
+        if self.audio is not None:
+            self.audio.volume = newvol
+        
+        if newvol != self.vol:
+            self.vol = newvol
+            return False
+        return True
+    
+    #FIXME In the actual pcs library, can't have >1 slash command
+    # @pcs.ServerCog.slash_command()
+    # async def volume(self, ctx: discord.ApplicationContext, *, vol:discord.Option(int, min_value=0, max_value=100)=None):
+    #     if vol is None:
+    #         await ctx.respond(f"The volume is currently {int(self.vol*100)}%")
+    #     else:
+    #         self.vol = vol/100
+    #         await ctx.send_response(f"Volume set to {vol}%", ephemeral=True)
+    
+    async def when_done(self, ctx: discord.ApplicationContext, vc: discord.VoiceClient):
+        if len(self.queue) > 0:
+            v_info, url = self.queue.pop(0)
+            self.raw_play(v_info, url, vc, ctx)
+        else:
+            self.leave_timer = self.bot.loop.create_task(self.leave_if_inactive(vc))
+    
+    async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
+        self.audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
+        vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self.when_done(vc, ctx)))
+        await views.send_song_embed(v_info, self.queue, vc, ctx, self)
+    
+    async def leave_if_inactive(self, vc: discord.VoiceClient):
+        await asyncio.sleep(300)
+        await vc.disconnect()
+        
+    def search(self, query:str) -> tuple[dict, str]:
+        with youtube_dl.YoutubeDL({'format': 'bestaudio', 'noplaylist': 'True'}) as ydl:
+            try:
+                requests.get(query)
+            except:
+                info = ydl.extract_info(
+                    f"ytsearch:{query}", download=False
+                )['entries'][0]
+            else:
+                info = ydl.extract_info(query, download=False)
+        return (info, info['formats'][0]['url'])
 
-
-def setup(bot):  # this is called by Pycord to setup the cog
-    bot.add_cog(Music(bot))  # add the cog to the self.bot
+def setup(bot):
+    bot.add_cog(Music.make_cog(bot))
