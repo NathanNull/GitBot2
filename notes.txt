@@ -1,2 +1,4 @@
-Things we need on the website:
+Things to add to the website:
 - change nickname
+- application creation/editing/deletion
+- application response channel

@@ -9,19 +9,31 @@ class Help(commands.Cog):
     def get_info(self, thing:str):
         match thing:
             case "level":
-                return "**|-Level Commands-|**\n\t/give_xp (Admin Only, well, it's supposed to be.)\n\t/reset_user [USER] (Admin Only, well, it's supposed to be.)\n\t/reset_server (Admin Only, well, it's supposed to be.)\n\t/rank [USER] <-- (optional field)\n\t"
+                return """**|-Level Commands-|**
+                    /give_xp (Admin Only, well, it's supposed to be.)
+                    /reset_user [USER] (Admin Only, well, it's supposed to be.)
+                    /reset_server (Admin Only, well, it's supposed to be.)
+                    /rank [USER] <-- (optional field)"""
             case "music":
-                return "**|-Music Commands-|**\n\t/play [SONG]"
+                return """**|-Music Commands-|**
+                    /play [SONG]"""
             case "moderation":
-                return "**|-Moderation Commands-|**\n\t/add_bad_word [WORD]\n\t/remove_bad_word [WORD]\n\t/config_bot [SETTING] [ENABLE]\n\t"
+                return """**|-Moderation Commands-|**
+                    /add_bad_word [WORD]
+                    /remove_bad_word [WORD]
+                    /config_bot [SETTING] [ENABLE]"""
             case "reaction":
-                return "**|-Reaction Commands-|**\n\t/reactionsetup [MESSAGE] [EMOJI] [ROLE ID] [CHANNEL]\n\t"
+                return """**|-Reaction Commands-|**
+                    /reactionsetup [MESSAGE] [EMOJI] [ROLE ID] [CHANNEL]"""
             case "auditlogs":
-                return "**|-Audit Log Commands-|**\n\t/set_audit_channel [CHANNEL]\n\t"
+                return """**|-Audit Log Commands-|**
+                    /set_audit_channel [CHANNEL]"""
             case "utility":
-                return "**|-Utility Commands-|**\n\t/time\n\t/ping\n\t"
+                return """**|-Utility Commands-|**
+                    /time
+                    /ping"""
             case "help":
-                return "\"But why...\" -evin"
+                return """"But why..." -evin"""
 
     @discord.slash_command()
     async def help(self, ctx:discord.ApplicationContext, setting: discord.Option(str,choices=[

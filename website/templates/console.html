@@ -43,7 +43,7 @@
         </select>
 
         <div class="box-row set-c">
-            <button id="audit-apply">Apply</button><br>
+            <button id="audit-apply">Apply Changes</button><br>
         </div>
     </div>
 
@@ -69,12 +69,12 @@
         <div class="box-title">Add Reaction Roles</div>
 
         <div class="box-row set-c">
-            <div class="box-row w-50 set-c">
+            <div class="box-row w-50 set-l">
                 <label for="react-msg">The message to send </label>
-                <input type="text" id="react-msg" style="flex-grow:1">
+                <input type="text" id="react-msg" style="flex-grow:0.5">
             </div>
             
-            <div class="box-row w-50 set-c">
+            <div class="box-row w-50 set-l" style="margin-left: 10px">
                 <label for="react-emoji">The emoji </label>
                 <input type="text" id="react-emoji" style="flex-grow:1">
             </div>
@@ -88,5 +88,17 @@
         </select>
 
         <button id="react-activate">Add Reaction Role</button>
+    </div>
+
+    <div class="box">
+        <div class="box-title">Application Config</div>
+
+        <select name="app-channel" id="app-channel">
+            <option value="-default">Select a channel for applications to send in</option>
+        </select>
+
+        <div class="box-row set-c">
+            <button id="appch-apply">Apply Changes</button><br>
+        </div>
     </div>
 </div>

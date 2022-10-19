@@ -78,6 +78,16 @@ async function add_react_role() {
 }
 get_element(["#react-activate"]).onclick = add_react_role
 
+async function app_channel() {
+    let selected = get_element(["#app-channel"]).value
+    if (selected == "-default") {
+        console.log("default")
+        return
+    }
+    await notify_bot("appchannel", selected)
+}
+get_element(["#appch-apply"]).onclick = app_channel
+
 async function notify_bot(type, info) {
     let data = { type, gid: serverid, info }
     let url = `http://${location.hostname}:3001/notify-bot`
@@ -130,6 +140,14 @@ async function main() {
         opt.value = role.id
         opt.textContent = role.name
         react_role.appendChild(opt)
+    })
+
+    let app_select = get_element(["#app-channel"])
+    all_channels.forEach(channel => {
+        let opt = document.createElement("option")
+        opt.value = channel.id
+        opt.textContent = channel.name
+        app_select.appendChild(opt)
     })
 }
 await main()

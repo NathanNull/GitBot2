@@ -71,6 +71,10 @@ class NotifDetector(SingleFolderEventHandler):
             cog = self.bot.get_cog("AuditLogging")
             cog.auditchannel[gid] = int(info["info"])
             asyncio.run(cog.save())
+        elif info["type"] == 'appchannel':
+            cog = self.bot.get_cog("App")
+            cog.app[gid]['channel'] = int(info["info"])
+            asyncio.run(cog.save())
         elif info["type"] == 'bannedwords':
             cog = self.bot.get_cog("Mod")
             cog.cursewords[gid] = info["info"]
