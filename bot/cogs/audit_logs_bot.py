@@ -13,7 +13,6 @@ class AuditLogging(commands.Cog):
 		self.bot = bot
 		with open(basepath+"configure_bot/auditlogchannel.json", "r") as file:
 			self.auditchannel:dict[str, dict[str, bool]] = json.load(file)
-			print(list(self.auditchannel.keys()))
 		
 		self.update_info = {}
 		self.check_updates.start()
@@ -21,7 +20,6 @@ class AuditLogging(commands.Cog):
 	async def save(self):
 		with open(basepath+"configure_bot/auditlogchannel.json", "w") as file:
 			json.dump(self.auditchannel, file, sort_keys=True, indent=4)
-		print("save auditchannels")
 
 	@discord.slash_command()
 	async def set_audit_channel(self, ctx:discord.ApplicationContext, auditchannel:discord.TextChannel):
@@ -48,9 +46,7 @@ class AuditLogging(commands.Cog):
 		if len(self.update_info) != 0:
 			for _, val in self.update_info.items():
 				gid = val[0]
-				print(gid)
 				channel = self.cid_raw(gid)
-				print(channel)
 				await channel.send("yay things worked")
 			self.update_info = {}
 
@@ -106,7 +102,6 @@ class AuditLogging(commands.Cog):
 	async def on_message_delete(self, message: discord.Message):
 		if message.guild is None:
 			return
-		print(message.content)
 		await self.channelidstuff(message.guild).send(
 			embed=discord.Embed(title="Deleted Message",
 			description=f"{message.content}, sent by {message.author}, was deleted from {message.channel}")
@@ -138,8 +133,6 @@ def get_relative_time(time:datetime):
 	for name, max_val in zip(units, maxes):
 		diffs = [(name, floor(curr_diff%max_val))] + diffs
 		curr_diff = floor(curr_diff // max_val)
-	
-	print(diffs)
 
 	nonzero_index = enumerate([d for d in diffs if d[1]!=0])
 	largest = [d for i,d in nonzero_index if i < DIFF_COUNT]

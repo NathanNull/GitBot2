@@ -22,7 +22,7 @@ class Music(pcs.ServerCog):
 
     @pcs.ServerCog.listener()
     async def on_ready(self):
-        print(f"Ready in {self.guild}")
+        pass
     
     @pcs.ServerCog.slash_command()
     async def play(self, ctx: discord.ApplicationContext, *, query):

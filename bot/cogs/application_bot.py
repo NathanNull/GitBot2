@@ -16,7 +16,6 @@ class App(commands.Cog):
 		self.bot = bot
 		with open(basepath+"configure_bot/application.json", "r", encoding='utf-8') as file:
 			self.app : dict[str, dict[str, int|dict[str, list[str]]]] = json.load(file)
-			print(self.app)
 	
 	def channelidstuff(self, guild: discord.Guild):
 		return self.cid_raw(str(guild.id))
@@ -34,9 +33,7 @@ class App(commands.Cog):
 		if len(self.update_info) != 0:
 			for _, val in self.update_info.items():
 				gid = val[0]
-				print(gid)
 				channel = self.cid_raw(gid)
-				print(channel)
 				await channel.send("yay things worked")
 			self.update_info = {}
 

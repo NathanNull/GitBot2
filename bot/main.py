@@ -41,7 +41,6 @@ async def time(ctx:discord.ApplicationContext):
 async def ping(ctx:discord.ApplicationContext):
     rounded_ping = round((bot.latency * 1000), 5)
     await ctx.respond(f"Pong! Latency is {rounded_ping} ms")
-    print("whee")
 
 status = cycle([
     discord.Activity(type=discord.ActivityType.listening, name="song"),
@@ -66,7 +65,6 @@ async def on_connect():
     except discord.errors.HTTPException as e:
         print(f"had error {e.code} ({e.text}), was fine")
 
-print("hey look guys it's me doin the stuff")
 #Runs the bot
 all_cogs = [
     "configuration_bot",

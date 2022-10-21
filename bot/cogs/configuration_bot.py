@@ -10,7 +10,6 @@ class Configuration(commands.Cog):
 
         with open(basepath+"configure_bot/configuration.json", "r") as file:
             self.configuration:dict[str, dict[str, bool]] = json.load(file)
-            print(list(self.configuration.keys()))
         
         global config
         config = self.configuration
@@ -30,7 +29,6 @@ class Configuration(commands.Cog):
         setting:str; enable:bool
 
         gid = str(ctx.guild.id)
-        print(enable, self.configuration[gid][setting])
 
         if gid not in self.configuration:
             self.configuration[gid] = {"moderation": True,"level": True,"music":True}
@@ -47,7 +45,6 @@ class Configuration(commands.Cog):
     async def save(self):
         with open(basepath+"configure_bot/configuration.json", "w") as file:
             json.dump(self.configuration, file, sort_keys=True, indent=4)
-        print("save config")
 
 def check_config(type_:str):
     def decorator(cmd:Callable):
@@ -62,5 +59,4 @@ def check_config(type_:str):
     return decorator
 
 def setup(bot:commands.Bot):
-    print("stuff")
     bot.add_cog(Configuration(bot))

@@ -11,7 +11,6 @@ class Level(commands.Cog):
         self.bot = bot
         with open(basepath+"configure_bot/levels.json", "r") as file:
             self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
-            print(self.levels)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
@@ -61,7 +60,6 @@ class Level(commands.Cog):
             return
         embed = discord.Embed(title=f"{user}")
         bar = xp_bar(xp,lvl)
-        print(bar)
         embed.add_field(name=f"Level {lvl}, XP {xp}/{xp_to_level(lvl+1)}", value=bar)
         await ctx.respond(embed=embed)
 
@@ -101,7 +99,6 @@ class Level(commands.Cog):
     async def save(self):
         with open(basepath+"configure_bot/levels.json", "w") as file:
             json.dump(self.levels, file, sort_keys=True, indent=4)
-        print("save levels")
 
 def xp_to_level(level:int):
     return (5 * (level ** 2)) + (25 * level) - 10
@@ -109,8 +106,6 @@ def xp_to_level(level:int):
 def xp_bar(xp:int, level:int, length:int=20):
     to_next = xp_to_level(level+1)
     num_blocks = clamp(round(length*xp/to_next),1,length-1)
-
-    print(num_blocks, length-num_blocks)
     
     return "```" + "█"*num_blocks + "-"*(length-num_blocks) + "```"
 

@@ -11,7 +11,6 @@ class Mod(commands.Cog):
         self.bot = bot
         with open(basepath+"configure_bot/cursewords.json", "r") as file:
             self.cursewords:dict[str,list[str]] = json.load(file)
-            print(list(self.cursewords.keys()))
         self.config:config_type = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
@@ -27,8 +26,6 @@ class Mod(commands.Cog):
             await ctx.respond(f"added ||{bad_word}|| to the banned words list")
         else:
             await ctx.respond(f"||{bad_word}|| was already added to the banned words list")
-
-        print(self.cursewords)
         await self.save()
 
     @discord.slash_command()
@@ -43,7 +40,6 @@ class Mod(commands.Cog):
             await ctx.respond(f"Removed ||{bad_word}|| from the banned words list")
         except ValueError:
             await ctx.respond(f"||{bad_word}|| was already removed from the banned words list")
-        print(self.cursewords)
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -56,13 +52,10 @@ class Mod(commands.Cog):
             await message.delete()
             await message.channel.send('no swearing')
 
-        print(self.cursewords)
-
     @tasks.loop(minutes=20)
     async def save(self):
         with open(basepath+"configure_bot/cursewords.json", "w") as file:
             json.dump(self.cursewords, file, sort_keys=True, indent=4)
-        print("save cursewords")
 
     def is_swear(self, text:str, guild_id:int) -> bool:
         gid = str(guild_id)

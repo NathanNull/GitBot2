@@ -32,7 +32,6 @@ class SingleFolderEventHandler(PatternMatchingEventHandler):
         self.filepath = basepath+filepath
         self.encoding = encoding
     def on_any_event(self, event:FileSystemEvent):
-        print(event.event_type, event.src_path)
         match event.event_type:
             case "deleted":
                 self.file_update(event.src_path, "", True)
@@ -51,7 +50,6 @@ class NotifDetector(SingleFolderEventHandler):
         super().__init__("/notif/*.json")
         self.bot = bot
     def file_update(self, path, contents, deleted=False):
-        print("heyyyyy, update")
         if deleted:
             return
         info = json.loads(contents)
@@ -88,6 +86,5 @@ class NotifDetector(SingleFolderEventHandler):
             cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
             asyncio.run(cog.save())
             
-        print(path)
         os.remove(path)
         

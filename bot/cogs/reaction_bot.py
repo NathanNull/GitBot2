@@ -9,7 +9,6 @@ class ReactionRoles(commands.Cog):
 		self.bot = bot
 		with open(basepath+"configure_bot/reactions.json", "r", encoding='utf-8') as file:
 			self.reaction : dict[str, dict[str, dict[str, int]]] = json.load(file)
-			print(self.reaction)
 		self.save.start()
 		self.update_info = {}
 		self.check_updates.start()
@@ -82,7 +81,6 @@ class ReactionRoles(commands.Cog):
 	async def save(self):
 		with open(basepath+"configure_bot/reactions.json", "w") as file:
 			json.dump(self.reaction, file, sort_keys=False, indent=4)
-		print("save reactions")
 
 def setup(bot):
     bot.add_cog(ReactionRoles(bot))
