@@ -1,9 +1,12 @@
 from flask import Flask, url_for, render_template
 from check_prod import is_prod
+from w_backend import add_backend
+from flask_cors import CORS
 
 host = "localhost"
 
 app = Flask(__name__)
+CORS(app)
 
 if is_prod:
     discord_login = \
@@ -52,8 +55,10 @@ def serverlist():
 def console(serverid):
     return make_page("console", serverid=serverid)
 
+add_backend(app)
+
 def main():
-    app.run(host)
+    app.run(host, port=80)
 
 if __name__ == "__main__":
     main()
