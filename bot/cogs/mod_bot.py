@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, tasks
 import json
-
 from utils import guild_only, basepath, make_config
 from configuration import requires, config_type
 cursewords = "cursewords"
@@ -11,14 +10,17 @@ class Mod(commands.Cog):
         self.bot = bot
         with open(basepath+"configure_bot/cursewords.json", "r") as file:
             self.cursewords:dict[str,list[str]] = json.load(file)
+        with open(basepath+"configure_bot/warns.json", "r") as file:
+            self.warns:dict[str,list[str]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
-        self.save.start()
+
+
             
     @discord.slash_command()
     @guild_only
     @requires.moderation
     async def add_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
-        gid = str(ctx.guild.id)
+        gid = int(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
         if bad_word not in self.cursewords[gid]:
@@ -26,13 +28,13 @@ class Mod(commands.Cog):
             await ctx.respond(f"added ||{bad_word}|| to the banned words list")
         else:
             await ctx.respond(f"||{bad_word}|| was already added to the banned words list")
-        await self.save()
+        await self.savecurse()
 
     @discord.slash_command()
     @guild_only
     @requires.moderation
     async def remove_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
-        gid = str(ctx.guild.id)
+        gid = int(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
         try:
@@ -40,6 +42,26 @@ class Mod(commands.Cog):
             await ctx.respond(f"Removed ||{bad_word}|| from the banned words list")
         except ValueError:
             await ctx.respond(f"||{bad_word}|| was already removed from the banned words list")
+
+    @discord.slash_command()
+    @guild_only
+    @requires.moderation
+    async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
+        gid = int(ctx.guild.id)
+        print(user)
+        if gid not in self.warns:
+            self.warns[gid] = {}
+            await self.savewarn()
+        if user.id not in self.warns[gid]:
+            self.warns[gid][int(user.id)] = 0
+        self.warns[gid][int(user.id)] += 1
+        if self.warns is str:
+            print("dont continue something is a string when it shouldnt be")
+            pass
+        else:
+            await self.savewarn()
+            await ctx.respond(f'<@{ctx.user.id}> has warned <@{user.id}> for {reason}')
+
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -52,10 +74,14 @@ class Mod(commands.Cog):
             await message.delete()
             await message.channel.send('no swearing')
 
-    @tasks.loop(minutes=20)
-    async def save(self):
+
+    async def savecurse(self):
         with open(basepath+"configure_bot/cursewords.json", "w") as file:
             json.dump(self.cursewords, file, sort_keys=True, indent=4)
+
+    async def savewarn(self):
+        with open(basepath+"configure_bot/warns.json", "w") as file:
+            json.dump(self.warns, file, sort_keys=True, indent=4)
 
     def is_swear(self, text:str, guild_id:int) -> bool:
         gid = str(guild_id)
@@ -64,8 +90,8 @@ class Mod(commands.Cog):
         if "moderation" in self.config[gid] and not self.config[gid]["moderation"]:
             return
         text = text.lower().replace(" ", "")
-        return str(guild_id) in self.cursewords\
-            and any(word in text for word in self.cursewords[gid])
+        return str(guild_id) in self.warns\
+            and any(word in text for word in self.warns[gid])
         
 def setup(bot:commands.Bot):
     bot.add_cog(Mod(bot))
