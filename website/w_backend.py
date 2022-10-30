@@ -23,11 +23,11 @@ token_bytes = Fernet(key).decrypt(encrypted)
 token = str(token_bytes)[2:-1]
 
 def api_get_request(url):
-    return get(
+    return jsonify(get(
         url, headers={
             "Authorization": "Bot "+token
         }
-    ).json()
+    ).json())
 
 def add_backend(app):
     @app.route("/api/botservers")
