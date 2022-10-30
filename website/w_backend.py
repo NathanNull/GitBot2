@@ -2,7 +2,7 @@ import random, json
 from typing import Any
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
-from requests import get
+from requests import get, post
 
 from dotenv import load_dotenv
 import os
@@ -13,6 +13,8 @@ from check_prod import is_prod
 basedir = os.path.dirname(__file__)
 basepath = os.path.abspath(os.path.join(basedir, os.pardir))
 botpath = basepath+"/bot"
+
+notif_cid = 1036385135567831051
 
 backend = Flask(__name__)
 CORS(backend)
@@ -53,9 +55,12 @@ def get_roles(gid):
 @cross_origin()
 def notify_bot():
     notif = json.dumps(request.json)
-    with open(botpath+f"/notif/{random.randint(10000,99999)}.json", "x") as file:
-        file.write(notif)
-    
+    n_res = post(f"https://discord.com/api/channels/{notif_cid}/messages", {
+        "content": notif
+    }, headers={
+        "Authorization": "Bot "+token
+    }).json()
+    print(n_res)
     response = jsonify(notif)
     return response
 

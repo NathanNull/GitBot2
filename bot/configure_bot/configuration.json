@@ -1,4 +1,10 @@
 {
+    "1036384841639399455": {
+        "level": false,
+        "moderation": false,
+        "music": false,
+        "reaction_roles": true
+    },
     "977331948890521620": {
         "level": true,
         "moderation": true,

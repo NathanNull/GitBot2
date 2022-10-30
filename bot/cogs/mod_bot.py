@@ -14,13 +14,21 @@ class Mod(commands.Cog):
             self.warns:dict[str,list[str]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
 
+        self.should_save = False
 
+        self.check_updates.start()
+
+    @tasks.loop(seconds=10)
+    async def check_updates(self):
+        if self.should_save:
+            self.should_save = False
+            await self.save()
             
     @discord.slash_command()
     @guild_only
     @requires.moderation
     async def add_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
-        gid = int(ctx.guild.id)
+        gid = str(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
         if bad_word not in self.cursewords[gid]:
@@ -28,13 +36,13 @@ class Mod(commands.Cog):
             await ctx.respond(f"added ||{bad_word}|| to the banned words list")
         else:
             await ctx.respond(f"||{bad_word}|| was already added to the banned words list")
-        await self.savecurse()
+        await self.save()
 
     @discord.slash_command()
     @guild_only
     @requires.moderation
     async def remove_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
-        gid = int(ctx.guild.id)
+        gid = str(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
         try:
@@ -47,21 +55,16 @@ class Mod(commands.Cog):
     @guild_only
     @requires.moderation
     async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
-        gid = int(ctx.guild.id)
+        gid = str(ctx.guild.id)
         print(user)
         if gid not in self.warns:
             self.warns[gid] = {}
-            await self.savewarn()
-        if user.id not in self.warns[gid]:
-            self.warns[gid][int(user.id)] = 0
-        self.warns[gid][int(user.id)] += 1
-        if self.warns is str:
-            print("dont continue something is a string when it shouldnt be")
-            pass
-        else:
-            await self.savewarn()
-            await ctx.respond(f'<@{ctx.user.id}> has warned <@{user.id}> for {reason}')
-
+            await self.save()
+        if str(user.id) not in self.warns[gid]:
+            self.warns[gid][str(user.id)] = 0
+        self.warns[gid][str(user.id)] += 1
+        await self.save()
+        await ctx.respond(f'<@{ctx.user.id}> has warned <@{user.id}> for {reason}')
 
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
@@ -74,12 +77,9 @@ class Mod(commands.Cog):
             await message.delete()
             await message.channel.send('no swearing')
 
-
-    async def savecurse(self):
+    async def save(self):
         with open(basepath+"configure_bot/cursewords.json", "w") as file:
             json.dump(self.cursewords, file, sort_keys=True, indent=4)
-
-    async def savewarn(self):
         with open(basepath+"configure_bot/warns.json", "w") as file:
             json.dump(self.warns, file, sort_keys=True, indent=4)
 

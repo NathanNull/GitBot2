@@ -26,33 +26,19 @@ def make_config():
     }
     return config
 
-class SingleFolderEventHandler(PatternMatchingEventHandler):
-    def __init__(self, filepath, encoding="UTF-8"):
-        super().__init__(["."+filepath], None, False, False)
-        self.filepath = basepath+filepath
-        self.encoding = encoding
-    def on_any_event(self, event:FileSystemEvent):
-        match event.event_type:
-            case "deleted":
-                self.file_update(event.src_path, "", True)
-            case "created":
-                with open(event.src_path, encoding=self.encoding) as file:
-                    contents = file.read()
-                self.file_update(event.src_path, contents)
-            case _:
-                return
-            
-    def file_update(self, contents, deleted=False):
-        pass
-
-class NotifDetector(SingleFolderEventHandler):
+class NotifDetector(Cog):
     def __init__(self, bot:discord.Bot):
-        super().__init__("/notif/*.json")
         self.bot = bot
-    def file_update(self, path, contents, deleted=False):
-        if deleted:
+    
+    @Cog.listener()
+    async def on_message(self, message:discord.Message):
+        if message.guild is None\
+        or message.channel.id != 1036385135567831051\
+        or message.author.id != self.bot.user.id:
+            print("no")
             return
-        info = json.loads(contents)
+        
+        info = json.loads(message.content)
         gid = info["gid"]
         audit = self.bot.get_cog("AuditLogging")
         if info["type"] == 'config':
@@ -76,7 +62,7 @@ class NotifDetector(SingleFolderEventHandler):
         elif info["type"] == 'bannedwords':
             cog = self.bot.get_cog("Mod")
             cog.cursewords[gid] = info["info"]
-            asyncio.run(cog.save())
+            cog.should_save = True
         elif info["type"] == 'reaction':
             cog = self.bot.get_cog("ReactionRoles")
             themessage = info['info']['message']
@@ -85,6 +71,4 @@ class NotifDetector(SingleFolderEventHandler):
             cid = int(info['info']['channel'])
             cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
             asyncio.run(cog.save())
-            
-        os.remove(path)
         
