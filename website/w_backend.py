@@ -4,15 +4,16 @@ from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 from requests import get, post
 
-from dotenv import load_dotenv
 import os
-from cryptography.fernet import Fernet
-load_dotenv()
-from check_prod import is_prod
-
 basedir = os.path.dirname(__file__)
 basepath = os.path.abspath(os.path.join(basedir, os.pardir))
-botpath = basepath+"/bot"
+
+from dotenv import load_dotenv
+from cryptography.fernet import Fernet
+load_dotenv(basepath+"/website/.env")
+from check_prod import is_prod
+
+
 
 notif_cid = 1036385135567831051
 
