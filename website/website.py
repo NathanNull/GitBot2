@@ -9,7 +9,7 @@ if is_prod:
     discord_login = \
         r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
         r"redirect_uri=https%3A%2F%2Fnullofspace.pythonanywhere.com%2Fserverlist"+\
-        r"&response_type=code&scope=identify%20guilds%20guilds.members.read%20guilds.join"
+        r"&response_type=token&scope=identify%20guilds%20guilds.members.read%20guilds.join"
     
     invite_link = \
         r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
