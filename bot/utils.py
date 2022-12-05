@@ -50,7 +50,7 @@ class NotifDetector(Cog):
             cog.configuration[gid]["moderation"] = info["info"]["moderation"]
             cog.configuration[gid]["reaction_roles"] = info["info"]["reaction_roles"]
             audit.botupdate(gid)
-            asyncio.run(cog.save())
+            cog.save()
         elif info["type"] == 'auditchannel':
             cog = self.bot.get_cog("AuditLogging")
             cog.auditchannel[gid] = int(info["info"])
