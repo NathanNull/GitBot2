@@ -53,15 +53,15 @@ class NotifDetector(Cog):
         elif info["type"] == 'auditchannel':
             cog = self.bot.get_cog("AuditLogging")
             cog.auditchannel[gid] = int(info["info"])
-            asyncio.run(cog.save())
+            await cog.save()
         elif info["type"] == 'appchannel':
             cog = self.bot.get_cog("App")
             cog.app[gid]['channel'] = int(info["info"])
-            asyncio.run(cog.save())
+            await cog.save()
         elif info["type"] == 'bannedwords':
             cog = self.bot.get_cog("Mod")
             cog.cursewords[gid] = info["info"]
-            cog.should_save = True
+            await cog.save()
         elif info["type"] == 'reaction':
             cog = self.bot.get_cog("ReactionRoles")
             themessage = info['info']['message']
@@ -69,6 +69,6 @@ class NotifDetector(Cog):
             emoji = info['info']['emoji']
             cid = int(info['info']['channel'])
             cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
-            asyncio.run(cog.save())
+            await cog.save()
         await audit.botupdate(gid)
         
