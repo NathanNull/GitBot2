@@ -70,5 +70,5 @@ class NotifDetector(Cog):
             cid = int(info['info']['channel'])
             cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
             asyncio.run(cog.save())
-        asyncio.run(audit.botupdate(gid))
+        await audit.botupdate(gid)
         
