@@ -118,7 +118,7 @@ class AuditLogging(commands.Cog):
 		await self.channelidstuff(before.guild).send(embed=discord.Embed(title="Edited Message", description=f"{before.content}\n**was edited to be**\n{after.content}"))
 	
 	@commands.Cog.listener()
-	async def on_guild_channel_create(self, channel: discord.Channel):
+	async def on_guild_channel_create(self, channel):
 		await self.channelidstuff(channel.guild).send('testing channel create feature)
 
 def get_relative_time(time:datetime):
