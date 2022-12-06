@@ -119,7 +119,7 @@ class AuditLogging(commands.Cog):
 	
 	@commands.Cog.listener()
 	async def on_guild_channel_create(self, channel):
-		print(channel)
+		print(channel.guild.id)
 
 def get_relative_time(time:datetime):
 	DIFF_COUNT = 3
