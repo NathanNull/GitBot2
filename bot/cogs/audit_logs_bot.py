@@ -116,10 +116,7 @@ class AuditLogging(commands.Cog):
 		if before.content == "" or after.content == "":
 			return
 		await self.channelidstuff(before.guild).send(embed=discord.Embed(title="Edited Message", description=f"{before.content}\n**was edited to be**\n{after.content}"))
-	
-	@commands.Cog.listener()
-	async def on_guild_channel_create(self, channel):
-		print(channel.guild.id)
+
 
 def get_relative_time(time:datetime):
 	DIFF_COUNT = 3
