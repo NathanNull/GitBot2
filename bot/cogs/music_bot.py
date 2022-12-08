@@ -75,7 +75,7 @@ class Music(pcs.ServerCog):
     async def when_done(self, ctx: discord.ApplicationContext, vc: discord.VoiceClient):
         if len(self.queue) > 0:
             v_info, url = self.queue.pop(0)
-            self.raw_play(v_info, url, vc, ctx)
+            await self.raw_play(v_info, url, vc, ctx)
         else:
             self.leave_timer = self.bot.loop.create_task(self.leave_if_inactive(vc))
     
