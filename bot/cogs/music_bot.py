@@ -81,7 +81,7 @@ class Music(pcs.ServerCog):
     
     async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
         self.audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
-        await vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self.when_done(ctx, vc)))
+        vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self.when_done(ctx, vc)))
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
     
     async def leave_if_inactive(self, vc: discord.VoiceClient):
