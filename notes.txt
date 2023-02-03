@@ -1,4 +1,4 @@
 Things to add to the website:
-- change nickname
+- change nickname?
 - application creation/editing/deletion
 - application response channel
