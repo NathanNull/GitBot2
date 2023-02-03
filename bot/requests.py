@@ -15,7 +15,7 @@ def bot_info(guildid:str, infotype:str):
             default = "NotSet"
         case "bannedwords":
             filename = basepath+"/configure_bot/cursewords.json"
-            process = lambda w:w
+            process = lambda c:c
             default = []
         case _:
             return "Invalid info type", 400

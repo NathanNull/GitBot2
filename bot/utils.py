@@ -32,12 +32,6 @@ class NotifDetector(Cog):
     
     @Cog.listener()
     async def on_message(self, message:discord.Message):
-        if message.guild is None\
-        or message.channel.id != 1036385135567831051\
-        or message.author.id != self.bot.user.id:
-            print("no")
-            return
-        
         info = json.loads(message.content)
         gid = info["gid"]
         audit = self.bot.get_cog("AuditLogging")
