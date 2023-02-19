@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Callable
 from discord.ext.commands import Cog
 import discord
-import os, json, asyncio, random, threading, websockets
+import os, json, asyncio, random, threading
 
 def guild_only(cmd:Callable):
     @wraps(cmd)
