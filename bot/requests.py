@@ -1,4 +1,4 @@
-import websockets
+#import websockets
 import discord
 import json
 from utils import basepath

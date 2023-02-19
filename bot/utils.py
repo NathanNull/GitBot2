@@ -25,10 +25,10 @@ def make_config():
     }
     return config
 
-async def _serve(bot):
+'''async def _serve(bot):
     responder = NotifResponder(bot)
     async with websockets.serve(responder.serve, port=8765):
-        await asyncio.Future()  # run forever
+        await asyncio.Future()  # run forever'''
 
 def serve_botinfo(bot):
     t = threading.Thread(target=lambda *args: asyncio.run(_serve(*args)), args=[bot])
