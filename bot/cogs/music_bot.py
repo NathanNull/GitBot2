@@ -1,5 +1,5 @@
 import pycord_cogsbyserver as pcs
-import discord, yt_dlp, requests
+import discord, yt_dlp, requests, json
 from discord.utils import get
 import asyncio
 import music_embeds
@@ -89,7 +89,7 @@ class Music(pcs.ServerCog):
         await vc.disconnect()
         
     def search(self, query:str) -> tuple[dict, str]:
-        with yt_dlp.YoutubeDL({'format': 'bestaudio', 'noplaylist': 'True'}) as ydl:
+        with yt_dlp.YoutubeDL({'format': 'm4a/bestaudio/best', 'noplaylist': 'True'}) as ydl:
             try:
                 print('test')
                 requests.get(query)
@@ -101,7 +101,7 @@ class Music(pcs.ServerCog):
             else:
                 print('test else')
                 info = ydl.extract_info(query, download=False)
-        return (info, info['formats'][0]['url'])
+        return (info, info['url'])
 
 def setup(bot):
     bot.add_cog(Music.make_cog(bot))
