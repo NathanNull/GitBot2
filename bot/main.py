@@ -83,3 +83,5 @@ if len(bot.extensions) != len(all_cogs):
 
 #serve_botinfo(bot)
 bot.run(token)
+
+#me when the when the, when the when
