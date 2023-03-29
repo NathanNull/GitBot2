@@ -28,8 +28,8 @@ class Music(pcs.ServerCog):
     async def play(self, ctx: discord.ApplicationContext, *, query):
         await ctx.defer()
 
-        # vc:discord.VoiceClient = None
-        # print(vc)
+        vc:discord.VoiceClient = None
+        print(vc)
         if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
