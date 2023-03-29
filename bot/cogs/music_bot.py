@@ -29,6 +29,7 @@ class Music(pcs.ServerCog):
         await ctx.defer()
 
         vc:discord.VoiceClient = None
+        print(vc)
         if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
