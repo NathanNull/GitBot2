@@ -48,6 +48,7 @@ class Music(pcs.ServerCog):
             vc = await ctx.author.voice.channel.connect()
         except:
             ctx.send('already in vc')
+            vc = get(self.bot.voice_clients, guild=self.guild)
         print('test after join if statement')
         v_info, url = self.search(query)
 
