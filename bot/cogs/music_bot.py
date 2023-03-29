@@ -2,6 +2,7 @@ import pycord_cogsbyserver as pcs
 import discord, yt_dlp, requests, json
 from discord.utils import get
 import asyncio
+import time
 import music_embeds
 
 FFMPEG_OPTIONS = {
@@ -41,6 +42,7 @@ class Music(pcs.ServerCog):
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return
+        time.sleep(1)
         print('test after join if statement')
         v_info, url = self.search(query)
 
