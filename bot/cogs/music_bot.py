@@ -51,6 +51,7 @@ class Music(pcs.ServerCog):
             vc = get(self.bot.voice_clients, guild=self.guild)
         while vc.is_connected() is False:
             print(vc)
+            vc = None
             vc = await ctx.author.voice.channel.connect()
         v_info, url = self.search(query)
 
