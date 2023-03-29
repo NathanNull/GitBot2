@@ -44,7 +44,10 @@ class Music(pcs.ServerCog):
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return'''
-        vc = await ctx.author.voice.channel.connect()
+        try:
+            vc = await ctx.author.voice.channel.connect()
+        except:
+            ctx.send('already in vc')
         print('test after join if statement')
         v_info, url = self.search(query)
 
