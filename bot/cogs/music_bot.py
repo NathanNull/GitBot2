@@ -32,14 +32,15 @@ class Music(pcs.ServerCog):
         if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
-            print(vc)
+            print('test already in vc')
         elif ctx.author.voice != None:
             # Bot isn't in a vc, but the command's user is, so join that one
             vc = await ctx.author.voice.channel.connect()
+            print('not in vc and has joined')
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return
-        
+        print('test after join if statement')
         v_info, url = self.search(query)
 
         if vc.is_playing():
