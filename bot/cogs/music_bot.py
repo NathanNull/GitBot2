@@ -2,7 +2,6 @@ import pycord_cogsbyserver as pcs
 import discord, yt_dlp, requests, json
 from discord.utils import get
 import asyncio
-import time
 import music_embeds
 
 FFMPEG_OPTIONS = {
@@ -37,12 +36,12 @@ class Music(pcs.ServerCog):
         elif ctx.author.voice != None:
             # Bot isn't in a vc, but the command's user is, so join that one
             print('test before bot joins vc')
+            print(ctx.author.voice)
             vc = await ctx.author.voice.channel.connect()
             print('not in vc and has joined')
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return
-        time.sleep(1)
         print('test after join if statement')
         v_info, url = self.search(query)
 
