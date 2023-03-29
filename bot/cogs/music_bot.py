@@ -53,6 +53,7 @@ class Music(pcs.ServerCog):
             if self.leave_timer != None:
                 self.leave_timer.cancel()
                 self.leave_timer = None
+            print(vc)
             await self.raw_play(v_info, url, vc, ctx)
     
     def adjust_volume(self, change):
@@ -84,6 +85,7 @@ class Music(pcs.ServerCog):
             self.leave_timer = self.bot.loop.create_task(self.leave_if_inactive(vc))
     
     async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
+        print(vc)
         self.audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self.when_done(ctx, vc)))
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
