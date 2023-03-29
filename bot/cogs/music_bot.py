@@ -49,7 +49,7 @@ class Music(pcs.ServerCog):
         except:
             await ctx.send('already in vc')
             vc = get(self.bot.voice_clients, guild=self.guild)
-        print('test after join if statement')
+        print(vc.channel)
         v_info, url = self.search(query)
 
         if vc.is_playing():
