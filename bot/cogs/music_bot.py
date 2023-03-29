@@ -45,15 +45,11 @@ class Music(pcs.ServerCog):
             await ctx.respond("Neither of us are in a voice channel.")
             return'''
         try:
+            print(ctx.author.voice.channel)
             vc = await ctx.author.voice.channel.connect()
         except:
             await ctx.send('already in vc')
-            vc = get(self.bot.voice_clients, guild=self.guild)
-        while vc.is_connected() is False:
-            print(vc)
-            vc = None
-            try: vc = await ctx.author.voice.channel.connect()
-            except: pass
+            vc = discord.VoiceClient
         v_info, url = self.search(query)
 
         if vc.is_playing():
