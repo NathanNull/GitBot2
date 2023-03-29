@@ -52,7 +52,8 @@ class Music(pcs.ServerCog):
         while vc.is_connected() is False:
             print(vc)
             vc = None
-            vc = await ctx.author.voice.channel.connect()
+            try: vc = await ctx.author.voice.channel.connect()
+            except: pass
         v_info, url = self.search(query)
 
         if vc.is_playing():
