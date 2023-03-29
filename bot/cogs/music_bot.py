@@ -38,7 +38,7 @@ class Music(pcs.ServerCog):
             print('test before bot joins vc')
             print(ctx.author.voice)
             vc = await ctx.author.voice.channel.connect()
-            print('not in vc and has joined')
+            print(vc)
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return
