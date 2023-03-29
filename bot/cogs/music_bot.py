@@ -30,7 +30,7 @@ class Music(pcs.ServerCog):
 
         # vc:discord.VoiceClient = None
         # print(vc)
-        if get(self.bot.voice_clients, guild=self.guild) is not None:
+        '''if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
             print(self.guild)
@@ -43,7 +43,8 @@ class Music(pcs.ServerCog):
             pass
         else:
             await ctx.respond("Neither of us are in a voice channel.")
-            return
+            return'''
+        vc = await ctx.author.voice.channel.connect()
         print('test after join if statement')
         v_info, url = self.search(query)
 
