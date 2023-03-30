@@ -30,7 +30,7 @@ class Music(pcs.ServerCog):
 
         vc:discord.VoiceClient = None
         print(vc)
-        print(ctx.author.voice)
+        print(self.bot.voice)
         if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
