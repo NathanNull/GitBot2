@@ -28,9 +28,9 @@ class Music(pcs.ServerCog):
     async def play(self, ctx: discord.ApplicationContext, *, query):
         await ctx.defer()
 
-        vc = discord.VoiceClient
+        vc:discord.VoiceClient = None
         print(vc)
-        '''if get(self.bot.voice_clients, guild=self.guild) is not None:
+        if get(self.bot.voice_clients, guild=self.guild) is not None:
             # Bot is in VC in the guild that this command was run in
             vc = get(self.bot.voice_clients, guild=self.guild)
             print(self.guild)
@@ -43,13 +43,12 @@ class Music(pcs.ServerCog):
             pass
         else:
             await ctx.respond("Neither of us are in a voice channel.")
-            return'''
-        try:
+            return
+        '''try:
             print(ctx.author.voice.channel)
             vc = await ctx.author.voice.channel.connect()
         except:
-            await ctx.send('already in vc')
-            vc = discord.VoiceClient
+            await ctx.send('already in vc')'''
         v_info, url = self.search(query)
 
         if vc.is_playing():
