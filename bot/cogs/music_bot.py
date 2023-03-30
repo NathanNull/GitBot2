@@ -66,7 +66,6 @@ class Music(pcs.ServerCog):
                 self.leave_timer.cancel()
                 self.leave_timer = None
             print(vc)
-            await vc.disconnect(force=True)
             await self.raw_play(v_info, url, vc, ctx)
     
     def adjust_volume(self, change):
