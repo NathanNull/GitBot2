@@ -12,7 +12,9 @@ def test_versions():
         current_ver = get_version(module)
         print(module.__name__, "at", current_ver)
         if current_ver != target_ver:
-            os.system(f"python3.10 -m pip install {pkg_name}=={target_ver}")
+            prod = "IS_PROD" in os.environ and os.environ["IS_PROD"] == "yes"
+            pip = "python3.10 -m pip" if prod else "pip"
+            os.system(f"{pip} install {pkg_name}=={target_ver}")
             updated.append(f"{module.__name__}=={target_ver}")
 
     if updated:
