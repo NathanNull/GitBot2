@@ -35,6 +35,7 @@ class Music(pcs.ServerCog):
             vc = get(self.bot.voice_clients, guild=self.guild)
             print(self.guild)
             print(self.bot.voice_clients)
+            print(discord.VoiceClient)
         elif ctx.author.voice != None:
             # Bot isn't in a vc, but the command's user is, so join that one
             print('test before bot joins vc')
