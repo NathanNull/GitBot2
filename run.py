@@ -6,7 +6,7 @@ from sys import platform
 # the script knows where to run python files from
 python = ".venv/Scripts/python.exe"\
     if platform not in ["linux", "linux2"]\
-    else ".venv/bin/python"
+    else ".venv/bin/python3.10"
 
 def run_file(input_):
     path, prefix = input_
