@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import json
-from utils import basepath, guild_only
+from utils import basepath
 from configuration import requires
 import appinput
 import random
@@ -39,7 +39,7 @@ class App(commands.Cog):
 
 	cmd_grp = discord.SlashCommandGroup("application")
     
-	@cmd_grp.command()
+	@cmd_grp.command(description="Create an application for people to apply")
 	async def create(self, ctx:discord.ApplicationContext, app_name, question_amount: int):
 		await ctx.send_modal(appinput.QuestionInput(cog=self, q_amt=question_amount, title=app_name))
 

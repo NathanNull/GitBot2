@@ -7,15 +7,12 @@ from requests import get, post
 import os
 basedir = os.path.dirname(__file__)
 basepath = os.path.abspath(os.path.join(basedir, os.pardir))
+botpath = basepath+"/bot"
 
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 load_dotenv(basepath+"/website/.env")
 from check_prod import is_prod
-
-
-
-notif_cid = 1036385135567831051
 
 key = bytes(os.environ["KEY" if is_prod else "DEVKEY"],"utf-8")
 encrypted = bytes(os.environ["TOKEN" if is_prod else "DEVTOKEN"],"utf-8")
@@ -54,12 +51,8 @@ def add_backend(app):
     @cross_origin()
     def notify_bot():
         notif = json.dumps(request.json)
-        n_res = post(f"https://discord.com/api/channels/{notif_cid}/messages", {
-            "content": notif
-        }, headers={
-            "Authorization": "Bot "+token
-        }).json()
-        print(n_res)
+        with open(botpath+f"/notif/{random.randint(10000,99999)}.json", "x") as file:
+            file.write(notif)
         response = jsonify(notif)
         return response
 

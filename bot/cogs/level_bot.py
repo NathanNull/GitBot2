@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import json
 import random
 from time import time
-from utils import guild_only, basepath
+from utils import basepath, perm_mod
 from configuration import requires, config_type
 
 class Level(commands.Cog):
@@ -44,8 +44,7 @@ class Level(commands.Cog):
 
             user_data["last_timestamp"] = round(time())
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(description="Checks the rank of the user", guild_only=True)
     @requires.level
     async def rank(self, ctx:discord.ApplicationContext, *, user:discord.Option(discord.User, required=False)):
         user:discord.User = user if user else ctx.author
@@ -63,8 +62,7 @@ class Level(commands.Cog):
         embed.add_field(name=f"Level {lvl}, XP {xp}/{xp_to_level(lvl+1)}", value=bar)
         await ctx.respond(embed=embed)
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(name="reset-server-xp", description="Resets server XP", guild_only=True, default_member_permissions=perm_mod)
     @requires.level
     async def reset_server(self, ctx:discord.ApplicationContext):
         for user in self.levels[str(ctx.guild.id)]:
@@ -72,8 +70,7 @@ class Level(commands.Cog):
         await self.save()
         await ctx.respond("Cleared all levels in this server")
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(name="reset-user-xp", description="Resets users XP", guild_only=True, default_member_permissions=perm_mod)
     @requires.level
     async def reset_user(self, ctx:discord.ApplicationContext, *, user:discord.Option(discord.User)):
         user:discord.User
@@ -81,8 +78,7 @@ class Level(commands.Cog):
         await self.save()
         await ctx.respond(f"Cleared levels for user {user}")
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.level
     async def give_xp(self, ctx:discord.ApplicationContext, *, amount:discord.Option(int), user:discord.Option(discord.User)):
         amount:int; user:discord.User

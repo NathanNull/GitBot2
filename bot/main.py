@@ -10,7 +10,8 @@ import datetime
 from itertools import cycle
 from encryption import decrypt
 from dotenv import load_dotenv
-#from utils import serve_botinfo
+from watchdog.observers import Observer
+from utils import basepath, NotifDetector
 
 # Need this so run.py can log the prints properly.
 # Otherwise subprocess.Popen doesn't count them as
@@ -81,7 +82,16 @@ for cog in all_cogs:
 if len(bot.extensions) != len(all_cogs):
     raise Exception("Cog problem idk")
 
-#serve_botinfo(bot)
-bot.run(token)
+o = Observer()
+handler = NotifDetector(bot)
+o.schedule(handler, basepath, recursive=True)
+o.start()
+
+try:
+    bot.run(token)
+finally:
+    print("done!")
+    o.stop()
+    o.join()
 
 #me when the when the, when the when

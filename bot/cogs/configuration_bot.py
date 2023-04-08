@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import json
 from functools import wraps
 from typing import Callable
-from utils import guild_only, basepath
+from utils import basepath, perm_mod
 class Configuration(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
@@ -16,8 +16,7 @@ class Configuration(commands.Cog):
 
         self.save.start()
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(name="configure-bot", description="Configure the bot settings", guild_only=True, default_member_permissions=perm_mod)
     async def config_bot(self, ctx:discord.ApplicationContext, *, 
             setting: discord.Option(str,choices=[
                 discord.OptionChoice("Level", "level"),

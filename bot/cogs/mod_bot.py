@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import json
-from utils import guild_only, basepath, make_config
+from utils import basepath, make_config, perm_mod
 from configuration import requires, config_type
 cursewords = "cursewords"
 
@@ -24,8 +24,7 @@ class Mod(commands.Cog):
             self.should_save = False
             await self.save()
             
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(name="add-blacklisted-word",description="adds blacklisted word to auto moderation", guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
     async def add_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
         gid = str(ctx.guild.id)
@@ -38,8 +37,7 @@ class Mod(commands.Cog):
             await ctx.respond(f"||{bad_word}|| was already added to the banned words list")
         await self.save()
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(name="remove-blacklisted-word",description="removes blacklisted word", guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
     async def remove_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
         gid = str(ctx.guild.id)
@@ -51,8 +49,7 @@ class Mod(commands.Cog):
         except ValueError:
             await ctx.respond(f"||{bad_word}|| was already removed from the banned words list")
 
-    @discord.slash_command()
-    @guild_only
+    @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
     async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
         gid = str(ctx.guild.id)

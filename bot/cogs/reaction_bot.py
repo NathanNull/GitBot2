@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import json
-from utils import basepath, guild_only
+from utils import basepath, perm_mod
 from configuration import requires
 
 class ReactionRoles(commands.Cog):
@@ -13,8 +13,7 @@ class ReactionRoles(commands.Cog):
 		self.update_info = {}
 		self.check_updates.start()
 
-	@discord.slash_command()
-	@guild_only
+	@discord.slash_command(name="add-reaction-roles",description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
 	@requires.reaction_roles
 	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: int, channel: discord.TextChannel): # can't use message as argument type, :(
 		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)

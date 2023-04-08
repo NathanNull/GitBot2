@@ -1,17 +1,19 @@
 from functools import wraps
 from typing import Callable
 from discord.ext.commands import Cog
+from watchdog.events import PatternMatchingEventHandler, FileSystemEvent
 import discord
 import os, json, asyncio, random, threading
 
-def guild_only(cmd:Callable):
-    @wraps(cmd)
-    async def wrapper(me:Cog, ctx:discord.ApplicationContext, *args, **kwargs):
-        if not ctx.guild:
-            await ctx.respond("This command isn't enabled in DMs")
-            return
-        await cmd(me, ctx, *args, **kwargs)
-    return wrapper
+# def guild_only(cmd:Callable):
+#     @wraps(cmd)
+#     async def wrapper(me:Cog, ctx:discord.ApplicationContext, *args, **kwargs):
+#         if not ctx.guild:
+#             await ctx.respond("This command isn't enabled in DMs")
+#             return
+#         await cmd(me, ctx, *args, **kwargs)
+#     return wrapper
+perm_mod = discord.Permissions(administrator=True)
 
 basedir = os.path.dirname(__file__)
 basepath = basedir+os.sep
@@ -25,19 +27,29 @@ def make_config():
     }
     return config
 
-'''async def _serve(bot):
-    responder = NotifResponder(bot)
-    async with websockets.serve(responder.serve, port=8765):
-        await asyncio.Future()  # run forever
+class SingleFolderEventHandler(PatternMatchingEventHandler):
+    def __init__(self, filepath, encoding="UTF-8"):
+        super().__init__(["."+filepath], None, False, False)
+        self.filepath = basepath+filepath
+        self.encoding = encoding
+    def on_any_event(self, event:FileSystemEvent):
+        match event.event_type:
+            case "deleted":
+                asyncio.run(self.file_update(event.src_path, "", True))
+            case "created":
+                with open(event.src_path, encoding=self.encoding) as file:
+                    contents = file.read()
+                asyncio.run(self.file_update(event.src_path, contents))
+            case _:
+                return
+            
+    async def file_update(self, path, contents, deleted=False):
+        pass
 
-def serve_botinfo(bot):
-    t = threading.Thread(target=lambda *args: asyncio.run(_serve(*args)), args=[bot])
-    t.start()
-    return t
-
-class NotifResponder:
+class NotifDetector(SingleFolderEventHandler):
     def __init__(self, bot:discord.Bot):
         self.bot = bot
+        super().__init__("/notif/*.json")
     
     async def serve(self, websocket):
         async for message in websocket:
@@ -45,8 +57,10 @@ class NotifResponder:
             if res is not None:
                 await websocket.send(res)
     
-    async def on_message(self, message:str):
-        info = json.loads(message)
+    async def file_update(self, path, contents, deleted=False):
+        if deleted:
+            return
+        info = json.loads(contents)
         gid = info["gid"]
         diff = info["info"]
         audit = self.bot.get_cog("AuditLogging")
@@ -55,12 +69,13 @@ class NotifResponder:
                 cog = self.bot.get_cog("Configuration")
                 if gid not in cog.configuration:
                     cog.configuration[gid] = make_config()
-                ccgid = cog.configuration[gid]
+                ccgid: 'dict[str, str]' = cog.configuration[gid]
                 ccgid["music"] = diff["music"]
                 ccgid["level"] = diff["level"]
                 ccgid["moderation"] = diff["moderation"]
                 ccgid["reaction_roles"] = diff["reaction_roles"]
                 await cog.save()
+                print("wheeeeeeeeee")
             case 'auditchannel':
                 cog = self.bot.get_cog("AuditLogging")
                 cog.auditchannel[gid] = int(diff)
@@ -81,4 +96,5 @@ class NotifResponder:
                 cid = int(info['info']['channel'])
                 cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
                 await cog.save()
-        await audit.botupdate(gid)'''
+        await audit.botupdate(gid)
+        os.remove(path)

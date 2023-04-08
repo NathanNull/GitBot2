@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from datetime import datetime
 from math import floor
 import json
-from utils import guild_only, basepath
+from utils import basepath, perm_mod
 import random
 # yeah this super doesn't work rn
 
@@ -20,7 +20,7 @@ class AuditLogging(commands.Cog):
 		with open(basepath+"configure_bot/auditlogchannel.json", "w") as file:
 			json.dump(self.auditchannel, file, sort_keys=True, indent=4)
 
-	@discord.slash_command()
+	@discord.slash_command(name="set-audit-channel", description="Sets audit log channel", default_member_permissions=perm_mod)
 	async def set_audit_channel(self, ctx:discord.ApplicationContext, auditchannel:discord.TextChannel):
 		cid = int(auditchannel.id)
 		gid = str(ctx.guild.id)
