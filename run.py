@@ -27,7 +27,6 @@ def run_file(input_):
 def main():
     proc_names = [
         ("bot/main.py", "BOT: "),
-        ("website/w_backend.py", "API: "),
         ("website/website.py", "FRONT: "),
     ]
     try:
