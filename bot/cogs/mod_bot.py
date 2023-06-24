@@ -63,6 +63,24 @@ class Mod(commands.Cog):
         await self.save()
         await ctx.respond(f'<@{ctx.user.id}> has warned <@{user.id}> for {reason}')
 
+    @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
+    @requires.moderation
+    async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
+        gid = str(ctx.guild.id)
+        print(user)
+        if gid not in self.warns:
+            self.warns[gid] = {}
+            await self.save()
+        if str(user.id) not in self.warns[gid]:
+            self.warns[gid][str(user.id)] = 0
+            await self.save()
+        if str(user.id) is 0 in self.warns[gid]:
+            await ctx.respond(f'<@{user.id}> does not have any warns')
+        else:
+            self.warns[gid][str(user.id)] -= 1
+            await self.save()
+            await ctx.respond(f'<@{ctx.user.id}> has removed a warn for <@{user.id}>')
+
     @commands.Cog.listener()
     async def on_message(self, message:discord.Message):
         if message.author.id == self.bot.user.id or not message.guild:
