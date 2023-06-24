@@ -65,7 +65,7 @@ class Mod(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
+    async def remove_warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
         gid = str(ctx.guild.id)
         print(user)
         if gid not in self.warns:
