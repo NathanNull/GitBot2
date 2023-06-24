@@ -74,7 +74,7 @@ class Mod(commands.Cog):
         if str(user.id) not in self.warns[gid]:
             self.warns[gid][str(user.id)] = 0
             await self.save()
-        if str(user.id) is 0 in self.warns[gid]:
+        if str(user.id) >= 0 in self.warns[gid]:
             await ctx.respond(f'<@{user.id}> does not have any warns')
         else:
             self.warns[gid][str(user.id)] -= 1
