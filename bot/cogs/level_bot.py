@@ -11,6 +11,8 @@ class Level(commands.Cog):
         self.bot = bot
         with open(basepath+"configure_bot/levels.json", "r") as file:
             self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
+        with open(basepath+"configure_bot/levelroles.json", "r") as file:
+            self.levelroles:dict[str,dict[str,dict[str,int]]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
@@ -40,6 +42,7 @@ class Level(commands.Cog):
             if user_data["xp"] >= xp_to_level(user_data["level"]+1):
                 user_data["xp"] -= xp_to_level(user_data["level"]+1)
                 user_data["level"] += 1
+
                 await message.author.send(f"You leveled up to level {user_data['level']} in {message.guild.name}")
 
             user_data["last_timestamp"] = round(time())
@@ -90,6 +93,16 @@ class Level(commands.Cog):
             user_data["level"] += 1
             user_data["xp"] -= next_amount
             next_amount = xp_to_level(user_data["level"]+1)
+
+    @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
+    @requires.level
+    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int), role:discord.Option(discord.Roles)):
+        gid = str(ctx.guild.id)
+        if gid not in self.levelroles:
+            self.levelroles[gid] = {}
+            print(self.levelroles)
+
+
 
     @tasks.loop(minutes=5)
     async def save(self):
