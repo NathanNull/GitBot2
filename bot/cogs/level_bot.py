@@ -96,11 +96,13 @@ class Level(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.level
-    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int), role:discord.Option(discord.author.roles)):
+    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int)):
         gid = str(ctx.guild.id)
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
             print(self.levelroles)
+            await roles()
+            await ctx.respond('testing things')
 
 
 
@@ -120,6 +122,10 @@ def xp_bar(xp:int, level:int, length:int=20):
 
 def clamp(val, mini, maxi):
     return min(max(val,mini),maxi)
+
+async def roles():
+    test = await discord.Guild.roles()
+    print(test)
 
 def setup(bot):
     bot.add_cog(Level(bot))
