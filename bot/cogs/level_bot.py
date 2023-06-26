@@ -101,7 +101,7 @@ class Level(commands.Cog):
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
             print(self.levelroles)
-            await roles()
+            await self.Guild.fetch_roles()
             await ctx.respond('testing things')
 
 
@@ -110,6 +110,7 @@ class Level(commands.Cog):
     async def save(self):
         with open(basepath+"configure_bot/levels.json", "w") as file:
             json.dump(self.levels, file, sort_keys=True, indent=4)
+    
 
 def xp_to_level(level:int):
     return (5 * (level ** 2)) + (25 * level) - 10
@@ -122,9 +123,6 @@ def xp_bar(xp:int, level:int, length:int=20):
 
 def clamp(val, mini, maxi):
     return min(max(val,mini),maxi)
-
-async def roles():
-    await discord.Guild.fetch_roles()
 
 def setup(bot):
     bot.add_cog(Level(bot))
