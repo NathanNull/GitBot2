@@ -124,7 +124,7 @@ def clamp(val, mini, maxi):
     return min(max(val,mini),maxi)
 
 async def roles():
-    test = await discord.Guild.roles()
+    test = discord.Guild.roles
     print(test)
 
 def setup(bot):
