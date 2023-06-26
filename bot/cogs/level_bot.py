@@ -96,7 +96,7 @@ class Level(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.level
-    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int), role:discord.Option(discord.Guild.roles)):
+    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int), role:discord.Option(discord.Guild.fetch_roles)):
         gid = str(ctx.guild.id)
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
