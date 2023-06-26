@@ -101,7 +101,7 @@ class Level(commands.Cog):
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
             print(self.levelroles)
-            await self.bot.Guild.fetch_roles()
+            #await self.bot.Guild.fetch_roles()
             await ctx.respond('testing things')
 
 
