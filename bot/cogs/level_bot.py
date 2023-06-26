@@ -9,7 +9,6 @@ from configuration import requires, config_type
 class Level(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
-        self.discord = discord.Discord()
         with open(basepath+"configure_bot/levels.json", "r") as file:
             self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
         with open(basepath+"configure_bot/levelroles.json", "r") as file:
@@ -102,7 +101,7 @@ class Level(commands.Cog):
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
             print(self.levelroles)
-            await self.discord.Guild.fetch_roles()
+            await self.bot.Guild.fetch_roles()
             await ctx.respond('testing things')
 
 
