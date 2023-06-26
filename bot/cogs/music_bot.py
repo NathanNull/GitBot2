@@ -39,7 +39,7 @@ class Music(pcs.ServerCog):
             await ctx.respond("Neither of us are in a voice channel.")
             return
         '''try:
-            prijnt(ctx.author.voice.channel)
+            print(ctx.author.voice.channel)
             vc = await ctx.author.voice.channel.connect()
         except:
             await ctx.send('already in vc')'''
@@ -68,14 +68,14 @@ class Music(pcs.ServerCog):
             return False
         return True
     
-    #FIXME In the actual pcs library, can't have >1 slash command
-    # @pcs.ServerCog.slash_command()
-    # async def volume(self, ctx: discord.ApplicationContext, *, vol:discord.Option(int, min_value=0, max_value=100)=None):
-    #     if vol is None:
-    #         await ctx.respond(f"The volume is currently {int(self.vol*100)}%")
-    #     else:
-    #         self.vol = vol/100
-    #         await ctx.send_response(f"Volume set to {vol}%", ephemeral=True)
+    @pcs.ServerCog.slash_command()
+    async def volume(self, ctx: discord.ApplicationContext, *, vol:discord.Option(int, min_value=0, max_value=100)=None):
+        if vol is None:
+            await ctx.respond(f"The volume is currently {int(self.vol*100)}%")
+        else:
+            dv = (vol/100) - self.vol
+            self.adjust_volume(dv)
+            await ctx.respond(f"Volume set to {vol}%", ephemeral=True)
     
     async def when_done(self, ctx: discord.ApplicationContext, vc: discord.VoiceClient):
         if len(self.queue) > 0:

@@ -12,7 +12,7 @@ class Level(commands.Cog):
         with open(basepath+"configure_bot/levels.json", "r") as file:
             self.levels:dict[str,dict[str,dict[str,int]]] = json.load(file)
         with open(basepath+"configure_bot/levelroles.json", "r") as file:
-            self.levelroles:dict[str,dict[str,dict[str,int]]] = json.load(file)
+            self.levelroles:dict[str,dict[str,int]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
         self.save.start()
             
@@ -35,15 +35,19 @@ class Level(commands.Cog):
 
         user_data = self.levels[gid][uid]
         
-        if user_data["last_timestamp"] + 60 < time() and not self.bot.get_cog("Mod").is_swear(message.content, message.guild.id):
+        if user_data["last_timestamp"] + 1 < time() and not self.bot.get_cog("Mod").is_swear(message.content, message.guild.id):
             
             user_data["xp"] += random.randint(5,20)
-    
-            if user_data["xp"] >= xp_to_level(user_data["level"]+1):
+
+            # while instead of if so that if you level up multiple times it works
+            while user_data["xp"] >= xp_to_level(user_data["level"]+1):
                 user_data["xp"] -= xp_to_level(user_data["level"]+1)
                 user_data["level"] += 1
 
                 await message.author.send(f"You leveled up to level {user_data['level']} in {message.guild.name}")
+                if gid in self.levelroles and str(user_data["level"]) in self.levelroles[gid]:
+                    rid = self.levelroles[gid][str(user_data["level"])]
+                    await message.author.add_roles(message.guild.get_role(rid))
 
             user_data["last_timestamp"] = round(time())
 
@@ -69,6 +73,10 @@ class Level(commands.Cog):
     @requires.level
     async def reset_server(self, ctx:discord.ApplicationContext):
         for user in self.levels[str(ctx.guild.id)]:
+            member = ctx.guild.get_member(int(user))
+            for rid in self.levelroles[str(ctx.guild.id)].values():
+                if any(r.id==rid for r in member.roles):
+                    await member.remove_roles(ctx.guild.get_role(rid))
             self.levels[str(ctx.guild.id)][user].update({"level": 0,"xp": 0})
         await self.save()
         await ctx.respond("Cleared all levels in this server")
@@ -77,6 +85,10 @@ class Level(commands.Cog):
     @requires.level
     async def reset_user(self, ctx:discord.ApplicationContext, *, user:discord.Option(discord.User)):
         user:discord.User
+        member = ctx.guild.get_member(user.id)
+        for rid in self.levelroles[str(ctx.guild.id)].values():
+            if any(r.id==rid for r in member.roles):
+                await member.remove_roles(ctx.guild.get_role(rid))
         self.levels[str(ctx.guild.id)][str(user.id)].update({"level": 0,"xp": 0})
         await self.save()
         await ctx.respond(f"Cleared levels for user {user}")
@@ -85,31 +97,63 @@ class Level(commands.Cog):
     @requires.level
     async def give_xp(self, ctx:discord.ApplicationContext, *, amount:discord.Option(int), user:discord.Option(discord.User)):
         amount:int; user:discord.User
+        gid = str(ctx.guild.id)
 
-        user_data = self.levels[str(ctx.guild.id)][str(user.id)]
+        user_data = self.levels[gid][str(user.id)]
         user_data["xp"] += amount
         next_amount = xp_to_level(user_data["level"]+1)
         while next_amount <= user_data["xp"]:
             user_data["level"] += 1
             user_data["xp"] -= next_amount
             next_amount = xp_to_level(user_data["level"]+1)
+            if gid in self.levelroles and str(user_data["level"]) in self.levelroles[gid]:
+                rid = self.levelroles[gid][str(user_data["level"])]
+                await ctx.guild.get_member(user.id).add_roles(ctx.guild.get_role(rid))
+        await ctx.guild.get_member(user.id).send(f"You leveled up to level {user_data['level']} in {ctx.guild.name}")
+        await ctx.respond(f"Done! The user is now lvl{user_data['level']}", ephemeral=True)
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.level
-    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int)):
+    async def add_level_role(self, ctx:discord.ApplicationContext, *, level:discord.Option(int), role:discord.Role):
         gid = str(ctx.guild.id)
         if gid not in self.levelroles:
             self.levelroles[gid] = {}
             print(self.levelroles)
-            await discord.Guild.fetch_roles()
-            await ctx.respond('testing things')
+        if any(rid==role.id for rid in self.levelroles[gid].values()):
+            await ctx.respond("That role is already being used for another level.")
+            return
+        if str(level) in self.levelroles[gid]:
+            await ctx.respond("That level already has a role assigned to it.")
+            return
+        self.levelroles[gid][str(level)] = role.id
+        for user in self.levels[gid]:
+            if self.levels[gid][user]["level"] >= level:
+                await ctx.guild.get_member(int(user)).add_roles(role)
+        await ctx.respond(role.id)
+        await self.save()
 
-
+    @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
+    @requires.level
+    async def remove_level_role(self, ctx:discord.ApplicationContext, *, role:discord.Role):
+        gid = str(ctx.guild.id)
+        if gid not in self.levelroles:
+            await ctx.respond("There are no level-assigned roles in this server.")
+            return
+        if role.id not in self.levelroles[gid].values():
+            await ctx.respond("There is no role assigned to this level")
+            return
+        else:
+            level = [k for k,v in self.levelroles[gid].items() if v==role.id][0]
+            del self.levelroles[gid][level]
+        await ctx.respond(role.id)
+        await self.save()
 
     @tasks.loop(minutes=5)
     async def save(self):
         with open(basepath+"configure_bot/levels.json", "w") as file:
             json.dump(self.levels, file, sort_keys=True, indent=4)
+        with open(basepath+"configure_bot/levelroles.json", "w") as file:
+            json.dump(self.levelroles, file, sort_keys=True, indent=4)
     
 
 def xp_to_level(level:int):
