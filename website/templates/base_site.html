@@ -4,6 +4,10 @@
         <title>SurfBot</title>
         <link rel="shortcut icon" href="{{ getpath('favicon.ico') }}">
         <link type="text/css" rel="stylesheet" href="{{ getpath('css/index.css') }}">
+        <script>
+            window.client_id = '{{client_id}}'
+            window.client_secret = '{{client_secret}}'
+        </script>
     </head>
     <body>
         {% include 'navbar.html' %}
