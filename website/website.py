@@ -10,7 +10,7 @@ CORS(app)
 
 if is_prod:
     discord_login = \
-        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&redirect_uri=http%3A%2F%2Fsurfbot.my.to%2Fserverlist&response_type=code&scope=identify%20guilds%20guilds.members.read%20guilds.join"
+        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&redirect_uri=http%3A%2F%2Fsurfbot.my.to%2Fserverlist&response_type=code&scope=identify%20guilds%20guilds.members.read%20guilds.join" # hey can you authorize localhost:8080 as a bot redirect link
     
     invite_link = \
         r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
@@ -18,7 +18,7 @@ if is_prod:
 else:
     discord_login = \
         r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
-        r"redirect_uri=http%3A%2F%2Flocalhost%3A80%2Fserverlist&response_type="+\
+        r"redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fserverlist&response_type="+\
         r"token&scope=identify%20guilds%20guilds.members.read%20guilds.join"
 
     invite_link = \
