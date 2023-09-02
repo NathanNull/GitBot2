@@ -26,7 +26,8 @@ let main = async () => {
             client_secret: window.client_secret,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'http://' + location.host + location.pathname
+            //redirect_uri: 'http://' + location.host + location.pathname
+            redirect_uri: 'http://surfbot.my.to' + location.pathname
         }
         for (let key in body) {
             console.log(encodeURI(body[key]))
