@@ -24,7 +24,7 @@ let main = async () => {
         let body = {
             client_id: window.client_id,
             client_secret: window.client_secret,
-            grant_type: 'implicit',
+            grant_type: 'implicit_code',
             code,
             redirect_uri: 'http://' + location.host + location.pathname
         }
