@@ -13,6 +13,7 @@ class Mod(commands.Cog):
         with open(basepath+"configure_bot/warns.json", "r") as file:
             self.warns:dict[str,list[str]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
+        print(self.cursewords)
 
         self.should_save = False
 
