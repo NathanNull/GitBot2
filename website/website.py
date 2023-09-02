@@ -3,7 +3,7 @@ from check_prod import is_prod
 from w_backend import add_backend
 from flask_cors import CORS
 
-host = "localhost"
+host = "0.0.0.0"
 
 app = Flask(__name__)
 CORS(app)
