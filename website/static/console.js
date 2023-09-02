@@ -90,7 +90,7 @@ get_element(["#appch-apply"]).onclick = app_channel
 
 async function notify_bot(type, info) {
     let data = { type, gid: serverid, info }
-    let url = `http://${location.hostname}/api/notify-bot`
+    let url = `http://${location.host}/api/notify-bot`
     let res = await fetch(url, {
         headers: {
             'Content-Type': 'application/json'
@@ -102,11 +102,11 @@ async function notify_bot(type, info) {
 }
 
 async function main() {
-    let base_url = `http://${location.hostname}/api/bot-info/${serverid}`
+    let base_url = `http://${location.host}/api/bot-info/${serverid}`
     let this_guild = bot_servers.find(g => g.id == serverid)
-    let all_channels = await fetch(`http://${location.hostname}/api/channels/${this_guild.id}`).then(r => r.json())
+    let all_channels = await fetch(`http://${location.host}/api/channels/${this_guild.id}`).then(r => r.json())
     all_channels = all_channels.filter(c => c.type == 0) //0 for GUILD_TEXT
-    let roles = await fetch(`http://${location.hostname}/api/roles/${this_guild.id}`).then(r => r.json())
+    let roles = await fetch(`http://${location.host}/api/roles/${this_guild.id}`).then(r => r.json())
 
     let config = await (await fetch(base_url + "/config")).json()
     config_names.forEach(name => {

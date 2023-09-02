@@ -30,6 +30,7 @@ def add_backend(app):
     @app.route("/api/botservers")
     @cross_origin()
     def get_env():
+        print('getting thing')
         return api_get_request("https://discord.com/api/users/@me/guilds")
 
     @app.route("/api/server/<gid>")
