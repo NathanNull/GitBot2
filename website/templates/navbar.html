@@ -5,7 +5,7 @@
         <img class="menuicon" src="{{ getpath('favicon.ico') }}"> 
         <h1>SurfBot</h1>
     </a>
-    <a id="addbot" class="button" href="{{ invite }}">Add SurfBot to your server</a>
+    <a id="addbot" class="button" onclick="window.open(`{{invite}}`)">Add SurfBot to your server</a>
     <a id="login" class="button" style="display: none;" onclick="window.open(`{{login}}`); window.close()">Login</a>
     <div id="user-details" style="display: none;">
         <div class="text" id="info">You aren't logged in yet</div>
