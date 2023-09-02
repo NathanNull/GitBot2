@@ -103,6 +103,9 @@ class Music(pcs.ServerCog):
                 )['entries'][0]
             else:
                 info = ydl.extract_info(query, download=False)
+        print(info['url'])
+        with open('test.json', 'w') as file:
+            json.dump(info, file)
         return (info, info['url'])
 
 def setup(bot):
