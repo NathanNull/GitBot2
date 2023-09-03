@@ -13,7 +13,6 @@ class Mod(commands.Cog):
         with open(basepath+"configure_bot/warns.json", "r") as file:
             self.warns:dict[str,list[str]] = json.load(file)
         self.config:config_type = self.bot.get_cog("Configuration").configuration
-        print(self.cursewords)
 
         self.should_save = False
 
@@ -106,8 +105,8 @@ class Mod(commands.Cog):
         if "moderation" in self.config[gid] and not self.config[gid]["moderation"]:
             return
         text = text.lower().replace(" ", "")
-        return str(guild_id) in self.warns\
-            and any(word in text for word in self.warns[gid])
+        return str(guild_id) in self.cursewords\
+            and any(word in text for word in self.cursewords[gid])
         
 def setup(bot:commands.Bot):
     bot.add_cog(Mod(bot))
