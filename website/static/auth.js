@@ -81,33 +81,6 @@ let main = async () => {
                 token_type = res.token_type
             } else return
         }
-        /*const data = new URLSearchParams()
-        let body = {
-            //client_id: window.client_id,
-            //client_secret: window.client_secret,
-            //grant_type: 'authorization_code',
-            //code,
-            //redirect_uri: 'http://' + location.host + location.pathname
-            //redirect_uri: 'http://' + urla + location.pathname
-        //}
-        for (let key in body) {
-            console.log(encodeURI(body[key]))
-            data.append(encodeURI(key), encodeURI(body[key]))
-        }
-        console.log(body)
-        console.log(Array(...data.entries()))
-        let res = await fetch("https://discord.com/api/oauth2/token", {
-            method: 'POST',
-            body: data,
-            headers: {
-                'Content-Type': "application/x-www-form-urlencoded"
-            }
-        }).then(r => r.json())
-        console.log(res)
-        if ('access_token' in res) {
-            access_token = res.access_token
-            token_type = res.token_type
-        } else return*/
     }
 
     await fetch("https://discord.com/api/users/@me", {
