@@ -56,7 +56,12 @@ async def change_status():
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    change_status.start()
+    try: 
+        change_status.start()
+    except:
+        print('had error but is fine')
+    else:
+        pass
 
 @bot.event
 async def on_connect():
