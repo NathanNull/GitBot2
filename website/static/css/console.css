@@ -86,3 +86,11 @@ select {
 .w-100 {
     width: 100%;
 }
+
+.set-c.box-row .button {
+    background-color: darkblue;
+}
+
+.set-c.box-row .button:hover {
+    background-color: darkcyan;
+}

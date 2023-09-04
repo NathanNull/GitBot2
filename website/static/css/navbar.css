@@ -52,6 +52,7 @@
     text-decoration: none;
     font-size: 17px;
     border: 1px#25273b;
+    font-family: sans-serif;
 }
 
 #navbar .text {
@@ -60,6 +61,7 @@
     padding: 0px 16px;
     text-decoration: none;
     font-size: 17px;
+    font-family: sans-serif;
 }
 
 /* Change the color of links on hover */
