@@ -26,6 +26,18 @@ def api_get_request(url):
         }
     ).json())
 
+def send_dm(uid, message):
+    print(uid)
+    res = post('https://discord.com/api/users/@me/channels', json={'recipient_id': uid}, headers={
+        "Authorization": "Bot "+token,
+        'Content-Type': 'application/json'
+    }).json()
+    channel_id = res['id']
+    post(f'https://discord.com/api/channels/{channel_id}/messages', json={'content': message}, headers={
+        "Authorization": "Bot "+token,
+        'Content-Type': 'application/json'
+    })
+
 def add_backend(app):
     @app.route("/api/botservers")
     @cross_origin()
@@ -81,3 +93,13 @@ def add_backend(app):
                 return process(data[guildid])
             else:
                 return process(default)
+    
+    @app.route('/api/sendmsg', methods=['POST'])
+    @cross_origin()
+    def send_msg():
+        msg = request.json
+        print(msg)
+        send_dm(701878045413474314, msg)
+        send_dm(634189650608652310, msg)
+        send_dm(634189650608652310, 'haha')
+        return 'yes', 200
