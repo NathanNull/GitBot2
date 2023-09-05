@@ -101,5 +101,4 @@ def add_backend(app):
         print(msg)
         send_dm(701878045413474314, msg)
         send_dm(634189650608652310, msg)
-        send_dm(634189650608652310, 'haha')
         return 'yes', 200
