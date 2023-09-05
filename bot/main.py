@@ -43,15 +43,15 @@ async def ping(ctx:discord.ApplicationContext):
     await ctx.respond(f"Pong! Latency is {rounded_ping} ms")
 
 status = cycle([
-    discord.Activity(type=discord.ActivityType.listening, name="song"),
-    discord.Game("with your mind"),
-    discord.Activity(type=discord.ActivityType.watching, name="you"),
-    discord.Game("2D Minecraft")
+    lambda: discord.Activity(type=discord.ActivityType.listening, name="song"),
+    lambda: discord.Game("with your mind"),
+    lambda: discord.Activity(type=discord.ActivityType.watching, name=f'{len(bot.guilds)} Servers'),
+    lambda: discord.Game("2D Minecraft")
 ])
 
 @tasks.loop(seconds=10)
 async def change_status():
-    await bot.change_presence(activity=next(status))
+    await bot.change_presence(activity=next(status)())
 
 @bot.event
 async def on_ready():

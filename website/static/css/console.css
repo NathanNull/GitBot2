@@ -1,53 +1,76 @@
+:root {
+    --dark: #040D12;
+    --shade1: #183D3D;
+    --shade2: #5C8374;
+    --shade3: #93B1A6;
+}
+
 select {
     font-family: sans-serif;
     border: none;
     border-radius: 5px;
-    width: 100%;
+    width: 90%;
     padding: 16px 30px;
-    margin: 5px 0px;
-    background-color: aqua;
+    margin: 5px 5%;
+    background-color: var(--shade2);
+    color: white
+}
+
+option {
+    background-color: var(--shade3);
+    color: black;
+}
+
+input[type="checkbox"] {
+    accent-color: var(--shade2);
+    background-color: var(--dark);
+}
+
+input[type="text"] {
+    margin-bottom: 10px
 }
 
 #bannedwords li:not(:hover) {
-    color:black;
-    background-color: black;
+    color: var(--dark);
+    background-color: var(--dark);
 }
 
 #bannedwords li:not(:hover) button{
-    color:black;
-    background-color: black;
+    color: var(--dark);
+    background-color: var(--dark);
 }
 
 .box {
-    border: 1px solid rgb(113, 113, 113);
+    border: 1px solid var(--shade3);
     border-radius: 20px;
     padding-bottom: 20px;
-    background-color: rgb(28, 32, 71);
+    background-color: var(--shade1);
     margin-bottom: 1.5rem;
 }
 
 .box .box-title:first-child {
-    border-bottom: 1px solid rgb(113, 113, 113);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    background-color: rgb(7, 0, 73);
+    background-color: var(--dark);
     font-size: x-large;
     font-weight: 800;
     text-align: center;
+    margin-bottom: 10px;
+}
+
+.box *:not(:first-child) {
+    padding: 5px unset;
 }
 
 .box-row {
-    height: 50%;
     display: flex;
     flex-direction: row;
-    border: 1px solid rgb(113, 113, 113);
+    /* margin: 2px; */
 }
 
 .box-col {
-    width: 50%;
     display: flex;
     flex-direction: column;
-    border: 1px solid rgb(113, 113, 113);
 }
 
 .set-l.box-col {
@@ -70,6 +93,18 @@ select {
     justify-content: center;
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    padding: 10px;
+}
+
 .subhead {
     font-size: large;
     font-weight: bold;
@@ -88,9 +123,11 @@ select {
 }
 
 .set-c.box-row .button {
-    background-color: darkblue;
+    background-color: var(--shade2);
+    color: black;
 }
 
 .set-c.box-row .button:hover {
-    background-color: darkcyan;
+    background-color: var(--shade3);
+    color: black;
 }

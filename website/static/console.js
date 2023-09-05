@@ -122,9 +122,7 @@ async function main() {
         opt.textContent = channel.name
         audit_select.appendChild(opt)
     })
-    audit_select.value = audit_channel
-    console.log(audit_channel, typeof audit_channel)
-    console.log(audit_select.selectedIndex)
+    if (audit_channel !== 'NotSet') audit_select.value = audit_channel
 
     let banned_words = await fetch(base_url + "/bannedwords").then(r => r.json())
     banned_words.forEach(w => {

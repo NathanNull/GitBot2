@@ -3,102 +3,103 @@
 </script>
 <script type="module" src="{{ getpath('console.js') }}"></script>
 <div id="content">
-    <div class="box">
-        <div class="box-title">Enable/Disable Sections</div>
+    <div class="row">
+        <div class="col">
+            <div class="box">
+                <div class="box-title">Enable/Disable Sections</div>
 
-        <div class="box-row">
-            <div class="box-col row-itm set-c">
-                <div class="subhead">Music</div>
-                <input type="checkbox" id="music">
+                <div class="box-row set-c">
+                    <div class="box-row row-itm set-c w-100">
+                        <div class="subhead">Music</div>
+                        <input type="checkbox" id="music">
+                    </div>
+
+                    <div class="box-row row-itm set-c w-100">
+                        <div class="subhead">Automod</div>
+                        <input type="checkbox" id="moderation">
+                    </div>
+                </div>
+
+                <div class="box-row set-c">
+                    <div class="box-row set-c w-100">
+                        <div class="subhead">Levels</div>
+                        <input type="checkbox" id="level">
+                    </div>
+
+                    <div class="box-row set-c w-100">
+                        <div class="subhead">Reaction Roles</div>
+                        <input type="checkbox" id="reaction_roles">
+                    </div>
+                </div>
+
+                <div class="box-row set-c">
+                    <button id="config-apply" class="button">Apply Changes</button>
+                </div>
             </div>
 
-            <div class="box-col row-itm set-c">
-                <div class="subhead">Automod</div>
-                <input type="checkbox" id="moderation">
+            <div class="box">
+                <div class="box-title">Change Audit-logging Channel</div>
+
+                <select name="audit-channel" id="audit-channel">
+                    <option value="-default">Select a channel for the audit logs</option>
+                </select>
+
+                <div class="box-row set-c">
+                    <button id="audit-apply" class="button">Apply Changes</button><br>
+                </div>
             </div>
-        </div>
 
-        <div class="box-row">
-            <div class="box-col set-c">
-                <div class="subhead">Levels</div>
-                <input type="checkbox" id="level">
-            </div>
+            <div class="box">
+                <div class="box-title">Application Config</div>
 
-            <div class="box-col set-c">
-                <div class="subhead">Reaction Roles</div>
-                <input type="checkbox" id="reaction_roles">
-            </div>
-        </div>
+                <select name="app-channel" id="app-channel">
+                    <option value="-default">Select a channel for applications to send in</option>
+                </select>
 
-        <div class="box-row set-c">
-            <button id="config-apply" class="button">Apply Changes</button>
-        </div>
-    </div>
-
-    <div class="box">
-        <div class="box-title">Change Audit-logging Channel</div>
-
-        <select name="audit-channel" id="audit-channel">
-            <option value="-default">Select a channel for the audit logs</option>
-        </select>
-
-        <div class="box-row set-c">
-            <button id="audit-apply">Apply Changes</button><br>
-        </div>
-    </div>
-
-    <div class="box">
-        <div class="box-title">Change banned words</div>
-
-        <div class="box-row set-l w-100">
-            <div class="subhead" style="width:auto">Current Banned Words</div>
-            <ul id="bannedwords"></ul>
-        </div>
-
-        <div class="box-row set-l">
-            <div class="subhead" style="width:auto">Add a Banned Word</div>
-            <input type="text" id="banword-input" style="flex-grow: 1">
-        </div>
-        
-        <div class="box-row set-c">
-            <button id="banword-confirm">Confirm</button>
-        </div>
-    </div>
-
-    <div class="box">
-        <div class="box-title">Add Reaction Roles</div>
-
-        <div class="box-row set-c">
-            <div class="box-row w-50 set-l">
-                <label for="react-msg">The message to send </label>
-                <input type="text" id="react-msg" style="flex-grow:0.5">
-            </div>
-            
-            <div class="box-row w-50 set-l" style="margin-left: 10px">
-                <label for="react-emoji">The emoji </label>
-                <input type="text" id="react-emoji" style="flex-grow:1">
+                <div class="box-row set-c">
+                    <button id="appch-apply" class="button">Apply Changes</button><br>
+                </div>
             </div>
         </div>
 
-        <select name="react-role" id="react-role">
-            <option value="-default">Select a role for the reaction to give</option>
-        </select>
-        <select name="react-channel" id="react-channel">
-            <option value="-default">Select a channel for the message to send in</option>
-        </select>
+        <div class="col">
+            <div class="box">
+                <div class="box-title">Add Reaction Roles</div>
 
-        <button id="react-activate">Add Reaction Role</button>
-    </div>
+                <div class="box-row set-c">
+                    <input type="text" id="react-msg" style="width: 80%; margin-left: 4%; height: 2rem; overflow-wrap: normal" placeholder="Message to Send">
+                    <input type="text" id="react-emoji" style="width: 10%; margin-right: 4%; margin-left: 2%; height: 2rem" placeholder="Emoji">
+                </div>
 
-    <div class="box">
-        <div class="box-title">Application Config</div>
+                <select name="react-role" id="react-role">
+                    <option value="-default">Select a role for the reaction to give</option>
+                </select>
+                <select name="react-channel" id="react-channel">
+                    <option value="-default">Select a channel for the message to send in</option>
+                </select>
 
-        <select name="app-channel" id="app-channel">
-            <option value="-default">Select a channel for applications to send in</option>
-        </select>
+                <div class="box-row set-c">
+                    <button id="react-activate" class="button">Add Reaction Role</button>
+                </div>
+            </div>
 
-        <div class="box-row set-c">
-            <button id="appch-apply">Apply Changes</button><br>
+            <div class="box">
+                <div class="box-title">Change banned words</div>
+
+                <div class="box-row set-l w-100">
+                    <div class="subhead" style="width:auto">Current Banned Words</div>
+                    <ul id="bannedwords"></ul>
+                </div>
+
+                <div class="box-row set-l">
+                    <!-- <div class="subhead" style="width:auto; padding: 10px">Add a Banned Word</div> -->
+                    <input type="text" id="banword-input" style="width: 90%; margin: 5px 5%" placeholder="Add a Banned Word">
+                </div>
+                
+                <div class="box-row set-c">
+                    <button id="banword-confirm" class="button">Confirm</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
