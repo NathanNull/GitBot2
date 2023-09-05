@@ -21,7 +21,8 @@ class Configuration(commands.Cog):
             setting: discord.Option(str,choices=[
                 discord.OptionChoice("Level", "level"),
                 discord.OptionChoice("Music", "music"),
-                discord.OptionChoice("Moderation", "moderation")
+                discord.OptionChoice("Moderation", "moderation"),
+                discord.OptionChoice("Reaction Roles", "reaction_roles")
             ]),
             enable: discord.Option(bool, "Turn on or off?")
         ):
@@ -30,7 +31,7 @@ class Configuration(commands.Cog):
         gid = str(ctx.guild.id)
 
         if gid not in self.configuration:
-            self.configuration[gid] = {"moderation": True,"level": True,"music":True}
+            self.configuration[gid] = {"moderation": True,"level": True,"music":True, 'reaction_roles':True}
 
         if self.configuration[gid][setting] == enable:
             await ctx.respond(f"{setting.capitalize()} was already {'enabled' if enable else 'disabled'} for this server")
