@@ -67,7 +67,7 @@ def add_backend(app):
                 default = {"music":True, "moderation":True, "level":True, "reaction_roles":True}
             case "auditchannel":
                 filename = botpath+"/configure_bot/auditlogchannel.json"
-                process = lambda c:str(c)
+                process = lambda c:f'"{str(c)}"'
                 default = "NotSet"
             case "bannedwords":
                 filename = botpath+"/configure_bot/cursewords.json"

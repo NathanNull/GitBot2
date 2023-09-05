@@ -107,6 +107,7 @@ async function main() {
     let all_channels = await fetch(`http://${location.host}/api/channels/${this_guild.id}`).then(r => r.json())
     all_channels = all_channels.filter(c => c.type == 0) //0 for GUILD_TEXT
     let roles = await fetch(`http://${location.host}/api/roles/${this_guild.id}`).then(r => r.json())
+    let audit_channel = await fetch(base_url + '/auditchannel').then(r => r.json())
 
     let config = await (await fetch(base_url + "/config")).json()
     config_names.forEach(name => {
@@ -121,6 +122,9 @@ async function main() {
         opt.textContent = channel.name
         audit_select.appendChild(opt)
     })
+    audit_select.value = audit_channel
+    console.log(audit_channel, typeof audit_channel)
+    console.log(audit_select.selectedIndex)
 
     let banned_words = await fetch(base_url + "/bannedwords").then(r => r.json())
     banned_words.forEach(w => {
