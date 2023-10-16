@@ -45,7 +45,7 @@ class Configuration(commands.Cog):
     async def save(self):
         with open(basepath+"configure_bot/configuration.json", "w") as file:
             json.dump(self.configuration, file, sort_keys=True, indent=4)
-            print('saved config')
+
 
 def check_config(type_:str):
     def decorator(cmd:Callable):
