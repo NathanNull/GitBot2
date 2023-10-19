@@ -62,7 +62,7 @@ class ReactionRoles(commands.Cog):
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
 			elif int(mid) in self.reaction[gid]:
-				if str(emoji) in self.reaction[gid][mid]:
+				if emoji in self.reaction[gid][mid]:
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
