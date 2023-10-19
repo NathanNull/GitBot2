@@ -40,7 +40,7 @@ class ReactionRoles(commands.Cog):
 		await self.save()
 		await send(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
 	
-	@tasks.loop(seconds=10)
+	@tasks.loop(seconds=1)
 	async def check_updates(self):
 		if len(self.update_info) != 0:
 			for _, val in self.update_info.items():
@@ -61,7 +61,11 @@ class ReactionRoles(commands.Cog):
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
-
+			elif int(mid) in self.reaction[gid]:
+				if str(emoji) in self.reaction[gid][mid]:
+					rid = self.reaction[gid][mid][emoji]
+					therole = guildw.get_role(int(rid))
+					await membera.add_roles(therole, reason=None, atomic=True)
 	
 	@commands.Cog.listener()
 	async def on_raw_reaction_remove(self, reaction: discord.Reaction):
@@ -77,7 +81,6 @@ class ReactionRoles(commands.Cog):
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.remove_roles(therole, reason=None, atomic=True)
-
 	@tasks.loop(minutes=5)
 	async def save(self):
 		with open(basepath+"configure_bot/reactions.json", "w") as file:

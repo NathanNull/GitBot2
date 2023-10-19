@@ -39,6 +39,6 @@
         "level": true,
         "moderation": true,
         "music": true,
-        "reaction_roles": false
+        "reaction_roles": true
     }
 }
