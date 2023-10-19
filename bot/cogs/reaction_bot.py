@@ -48,12 +48,12 @@ class ReactionRoles(commands.Cog):
 			self.update_info = {}
 
 	@commands.Cog.listener()
-	async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
-		mid = int(reaction.message.id)
-		emoji = reaction.emoji
-		gid = str(user.guild.id)
-		uid = user.id
-		guildw = self.bot.get_guild(int(gid))
+	async def on_raw_reaction_add(self, reaction: discord.Reaction):
+		mid = str(reaction.message_id)
+		emoji = reaction.emoji.name
+		gid = str(reaction.guild_id)
+		uid = reaction.user_id
+		guildw = self.bot.get_guild(int(reaction.guild_id))
 		membera = guildw.get_member(int(uid))
 		if gid in self.reaction:
 			if mid in self.reaction[gid]:
@@ -61,14 +61,15 @@ class ReactionRoles(commands.Cog):
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
+
 	
 	@commands.Cog.listener()
-	async def on_reaction_remove(self, reaction: discord.Reaction, user: discord.User):
-		mid = int(reaction.message.id)
-		emoji = reaction.emoji
-		gid = str(user.guild.id)
-		uid = user.id
-		guildw = self.bot.get_guild(int(gid))
+	async def on_raw_reaction_remove(self, reaction: discord.Reaction):
+		mid = str(reaction.message_id)
+		emoji = reaction.emoji.name
+		gid = str(reaction.guild_id)
+		uid = reaction.user_id
+		guildw = self.bot.get_guild(int(reaction.guild_id))
 		membera = guildw.get_member(int(uid))
 		if gid in self.reaction:
 			if mid in self.reaction[gid]:
