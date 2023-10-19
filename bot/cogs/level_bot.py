@@ -27,7 +27,6 @@ class Level(commands.Cog):
 
         gid = str(message.guild.id)
         uid = str(message.author.id)
-
         if gid not in self.levels:
             self.levels[gid] = {}
         if uid not in self.levels[gid]:
@@ -43,7 +42,7 @@ class Level(commands.Cog):
             while user_data["xp"] >= xp_to_level(user_data["level"]+1):
                 user_data["xp"] -= xp_to_level(user_data["level"]+1)
                 user_data["level"] += 1
-
+                await self.save()
                 await message.author.send(f"You leveled up to level {user_data['level']} in {message.guild.name}")
                 if gid in self.levelroles and str(user_data["level"]) in self.levelroles[gid]:
                     rid = self.levelroles[gid][str(user_data["level"])]

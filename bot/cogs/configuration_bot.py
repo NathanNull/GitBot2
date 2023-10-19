@@ -41,7 +41,7 @@ class Configuration(commands.Cog):
             await self.save()
         
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=1)
     async def save(self):
         with open(basepath+"configure_bot/configuration.json", "w") as file:
             json.dump(self.configuration, file, sort_keys=True, indent=4)

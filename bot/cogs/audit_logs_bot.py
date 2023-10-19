@@ -45,13 +45,14 @@ class AuditLogging(commands.Cog):
 	async def botupdate(self, gid):
 		self.update_info[random.randint(10000,99999)] = [gid]
 
-	@tasks.loop(seconds=10)
+	@tasks.loop(seconds=1)
 	async def check_updates(self):
 		if len(self.update_info) != 0:
 			for _, val in self.update_info.items():
 				gid = val[0]
 				channel = self.cid_raw(gid)
 				if channel is not None:
+					await self.save()
 					await channel.send("yay things worked")
 			self.update_info = {}
 
