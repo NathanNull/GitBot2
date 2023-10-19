@@ -15,7 +15,8 @@ class ReactionRoles(commands.Cog):
 
 	@discord.slash_command(name="add-reaction-roles",description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
 	@requires.reaction_roles
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid: int, channel: discord.TextChannel): # can't use message as argument type, :(
+	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid, channel: discord.TextChannel): # can't use message as argument type, :(
+		theroleid = int(theroleid)
 		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
 	
 	async def rxn_raw(self, rid:int, cid:int, themessage:str, emoji:str, send=None):
