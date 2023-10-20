@@ -1,4 +1,5 @@
 import discord
+import discord.utils
 from discord.ext import commands, tasks
 import json
 from utils import basepath, perm_mod
@@ -7,6 +8,7 @@ from configuration import requires
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot:discord.Bot):
 		self.bot = bot
+		self.utils = discord.utils
 		with open(basepath+"configure_bot/reactions.json", "r", encoding='utf-8') as file:
 			self.reaction : dict[str, dict[str, dict[str, int]]] = json.load(file)
 		self.save.start()
@@ -15,23 +17,48 @@ class ReactionRoles(commands.Cog):
 
 	@discord.slash_command(name="add-reaction-roles",description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
 	@requires.reaction_roles
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *, themessage: str, emoji, theroleid, channel: discord.TextChannel): # can't use message as argument type, :(
+	async def reactionsetup(self, ctx: discord.ApplicationContext, *, messageopt: discord.Option(str,
+                    "Would you like to use a Message ID or have the bot send a message?", 
+                    choices=["Send Message", "Message ID"], 
+                    required=True), emoji, theroleid, channel: discord.TextChannel): # can't use message as argument type, :(
+		await ctx.defer()
 		theroleid = int(theroleid)
-		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
+		if messageopt == "Send Message":
+			def check(message):
+				return message.author == ctx.author
+
+			await ctx.send("whatever")
+			themessage = await self.bot.wait_for("message", check=check)
+			themessage = str(themessage.content)
+
+		elif messageopt == "Message ID":
+			def check(message):
+				return message.author == ctx.author
+
+			await ctx.send("whatever")
+			themessage = await self.bot.wait_for("message", check=check)
+			themessage = int(themessage.content)
+
+		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx, ctx.respond)
 	
-	async def rxn_raw(self, rid:int, cid:int, themessage:str, emoji:str, send=None):
+	async def rxn_raw(self, rid:int, cid:int, themessage, emoji:str, ctx: discord.ApplicationContext, send=None):
 		channel = self.bot.get_channel(cid)
 		if send is None:
 			send = channel.send
 		gid = str(channel.guild.id)
-		message = await channel.send(themessage)
-		mid = message.id
+		if isinstance(themessage, int):
+			mid = themessage
+			print(mid)
+		elif isinstance(themessage, str):
+			message = await channel.send(themessage)
+			mid = message.id
 		if gid not in self.reaction:
 			self.reaction[gid] = {}
 		if mid not in self.reaction[gid]:
 			self.reaction[gid][mid] = {}
 		if emoji not in self.reaction[gid][mid]:
-			await self.bot.get_message(int(mid)).add_reaction(emoji)
+			message = await channel.fetch_message(mid)
+			await message.add_reaction(emoji) 
 			self.reaction[gid][mid][emoji] = rid
 
 		else:
@@ -62,6 +89,7 @@ class ReactionRoles(commands.Cog):
 					therole = guildw.get_role(int(rid))
 					await membera.add_roles(therole, reason=None, atomic=True)
 			elif int(mid) in self.reaction[gid]:
+				mid = int(mid)
 				if emoji in self.reaction[gid][mid]:
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
@@ -78,6 +106,12 @@ class ReactionRoles(commands.Cog):
 		if gid in self.reaction:
 			if mid in self.reaction[gid]:
 				if str(emoji) in self.reaction[gid][mid]:
+					rid = self.reaction[gid][mid][emoji]
+					therole = guildw.get_role(int(rid))
+					await membera.remove_roles(therole, reason=None, atomic=True)
+			elif int(mid) in self.reaction[gid]:
+				mid = int(mid)
+				if emoji in self.reaction[gid][mid]:
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.remove_roles(therole, reason=None, atomic=True)

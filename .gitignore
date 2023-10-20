@@ -4,3 +4,5 @@ __pycache__/
 cogs/__pycache__/
 notes/*.json
 test_notif.json
+bot/cogs/reaction_bot.py
+bot/configure_bot/reactions.json
