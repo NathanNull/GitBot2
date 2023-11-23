@@ -24,15 +24,9 @@ class ReactionRoles(commands.Cog):
 		await ctx.defer()
 		theroleid = int(theroleid)
 		if messageopt == "Send Message":
-			def check(textmessageorid):
-				return message.author == ctx.author
-
 			themessage = str(textmessageorid)
 
 		elif messageopt == "Message ID":
-			def check(textmessageorid):
-				return message.author == ctx.author
-
 			themessage = int(textmessageorid)
 
 		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
