@@ -10,7 +10,7 @@ CORS(app)
 
 if is_prod:
     discord_login = \
-        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&redirect_uri=http%3A%2F%2Fsurfbot.my.to%2Fserverlist&response_type=code&scope=identify%20guilds%20guilds.members.read%20guilds.join"
+        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&redirect_uri=https%3A%2F%2Fsurfbot.xyz%2Fserverlist&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read"
     
     invite_link = \
         r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
@@ -56,7 +56,7 @@ def console(serverid):
 add_backend(app)
 
 def main():
-    app.run(host, port=8080)
+    app.run(host, port=4320)
 
 if __name__ == "__main__":
     main()

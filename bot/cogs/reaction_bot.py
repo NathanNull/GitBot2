@@ -20,28 +20,24 @@ class ReactionRoles(commands.Cog):
 	async def reactionsetup(self, ctx: discord.ApplicationContext, *, messageopt: discord.Option(str,
                     "Would you like to use a Message ID or have the bot send a message?", 
                     choices=["Send Message", "Message ID"], 
-                    required=True), emoji, theroleid, channel: discord.TextChannel): # can't use message as argument type, :(
+                    required=True), emoji, theroleid, channel: discord.TextChannel, textmessageorid): # can't use message as argument type, :(
 		await ctx.defer()
 		theroleid = int(theroleid)
 		if messageopt == "Send Message":
-			def check(message):
+			def check(textmessageorid):
 				return message.author == ctx.author
 
-			await ctx.send("whatever")
-			themessage = await self.bot.wait_for("message", check=check)
-			themessage = str(themessage.content)
+			themessage = str(textmessageorid)
 
 		elif messageopt == "Message ID":
-			def check(message):
+			def check(textmessageorid):
 				return message.author == ctx.author
 
-			await ctx.send("whatever")
-			themessage = await self.bot.wait_for("message", check=check)
-			themessage = int(themessage.content)
+			themessage = int(textmessageorid)
 
-		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx, ctx.respond)
+		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
 	
-	async def rxn_raw(self, rid:int, cid:int, themessage, emoji:str, ctx: discord.ApplicationContext, send=None):
+	async def rxn_raw(self, rid:int, cid:int, themessage, emoji:str, send=None):
 		channel = self.bot.get_channel(cid)
 		if send is None:
 			send = channel.send

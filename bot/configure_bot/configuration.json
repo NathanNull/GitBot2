@@ -5,6 +5,12 @@
         "music": true,
         "reaction_roles": true
     },
+    "1027199096739598398": {
+        "level": true,
+        "moderation": true,
+        "music": true,
+        "reaction_roles": true
+    },
     "1036384841639399455": {
         "level": false,
         "moderation": false,
@@ -19,6 +25,30 @@
     },
     "1089823545233780816": {
         "level": true,
+        "moderation": true,
+        "music": true,
+        "reaction_roles": true
+    },
+    "1138996168035160064": {
+        "level": true,
+        "moderation": true,
+        "music": true,
+        "reaction_roles": true
+    },
+    "1157080142535983135": {
+        "level": true,
+        "moderation": true,
+        "music": true,
+        "reaction_roles": true
+    },
+    "1163978016490258512": {
+        "level": true,
+        "moderation": true,
+        "music": true,
+        "reaction_roles": true
+    },
+    "591652132504076338": {
+        "level": false,
         "moderation": true,
         "music": true,
         "reaction_roles": true

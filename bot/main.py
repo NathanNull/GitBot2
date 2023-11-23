@@ -23,10 +23,11 @@ flush_prints.start()
 
 #Define variables to make the rest run
 load_dotenv()
-prod = "IS_PROD" in os.environ and os.environ["IS_PROD"] == "yes"
+prod = not ("IS_DEV" in os.environ and os.environ["IS_DEV"] == "yes")
+
 token = decrypt(
-    os.environ["TOKEN" if prod else "DEVTOKEN"],
-    os.environ["KEY" if prod else "DEVKEY"]
+    os.environ["TOKEN" if prod else "DEV_TOKEN"],
+    os.environ["KEY" if prod else "DEV_KEY"]
 )
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
