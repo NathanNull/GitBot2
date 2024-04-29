@@ -26,8 +26,9 @@ let main = async () => {
                 client_secret: window.client_secret,
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: 'https://' + location.host + location.pathname
+                redirect_uri: location.protocol + "//" + location.host + location.pathname
             }
+            console.log(body)
             for (let key in body) {
                 console.log(encodeURI(body[key]))
                 data.append(encodeURI(key), encodeURI(body[key]))

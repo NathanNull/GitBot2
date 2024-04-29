@@ -1,17 +1,14 @@
 import discord
 import discord.utils
 from discord.ext import commands, tasks
-import json
-from utils import basepath, perm_mod
+from utils import update_db, perm_mod
 from configuration import requires
 
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot:discord.Bot):
 		self.bot = bot
 		self.utils = discord.utils
-		with open(basepath+"configure_bot/reactions.json", "r", encoding='utf-8') as file:
-			self.reaction : dict[str, dict[str, dict[str, int]]] = json.load(file)
-		self.save.start()
+		self.reaction : dict[str, dict[str, dict[str, int]]] = {}
 		self.update_info = {}
 		self.check_updates.start()
 
@@ -20,7 +17,7 @@ class ReactionRoles(commands.Cog):
 	async def reactionsetup(self, ctx: discord.ApplicationContext, *, messageopt: discord.Option(str,
                     "Would you like to use a Message ID or have the bot send a message?", 
                     choices=["Send Message", "Message ID"], 
-                    required=True), emoji, theroleid, channel: discord.TextChannel, textmessageorid): # can't use message as argument type, :(
+                    required=True), emoji, theroleid, channel: discord.TextChannel, textmessageorid): # type: ignore
 		await ctx.defer()
 		theroleid = int(theroleid)
 		if messageopt == "Send Message":
@@ -32,7 +29,10 @@ class ReactionRoles(commands.Cog):
 		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
 	
 	async def rxn_raw(self, rid:int, cid:int, themessage, emoji:str, send=None):
+		print(rid, cid, themessage)
+		print(cid)
 		channel = self.bot.get_channel(cid)
+		print(channel)
 		if send is None:
 			send = channel.send
 		gid = str(channel.guild.id)
@@ -59,7 +59,7 @@ class ReactionRoles(commands.Cog):
 	
 	@tasks.loop(seconds=1)
 	async def check_updates(self):
-		if len(self.update_info) != 0:
+		if len(self.update_info) != 0 and self.bot.is_ready():
 			for _, val in self.update_info.items():
 				await self.rxn_raw(*val)
 			self.update_info = {}
@@ -105,10 +105,9 @@ class ReactionRoles(commands.Cog):
 					rid = self.reaction[gid][mid][emoji]
 					therole = guildw.get_role(int(rid))
 					await membera.remove_roles(therole, reason=None, atomic=True)
-	@tasks.loop(minutes=5)
+
 	async def save(self):
-		with open(basepath+"configure_bot/reactions.json", "w") as file:
-			json.dump(self.reaction, file, sort_keys=False, indent=4)
+		update_db("reaction", self.reaction)
 
 def setup(bot):
     bot.add_cog(ReactionRoles(bot))

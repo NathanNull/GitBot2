@@ -1,9 +1,7 @@
-from functools import wraps
-from typing import Callable
-from discord.ext.commands import Cog
-from watchdog.events import PatternMatchingEventHandler, FileSystemEvent
 import discord
-import os, json, asyncio, random, threading
+import os
+import random
+from firebase_admin import db, credentials, initialize_app
 
 # def guild_only(cmd:Callable):
 #     @wraps(cmd)
@@ -18,6 +16,7 @@ perm_mod = discord.Permissions(administrator=True)
 basedir = os.path.dirname(__file__)
 basepath = basedir+os.sep
 
+
 def make_config():
     config = {
         "level": True,
@@ -27,46 +26,22 @@ def make_config():
     }
     return config
 
-class SingleFolderEventHandler(PatternMatchingEventHandler):
-    def __init__(self, filepath, encoding="UTF-8"):
-        super().__init__(["."+filepath], None, False, False)
-        self.filepath = basepath+filepath
-        self.encoding = encoding
-    def on_any_event(self, event:FileSystemEvent):
-        match event.event_type:
-            case "deleted":
-                asyncio.run(self.file_update(event.src_path, "", True))
-            case "created":
-                with open(event.src_path, encoding=self.encoding) as file:
-                    contents = file.read()
-                asyncio.run(self.file_update(event.src_path, contents))
-            case _:
-                return
-            
-    async def file_update(self, path, contents, deleted=False):
-        pass
+def init_db():
+    is_prod = not ("IS_DEV" in os.environ and os.environ["IS_DEV"] == "yes")
+    cred = credentials.Certificate(
+        '.\\surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else '.\\testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
+    url = "https://surfbot-e0d83-default-rtdb.firebaseio.com" if is_prod else "https://testing-99c64-default-rtdb.firebaseio.com"
+    default_app = initialize_app(cred, {'databaseURL': url})
 
-class NotifDetector(SingleFolderEventHandler):
-    def __init__(self, bot:discord.Bot):
-        self.bot = bot
-        super().__init__("/notif/*.json")
-    
-    async def serve(self, websocket):
-        async for message in websocket:
-            res = await self.on_message(message)
-            if res is not None:
-                await websocket.send(res)
-    
-    async def file_update(self, path, contents, deleted=False):
-        if deleted:
-            return
-        info = json.loads(contents)
-        gid = info["gid"]
-        diff = info["info"]
-        audit = self.bot.get_cog("AuditLogging")
-        match info["type"]:
+
+def set_hooks(bot: discord.Bot):
+    init_db()
+    root_ref = db.reference()
+
+    def update_bot(gid: str, category: str, diff):
+        match category:
             case 'config':
-                cog = self.bot.get_cog("Configuration")
+                cog = bot.get_cog("Configuration")
                 if gid not in cog.configuration:
                     cog.configuration[gid] = make_config()
                 ccgid: 'dict[str, str]' = cog.configuration[gid]
@@ -74,27 +49,54 @@ class NotifDetector(SingleFolderEventHandler):
                 ccgid["level"] = diff["level"]
                 ccgid["moderation"] = diff["moderation"]
                 ccgid["reaction_roles"] = diff["reaction_roles"]
-                await cog.save()
-                print("wheeeeeeeeee")
             case 'auditchannel':
-                cog = self.bot.get_cog("AuditLogging")
+                cog = bot.get_cog("AuditLogging")
                 cog.auditchannel[gid] = int(diff)
-                await cog.save()
             case 'appchannel':
-                cog = self.bot.get_cog("App")
-                cog.app[gid]['channel'] = int(diff)
-                await cog.save()
+                cog = bot.get_cog("App")
+                cog.app[gid] = diff
             case 'bannedwords':
-                cog = self.bot.get_cog("Mod")
+                cog = bot.get_cog("Mod")
                 cog.cursewords[gid] = diff
-                await cog.save()
-            case 'reaction':
-                cog = self.bot.get_cog("ReactionRoles")
-                themessage = info['info']['message']
-                rid = int(info['info']['role'])
-                emoji = info['info']['emoji']
-                cid = int(info['info']['channel'])
-                cog.update_info[random.randint(10000,99999)] = (rid, cid, themessage, emoji)
-                await cog.save()
-        await audit.botupdate(gid)
-        os.remove(path)
+            case 'add_reaction':
+                cog = bot.get_cog("ReactionRoles")
+                for (key, data) in diff.items():
+                    themessage = data['message']
+                    rid = int(data['role'])
+                    emoji = data['emoji']
+                    cid = int(data['channel'])
+                    cog.update_info[random.randint(10000, 99999)] = (
+                        rid, cid, themessage, emoji)
+                    db.reference(f"/add_reaction/{gid}/{key}").delete()
+
+    def callback(event: db.Event):
+        path: str = event.path
+        if event.data == None: # This indicates a deletion
+            return
+        
+        print("db update")
+        match path.split("/"):
+            case ["", ""]:
+                for (category, data) in event.data.items():
+                    for (gid, info) in data.items():
+                        update_bot(gid, category, info)
+
+            case ["", category]:
+                print(f"path: {path}")
+                for (gid, info) in event.data.items():
+                    update_bot(gid, category, info)
+
+            case ["", category, gid, *nested_path]:
+                data = db.reference(
+                    f"/{category}/{gid}").get()
+                update_bot(gid, category, data)
+
+            case _:
+                print(f"{event.event_type} from {event.path}")
+                print("you messed up")
+
+    root_ref.listen(callback)
+
+
+def update_db(category, data):
+    db.reference(f"/{category}").set(data)

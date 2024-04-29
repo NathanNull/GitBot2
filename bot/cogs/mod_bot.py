@@ -1,18 +1,17 @@
 import discord
 from discord.ext import commands, tasks
-import json
-from utils import basepath, make_config, perm_mod
+from utils import update_db, make_config, perm_mod
 from configuration import requires, config_type
 cursewords = "cursewords"
 
+
 class Mod(commands.Cog):
-    def __init__(self, bot:commands.Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        with open(basepath+"configure_bot/cursewords.json", "r") as file:
-            self.cursewords:dict[str,list[str]] = json.load(file)
-        with open(basepath+"configure_bot/warns.json", "r") as file:
-            self.warns:dict[str,list[str]] = json.load(file)
-        self.config:config_type = self.bot.get_cog("Configuration").configuration
+        self.cursewords: dict[str, list[str]] = {}
+        self.warns: dict[str, list[str]] = {}
+        self.config: config_type = self.bot.get_cog(
+            "Configuration").configuration
 
         self.should_save = False
 
@@ -23,10 +22,10 @@ class Mod(commands.Cog):
         if self.should_save:
             self.should_save = False
             await self.save()
-            
-    @discord.slash_command(name="add-blacklisted-word",description="adds blacklisted word to auto moderation", guild_only=True, default_member_permissions=perm_mod)
+
+    @discord.slash_command(name="add-blacklisted-word", description="adds blacklisted word to auto moderation", guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def add_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
+    async def add_bad_word(self, ctx: discord.ApplicationContext, *, bad_word: str):
         gid = str(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
@@ -37,9 +36,9 @@ class Mod(commands.Cog):
             await ctx.respond(f"||{bad_word}|| was already added to the banned words list")
         await self.save()
 
-    @discord.slash_command(name="remove-blacklisted-word",description="removes blacklisted word", guild_only=True, default_member_permissions=perm_mod)
+    @discord.slash_command(name="remove-blacklisted-word", description="removes blacklisted word", guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def remove_bad_word(self, ctx:discord.ApplicationContext, *, bad_word:str):
+    async def remove_bad_word(self, ctx: discord.ApplicationContext, *, bad_word: str):
         gid = str(ctx.guild.id)
         if gid not in self.cursewords:
             self.cursewords[gid] = []
@@ -51,7 +50,7 @@ class Mod(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
+    async def warn(self, ctx: discord.ApplicationContext, *, user: discord.User, reason: str):
         gid = str(ctx.guild.id)
         print(user)
         if gid not in self.warns:
@@ -65,7 +64,7 @@ class Mod(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def remove_warn(self, ctx:discord.ApplicationContext, *, user:discord.User, reason:str):
+    async def remove_warn(self, ctx: discord.ApplicationContext, *, user: discord.User, reason: str):
         gid = str(ctx.guild.id)
         print(user)
         if gid not in self.warns:
@@ -74,7 +73,7 @@ class Mod(commands.Cog):
         if str(user.id) not in self.warns[gid]:
             self.warns[gid][str(user.id)] = 0
             await self.save()
-        if self.warns[gid][str(user.id)] >= 0:
+        if self.warns[gid][str(user.id)] <= 0:
             await ctx.respond(f'<@{user.id}> does not have any warns')
         else:
             self.warns[gid][str(user.id)] -= 1
@@ -82,23 +81,21 @@ class Mod(commands.Cog):
             await ctx.respond(f'<@{ctx.user.id}> has removed a warn for <@{user.id}>')
 
     @commands.Cog.listener()
-    async def on_message(self, message:discord.Message):
+    async def on_message(self, message: discord.Message):
         if message.author.id == self.bot.user.id or not message.guild:
             return
         msg_content = message.content.lower()
-    
+
         # delete curse word if match with the list
         if self.is_swear(msg_content, message.guild.id):
             await message.delete()
             await message.channel.send('no swearing')
 
     async def save(self):
-        with open(basepath+"configure_bot/cursewords.json", "w") as file:
-            json.dump(self.cursewords, file, sort_keys=True, indent=4)
-        with open(basepath+"configure_bot/warns.json", "w") as file:
-            json.dump(self.warns, file, sort_keys=True, indent=4)
+        update_db("cursewords", self.cursewords)
+        update_db("warns", self.warns)
 
-    def is_swear(self, text:str, guild_id:int) -> bool:
+    def is_swear(self, text: str, guild_id: int) -> bool:
         gid = str(guild_id)
         if gid not in self.config:
             self.config[gid] = make_config()
@@ -107,6 +104,7 @@ class Mod(commands.Cog):
         text = text.lower().replace(" ", "")
         return str(guild_id) in self.cursewords\
             and any(word in text for word in self.cursewords[gid])
-        
-def setup(bot:commands.Bot):
+
+
+def setup(bot: commands.Bot):
     bot.add_cog(Mod(bot))

@@ -17,7 +17,7 @@ if is_prod:
         r"permissions=1644971949559&scope=bot%20applications.commands"
 else:
     discord_login = \
-        r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fserverlist&response_type=code&scope=guilds%20guilds.join%20guilds.members.read%20identify"
+        r"https://discord.com/oauth2/authorize?client_id=835950957196083201&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A4320%2Fserverlist&scope=guilds.members.read+guilds+guilds.join+identify"
 
     invite_link = \
         r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\

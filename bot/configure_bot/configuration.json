@@ -70,5 +70,11 @@
         "moderation": true,
         "music": true,
         "reaction_roles": true
+    },
+    "gid": {
+        "level": true,
+        "moderation": true,
+        "music": false,
+        "reaction_roles": true
     }
 }

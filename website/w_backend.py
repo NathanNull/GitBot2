@@ -1,23 +1,30 @@
-import random, json
+from check_prod import is_prod
+from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+import random
+import json
 from typing import Any
 from flask import Flask, jsonify, request
 from flask_cors import cross_origin
 from requests import get, post
+from firebase_admin import db, credentials, initialize_app
 
 import os
 basedir = os.path.dirname(__file__)
 basepath = os.path.abspath(os.path.join(basedir, os.pardir))
-botpath = basepath+"/bot"
 
-from dotenv import load_dotenv
-from cryptography.fernet import Fernet
 load_dotenv(basepath+"/website/.env")
-from check_prod import is_prod
 
-key = bytes(os.environ["KEY" if is_prod else "DEVKEY"],"utf-8")
-encrypted = bytes(os.environ["TOKEN" if is_prod else "DEVTOKEN"],"utf-8")
+cred = credentials.Certificate(
+    '.\\surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else '.\\testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
+url = "https://surfbot-e0d83-default-rtdb.firebaseio.com" if is_prod else "https://testing-99c64-default-rtdb.firebaseio.com"
+default_app = initialize_app(cred, {'databaseURL': url})
+
+key = bytes(os.environ["KEY" if is_prod else "DEVKEY"], "utf-8")
+encrypted = bytes(os.environ["TOKEN" if is_prod else "DEVTOKEN"], "utf-8")
 token_bytes = Fernet(key).decrypt(encrypted)
 token = str(token_bytes)[2:-1]
+
 
 def api_get_request(url):
     return jsonify(get(
@@ -25,6 +32,7 @@ def api_get_request(url):
             "Authorization": "Bot "+token
         }
     ).json())
+
 
 def send_dm(uid, message):
     print(uid)
@@ -37,6 +45,7 @@ def send_dm(uid, message):
         "Authorization": "Bot "+token,
         'Content-Type': 'application/json'
     })
+
 
 def add_backend(app):
     @app.route("/api/botservers")
@@ -63,37 +72,47 @@ def add_backend(app):
     @app.route("/api/notify-bot", methods=["POST"])
     @cross_origin()
     def notify_bot():
-        notif = json.dumps(request.json)
-        with open(botpath+f"/notif/{random.randint(10000,99999)}.json", "x") as file:
-            file.write(notif)
-        response = jsonify(notif)
-        return response
+        notif = request.json
+        category = notif["type"]
+        gid = notif["gid"]
+        info = notif["info"]
+
+        match category:
+            case "auditchannel" | "config" | "bannedwords":
+                print(f"{info=}")
+                db.reference(f"/{category}/{gid}").set(info)
+            case "reaction":
+                db.reference(f"/add_reaction/{gid}").push(info)
+            case "appchannel":
+                db.reference(f"/{category}/{gid}/channel").set(info)
+            case _:
+                return "What even is this", 400
+
+        return "All good", 200
 
     @app.route("/api/bot-info/<guildid>/<infotype>")
     @cross_origin()
-    def bot_info(guildid:str, infotype:str):
+    def bot_info(guildid: str, infotype: str):
         match infotype:
             case "config":
-                filename = botpath+"/configure_bot/configuration.json"
-                process = lambda c:c
-                default = {"music":True, "moderation":True, "level":True, "reaction_roles":True}
+                def process(c): return c
+                default = {"music": True, "moderation": True,
+                           "level": True, "reaction_roles": True}
             case "auditchannel":
-                filename = botpath+"/configure_bot/auditlogchannel.json"
-                process = lambda c:f'"{str(c)}"'
+                def process(c): return f'"{str(c)}"'
                 default = "NotSet"
             case "bannedwords":
-                filename = botpath+"/configure_bot/cursewords.json"
-                process = lambda w:w
+                def process(w): return w
                 default = []
             case _:
                 return "Invalid info type", 400
-        with open(filename) as file:
-            data:dict[str,Any] = json.load(file)
-            if guildid in data:
-                return process(data[guildid])
-            else:
-                return process(default)
-    
+        ref = db.reference(f"/{infotype}/{guildid}")
+        data: dict[str, Any] = ref.get()
+        if data is not None:
+            return process(data)
+        else:
+            return process(default)
+
     @app.route('/api/sendmsg', methods=['POST'])
     @cross_origin()
     def send_msg():
