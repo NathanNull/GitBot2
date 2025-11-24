@@ -35,14 +35,13 @@ class Help(commands.Cog):
                 return """"But why..." -evin"""
 
     @discord.slash_command()
-    async def help(self, ctx:discord.ApplicationContext, setting: discord.Option(str,choices=[
-                discord.OptionChoice("Level", "level"),
-                discord.OptionChoice("Music", "music"),
-                discord.OptionChoice("Utility","utility"),
-                discord.OptionChoice("Help","help"),
-                discord.OptionChoice("Moderation", "moderation"),
-                discord.OptionChoice("Reaction Roles", "reaction"),
-                discord.OptionChoice("Audit Logs", "auditlogs")])):
+    async def help(self, ctx:discord.ApplicationContext, setting: discord.Option(str,choices=[ # type: ignore
+        discord.OptionChoice("Level", "level"),
+        discord.OptionChoice("Music", "music"),
+        discord.OptionChoice("Utility","utility"),
+        discord.OptionChoice("Help","help"),
+        discord.OptionChoice("Moderation", "moderation"),
+        discord.OptionChoice("Audit Logs", "auditlogs")])):
 
         await ctx.respond(self.get_info(setting))
 

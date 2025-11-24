@@ -36,7 +36,6 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Slash commands
 
-
 @bot.slash_command()
 async def time(ctx: discord.ApplicationContext):
     timestamp = round(datetime.datetime.now().timestamp())

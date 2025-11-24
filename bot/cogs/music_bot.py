@@ -34,16 +34,14 @@ class Music(pcs.ServerCog):
             vc = get(self.bot.voice_clients, guild=self.guild)
         elif ctx.author.voice != None:
             # Bot isn't in a vc, but the command's user is, so join that one
+            print("starting vc connect")
             vc = await ctx.author.voice.channel.connect()
+            print(f"1: {vc.is_connected()=}")
         else:
             await ctx.respond("Neither of us are in a voice channel.")
             return
-        '''try:
-            print(ctx.author.voice.channel)
-            vc = await ctx.author.voice.channel.connect()
-        except:
-            await ctx.send('already in vc')'''
-        
+
+        print(f"2: {vc.is_connected()=}")
         v_info, url = self.search(query)
 
         if vc.is_playing():
@@ -69,7 +67,9 @@ class Music(pcs.ServerCog):
         return True
     
     @pcs.ServerCog.slash_command()
-    async def volume(self, ctx: discord.ApplicationContext, *, vol:discord.Option(int, min_value=0, max_value=100)=None):
+    async def volume(self, ctx: discord.ApplicationContext, *,
+                     vol:discord.Option(int, min_value=0, max_value=100)=None # type: ignore
+                     ):
         if vol is None:
             await ctx.respond(f"The volume is currently {int(self.vol*100)}%")
         else:
@@ -93,7 +93,7 @@ class Music(pcs.ServerCog):
         await asyncio.sleep(300)
         await vc.disconnect()
         
-    def search(self, query:str) -> tuple[dict, str]:
+    '''def search(self, query:str) -> tuple[dict, str]:
         with yt_dlp.YoutubeDL({'format': 'm4a/bestaudio/best', 'noplaylist': 'True'}) as ydl:
             try:
                 requests.get(query)
@@ -103,7 +103,22 @@ class Music(pcs.ServerCog):
                 )['entries'][0]
             else:
                 info = ydl.extract_info(query, download=False)
+        return (info, info['url'])'''
+    def search(self, query: str) -> tuple[dict, str]:
+        with yt_dlp.YoutubeDL({'format': 'm4a/bestaudio/best', 'noplaylist': True}) as ydl:
+            try:
+                # stream=True prevents Requests from downloading the body
+                r = requests.get(query, stream=True, timeout=3)
+                r.close()  # <-- absolutely required
+            except Exception:
+                # Not a valid URL → treat as search
+                info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
+            else:
+                # Valid URL → extract directly
+                info = ydl.extract_info(query, download=False)
+
         return (info, info['url'])
+
 
 def setup(bot):
     bot.add_cog(Music.make_cog(bot))

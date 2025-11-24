@@ -18,14 +18,14 @@ class Configuration(commands.Cog):
 
     @discord.slash_command(name="configure-bot", description="Configure the bot settings", guild_only=True, default_member_permissions=perm_mod)
     async def config_bot(self, ctx: discord.ApplicationContext, *,
-                         setting: discord.Option(str, choices=[
+                         setting: discord.Option(str, choices=[ # type: ignore
                              discord.OptionChoice("Level", "level"),
                              discord.OptionChoice("Music", "music"),
                              discord.OptionChoice("Moderation", "moderation"),
                              discord.OptionChoice(
                                  "Reaction Roles", "reaction_roles")
                          ]),
-                         enable: discord.Option(bool, "Turn on or off?")
+                         enable: discord.Option(bool, "Turn on or off?") # type: ignore
                          ):
         setting: str
         enable: bool

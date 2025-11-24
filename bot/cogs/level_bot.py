@@ -104,7 +104,7 @@ class Level(commands.Cog):
         if gid not in self.levels:
             self.levels[gid] = {}
         if str(user.id) not in self.levels[gid]:
-            self.levels[gid][str(user.id)] = 
+            self.levels[gid][str(user.id)] = {"level": 0, "xp": 0, "last_timestamp": 0}
         user_data = self.levels[gid][str(user.id)]
         user_data["xp"] += amount
         next_amount = xp_to_level(user_data["level"]+1)

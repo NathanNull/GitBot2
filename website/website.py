@@ -10,7 +10,7 @@ CORS(app)
 
 if is_prod:
     discord_login = \
-        r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&redirect_uri=https%3A%2F%2Fsurfbot.xyz%2Fserverlist&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read"
+        r"https://discord.com/oauth2/authorize?client_id=985641530356273182&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A4320%2Fserverlist&scope=identify+guilds+guilds.join+guilds.members.read"
     
     invite_link = \
         r"https://discord.com/api/oauth2/authorize?client_id=985641530356273182&"+\
