@@ -29,7 +29,7 @@ def make_config():
 def init_db():
     is_prod = not ("IS_DEV" in os.environ and os.environ["IS_DEV"] == "yes")
     cred = credentials.Certificate(
-        '.\\surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else '.\\testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
+        r'./surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else r'./testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
     url = "https://surfbot-e0d83-default-rtdb.firebaseio.com" if is_prod else "https://testing-99c64-default-rtdb.firebaseio.com"
     default_app = initialize_app(cred, {'databaseURL': url})
 
