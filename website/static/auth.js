@@ -32,7 +32,7 @@ let main = async () => {
                 // client_secret: window.client_secret,
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: location.protocol + "//" + location.host + location.pathname
+                redirect_uri: location.protocol + "//" + host + location.pathname
             }
             console.log(body)
             for (let key in body) {
