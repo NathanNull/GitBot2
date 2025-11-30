@@ -55,8 +55,13 @@ def console(serverid):
 
 add_backend(app)
 
+if is_prod:
+    port = 80
+else:
+    port = 4320
+
 def main():
-    app.run(host, port=4320)
+    app.run(host, port=port)
 
 if __name__ == "__main__":
     main()

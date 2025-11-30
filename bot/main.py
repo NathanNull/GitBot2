@@ -1,4 +1,5 @@
 # Make sure libraries and such are up to date
+# Imports the packages
 import sys
 import os
 from utils import set_hooks
@@ -11,7 +12,7 @@ import discord
 import ensure_libs
 ensure_libs.ready()
 
-# Imports the packages
+
 
 # Need this so run.py can log the prints properly.
 # Otherwise subprocess.Popen doesn't count them as
