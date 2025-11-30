@@ -4,13 +4,14 @@ from sys import platform
 
 # requires that you have a venv set up, so
 # the script knows where to run python files from
-python = ".venv/Scripts/python.exe"\
+bot = [".venv/Scripts/python.exe"\
     if platform not in ["linux", "linux2"]\
-    else "python"
+    else "python", "bot/main.py"]
+website = "flask --app=website/website run" if platform not in ["linux", "linux2"] else "sudo ~/SurfBot/.venv/bin/flask --app=website/website.py run -h 0.0.0.0 -p 80"
 
 def run_file(input_):
-    path, prefix = input_
-    proc = Popen([python, path], stdout=PIPE, stderr=STDOUT)
+    cmd, prefix = input_
+    proc = Popen(cmd, stdout=PIPE, stderr=STDOUT)
     print(f"{prefix:>7}Started.")
     while True:
         # Get line
@@ -26,8 +27,8 @@ def run_file(input_):
 
 def main():
     proc_names = [
-        ("bot/main.py", "BOT: "),
-        ("website/website.py", "FRONT: "),
+        (bot, "BOT: "),
+        (website, "FRONT: "),
     ]
     try:
         with Pool(len(proc_names)) as pool:
