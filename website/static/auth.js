@@ -21,6 +21,12 @@ let main = async () => {
         }
     } else {
             const data = new URLSearchParams()
+            let host;
+            if (location.host.startsWith("localhost")) {
+                host = location.host
+            } else {
+                host = "surfbot.my.to"
+            }
             let body = {
                 // client_id: window.client_id,
                 // client_secret: window.client_secret,
