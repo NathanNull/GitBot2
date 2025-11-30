@@ -1,7 +1,7 @@
 import discord
 from discord import ui, ButtonStyle, Interaction, ApplicationContext
 
-res_args = {"delete_after": 3}
+res_args = {"ephemeral": True}
 
 class PlayView(ui.View):
     def __init__(self, bot, m_cog, vc: discord.VoiceClient):

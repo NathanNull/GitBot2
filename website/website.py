@@ -17,10 +17,10 @@ if is_prod:
         r"permissions=1644971949559&scope=bot%20applications.commands"
 else:
     discord_login = \
-        r"https://discord.com/oauth2/authorize?client_id=835950957196083201&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A4320%2Fserverlist&scope=guilds.members.read+guilds+guilds.join+identify"
+        r"https://discord.com/oauth2/authorize?client_id=1444562104609669120&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fserverlist&scope=guilds.members.read+guilds+guilds.join+identify"
 
     invite_link = \
-        r"https://discord.com/api/oauth2/authorize?client_id=835950957196083201&"+\
+        r"https://discord.com/api/oauth2/authorize?client_id=1444562104609669120&"+\
         r"permissions=1644971949559&scope=bot%20applications.commands"
 
 def getpath(static_path: str):
@@ -37,8 +37,8 @@ PARAMS = {
     "getpath": getpath,
     "getstyle": getstyle,
     "invite": invite_link,
-    "client_id": "985641530356273182" if is_prod else "835950957196083201",
-    "client_secret": "CswKZV4Ed1ApKlxr0U2o0g45n68HbKFT" if is_prod else "6RBxvFT8dWGQw4nJyRPB-pPHPSTnseUZ"
+    "client_id": "985641530356273182" if is_prod else "1444562104609669120",
+    "client_secret": "dEWJxhVGhDQ-lD0UyCVtvZQx8Rk2FVUI" if is_prod else "D81OafFsY8YxMNEwXW7LVQTKbTi87QjF"
 }
 
 @app.route("/")

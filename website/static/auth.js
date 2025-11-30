@@ -22,8 +22,8 @@ let main = async () => {
     } else {
             const data = new URLSearchParams()
             let body = {
-                client_id: window.client_id,
-                client_secret: window.client_secret,
+                // client_id: window.client_id,
+                // client_secret: window.client_secret,
                 grant_type: 'authorization_code',
                 code,
                 redirect_uri: location.protocol + "//" + location.host + location.pathname
@@ -34,12 +34,15 @@ let main = async () => {
                 data.append(encodeURI(key), encodeURI(body[key]))
             }
             console.log(body)
-            console.log(Array(...data.entries()))
+            console.log(Array(...data.entries()));
+
+            let credentials = btoa(`${window.client_id}:${window.client_secret}`);
             let res = await fetch("https://discord.com/api/oauth2/token", {
                 method: 'POST',
                 body: data,
                 headers: {
-                    'Content-Type': "application/x-www-form-urlencoded"
+                    'Content-Type': "application/x-www-form-urlencoded",
+                    'Authorization': `Basic ${credentials}`
                 }
             }).then(r => r.json())
             console.log(res)

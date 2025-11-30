@@ -38,7 +38,7 @@ class Music(pcs.ServerCog):
             vc = await ctx.author.voice.channel.connect()
             print(f"1: {vc.is_connected()=}")
         else:
-            await ctx.respond("Neither of us are in a voice channel.")
+            await ctx.respond("Neither of us are in a voice channel.", ephemeral=True)
             return
 
         print(f"2: {vc.is_connected()=}")
@@ -46,7 +46,7 @@ class Music(pcs.ServerCog):
 
         if vc.is_playing():
             self.queue.append((v_info, url))
-            await ctx.respond("Song added to queue")
+            await ctx.respond("Song added to queue", ephemeral=True)
             await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
         else:
             if self.leave_timer != None:
@@ -71,7 +71,7 @@ class Music(pcs.ServerCog):
                      vol:discord.Option(int, min_value=0, max_value=100)=None # type: ignore
                      ):
         if vol is None:
-            await ctx.respond(f"The volume is currently {int(self.vol*100)}%")
+            await ctx.respond(f"The volume is currently {int(self.vol*100)}%", ephemeral=True)
         else:
             dv = (vol/100) - self.vol
             self.adjust_volume(dv)
