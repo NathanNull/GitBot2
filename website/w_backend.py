@@ -16,7 +16,7 @@ basepath = os.path.abspath(os.path.join(basedir, os.pardir))
 load_dotenv(basepath+"/website/.env")
 
 cred = credentials.Certificate(
-    r'./surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else r'./testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
+    r'../surfbot-e0d83-firebase-adminsdk-dgaks-b191f56486.json' if is_prod else r'./testing-99c64-firebase-adminsdk-t7j1l-9fc9429ff6.json')
 url = "https://surfbot-e0d83-default-rtdb.firebaseio.com" if is_prod else "https://testing-99c64-default-rtdb.firebaseio.com"
 default_app = initialize_app(cred, {'databaseURL': url})
 
