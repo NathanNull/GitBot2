@@ -4,60 +4,63 @@ let token;
 let userdata;
 
 let main = async () => {
+    if ("discord_token" in sessionStorage) // Check if it's stored in sessionStorage, if so then use it.
+    {
+        [token_type, access_token] = sessionStorage.getItem("discord_token").split(" ")
+        return
+    }
+
     // Get URL fragment
     let params = new URLSearchParams(window.location.search.slice(1))
     let code = params.get("code")
     let token_type, access_token
 
     if (!code) {
-        if ("discord_token" in sessionStorage) // Check if it's stored in sessionStorage, if so then use it.
-            [token_type, access_token] = sessionStorage.getItem("discord_token").split(" ")
-        else // If it isn't, then let the user log in.
-        {
-            document.addEventListener("DOMContentLoaded",
-                () => get_element(["#login"]).style.display = "flex"
-            )
-            return
-        }
-    } else {
-            const data = new URLSearchParams()
-            let host;
-            if (location.host.startsWith("localhost")) {
-                host = location.host
-            } else {
-                host = "surfbot.my.to"
-            }
-            let body = {
-                // client_id: window.client_id,
-                // client_secret: window.client_secret,
-                grant_type: 'authorization_code',
-                code,
-                redirect_uri: location.protocol + "//" + host + location.pathname
-            }
-            console.log(body)
-            for (let key in body) {
-                console.log(encodeURI(body[key]))
-                data.append(encodeURI(key), encodeURI(body[key]))
-            }
-            console.log(body)
-            console.log(Array(...data.entries()));
 
-            let credentials = btoa(`${window.client_id}:${window.client_secret}`);
-            let res = await fetch("https://discord.com/api/oauth2/token", {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Content-Type': "application/x-www-form-urlencoded",
-                    'Authorization': `Basic ${credentials}`
-                }
-            }).then(r => r.json())
-            console.log(res)
-            if ('access_token' in res) {
-                access_token = res.access_token
-                token_type = res.token_type
-            } else return
+        document.addEventListener("DOMContentLoaded",
+            () => get_element(["#login"]).style.display = "flex"
+        )
+        return
+
+    } else {
+        const data = new URLSearchParams()
+        let host;
+        if (location.host.startsWith("localhost")) {
+            host = location.host
+        } else {
+            host = "surfbot.my.to"
         }
-    
+        let body = {
+            // client_id: window.client_id,
+            // client_secret: window.client_secret,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: location.protocol + "//" + host + location.pathname
+        }
+        console.log(body)
+        for (let key in body) {
+            console.log(encodeURI(body[key]))
+            data.append(encodeURI(key), encodeURI(body[key]))
+        }
+        console.log(body)
+        console.log(Array(...data.entries()));
+
+        let credentials = btoa(`${window.client_id}:${window.client_secret}`);
+        let res = await fetch("https://discord.com/api/oauth2/token", {
+            method: 'POST',
+            body: data,
+            headers: {
+                'Content-Type': "application/x-www-form-urlencoded",
+                'Authorization': `Basic ${credentials}`
+            }
+        }).then(r => r.json())
+        console.log(res)
+        if ('access_token' in res) {
+            access_token = res.access_token
+            token_type = res.token_type
+        } else return
+    }
+
 
     await fetch("https://discord.com/api/users/@me", {
         headers: {

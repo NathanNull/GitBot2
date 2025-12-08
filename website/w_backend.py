@@ -1,10 +1,8 @@
 from check_prod import is_prod
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import random
-import json
 from typing import Any
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 from flask_cors import cross_origin
 from requests import get, post
 from firebase_admin import db, credentials, initialize_app
