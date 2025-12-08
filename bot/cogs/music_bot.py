@@ -12,6 +12,8 @@ FFMPEG_OPTIONS = {
     'options': '-vn'
 }
 
+
+
 class Music(pcs.ServerCog):
     def __init__(self, *args):
         super().__init__(*args)
@@ -101,10 +103,10 @@ class Music(pcs.ServerCog):
 
     def search(self, query: str) -> tuple[dict, str]:
         with yt_dlp.YoutubeDL({
+            'cookiefile': './cookies.txt',
             'format': 'm4a/bestaudio/best',
             'noplaylist': True,
             'js_runtimes': {'node': {}},
-            'cookiefile': './cookies.txt',
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=3)
