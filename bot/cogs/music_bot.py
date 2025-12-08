@@ -12,7 +12,6 @@ FFMPEG_OPTIONS = {
     'options': '-vn'
 }
 
-
 class Music(pcs.ServerCog):
     def __init__(self, *args):
         super().__init__(*args)
@@ -105,17 +104,17 @@ class Music(pcs.ServerCog):
             'format': 'm4a/bestaudio/best',
             'noplaylist': True,
             'js_runtimes': {'node': {}},
+            'cookiefile': './cookies.txt',
         }) as ydl:
             try:
-                # stream=True prevents Requests from downloading the body
                 r = requests.get(query, stream=True, timeout=3)
-                r.close()  # <-- absolutely required
+                r.close()
             except Exception:
-                # Not a valid URL → treat as search
+                # Not a valid URL -> treat as search
                 info = ydl.extract_info(f"ytsearch:{query}", download=False)[
                     'entries'][0]
             else:
-                # Valid URL → extract directly
+                # Valid URL -> extract directly
                 info = ydl.extract_info(query, download=False)
 
         return (info, info['url'])
