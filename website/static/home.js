@@ -5,7 +5,7 @@ async function main() {
     let feedback_submit = get_element(['#feedback-submit'])
     feedback_submit.onclick = async () => {
         let data = feedback_box.value
-        await fetch(`https://${location.host}/api/sendmsg`, {
+        await fetch(`${location.protocol}//${location.host}/api/sendmsg`, {
             headers: {
                 'Content-Type': 'application/json'
             },
