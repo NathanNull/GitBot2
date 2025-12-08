@@ -1,3 +1,4 @@
+from sys import platform
 import pycord_cogsbyserver as pcs
 import discord
 import yt_dlp
@@ -12,7 +13,7 @@ FFMPEG_OPTIONS = {
     'options': '-vn'
 }
 
-
+node_path = "C:\Program Files\nodejs\node.exe" if platform not in ["linux", "linux2"] else "~/.nvm/versions/node/v24.11.1/bin/node"
 
 class Music(pcs.ServerCog):
     def __init__(self, *args):
@@ -106,7 +107,7 @@ class Music(pcs.ServerCog):
             'cookiefile': './cookies.txt',
             'format': 'm4a/bestaudio/best',
             'noplaylist': True,
-            'js_runtimes': {'node': {}},
+            'js_runtimes': {'node': {'path': node_path}},
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=3)
