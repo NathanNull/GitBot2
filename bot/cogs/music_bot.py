@@ -107,7 +107,7 @@ class Music(pcs.ServerCog):
             'cookiefile': './cookies.txt',
             'format': 'm4a/bestaudio/best',
             'noplaylist': True,
-            'js_runtimes': {'node': {'path': node_path}},
+            # 'js_runtimes': {'node': {'path': node_path}},
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=3)
