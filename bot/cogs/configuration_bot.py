@@ -9,7 +9,14 @@ class Configuration(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.configuration: dict[str, dict[str, bool]] = {}
+        self.configuration: dict[str, dict[str, bool]] = {
+            "asdf": {
+                "level": False,
+                "music": False,
+                "moderation": False,
+                "reaction_roles": False,
+            }
+        }
 
         global config
         config = self.configuration
