@@ -18,7 +18,7 @@ class AuditLogging(commands.Cog):
     async def save(self):
         update_db("auditchannel", self.auditchannel)
     
-    @discord.commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         self.auditchannel = read_db("auditchannel")
 

@@ -53,7 +53,7 @@ class App(commands.Cog):
     async def save(self):
         update_db('appchannel', self.app)
     
-    @discord.commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         self.app = read_db("appchannel")
 

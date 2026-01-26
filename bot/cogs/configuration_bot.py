@@ -16,7 +16,7 @@ class Configuration(commands.Cog):
 
         self.save.start()
     
-    @discord.commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_ready(self):
         self.configuration = read_db("config")
         
