@@ -5,6 +5,7 @@ import yt_dlp
 import requests
 from discord.utils import get
 import asyncio
+from configuration import requires
 import music_embeds
 
 FFMPEG_OPTIONS = {
@@ -30,6 +31,7 @@ class Music(pcs.ServerCog):
         pass
 
     @pcs.ServerCog.slash_command()
+    @requires.music
     async def play(self, ctx: discord.ApplicationContext, *, query):
         await ctx.defer()
 
@@ -72,6 +74,7 @@ class Music(pcs.ServerCog):
         return True
 
     @pcs.ServerCog.slash_command()
+    @requires.music
     async def volume(self, ctx: discord.ApplicationContext, *,
                      vol: discord.Option(
                          int, min_value=0, max_value=100) = None  # type: ignore
