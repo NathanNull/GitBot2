@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import random
 from time import time
-from utils import update_db, perm_mod
+from utils import read_db, update_db, perm_mod
 from configuration import requires, config_type
 
 
@@ -154,6 +154,10 @@ class Level(commands.Cog):
             del self.levelroles[gid][level]
         await ctx.respond(role.id)
         await self.save()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.levels = read_db("levels")
 
     async def save(self):
         update_db("levels", self.levels)

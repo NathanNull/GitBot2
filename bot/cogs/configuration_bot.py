@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands, tasks
 from functools import wraps
 from typing import Callable
-from utils import update_db, perm_mod
+from utils import read_db, update_db, perm_mod
 
 
 class Configuration(commands.Cog):
@@ -15,6 +15,13 @@ class Configuration(commands.Cog):
         config = self.configuration
 
         self.save.start()
+    
+    @discord.commands.Cog.listener()
+    async def on_ready(self):
+        self.configuration = read_db("config")
+        
+        global config
+        config = self.configuration
 
     @discord.slash_command(name="configure-bot", description="Configure the bot settings", guild_only=True, default_member_permissions=perm_mod)
     async def config_bot(self, ctx: discord.ApplicationContext, *,

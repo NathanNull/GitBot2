@@ -1,7 +1,7 @@
 import discord
 import discord.utils
 from discord.ext import commands, tasks
-from utils import update_db, perm_mod
+from utils import read_db, update_db, perm_mod
 from configuration import requires
 
 class ReactionRoles(commands.Cog):
@@ -63,6 +63,10 @@ class ReactionRoles(commands.Cog):
 			for _, val in self.update_info.items():
 				await self.rxn_raw(*val)
 			self.update_info = {}
+
+	@commands.Cog.listener()
+	async def on_ready(self):
+		self.reaction = read_db("reaction")
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, reaction: discord.Reaction):

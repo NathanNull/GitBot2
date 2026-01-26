@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from utils import update_db, make_config, perm_mod
+from utils import read_db, update_db, make_config, perm_mod
 from configuration import requires, config_type
 cursewords = "cursewords"
 
@@ -94,6 +94,11 @@ class Mod(commands.Cog):
     async def save(self):
         update_db("cursewords", self.cursewords)
         update_db("warns", self.warns)
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.warns = read_db("warns")
+        self.cursewords = read_db("cursewords")
 
     def is_swear(self, text: str, guild_id: int) -> bool:
         gid = str(guild_id)

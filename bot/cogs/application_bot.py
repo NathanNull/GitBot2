@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from configuration import requires
 import appinput
 import random
-from utils import update_db
+from utils import read_db, update_db
 
 
 async def autocomplete_app_name(ctx: discord.AutocompleteContext):
@@ -52,6 +52,10 @@ class App(commands.Cog):
     
     async def save(self):
         update_db('appchannel', self.app)
+    
+    @discord.commands.Cog.listener()
+    async def on_ready(self):
+        self.app = read_db("appchannel")
 
 def setup(bot):
     bot.add_cog(App(bot))
