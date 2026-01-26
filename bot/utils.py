@@ -100,7 +100,8 @@ def set_hooks(bot: discord.Bot):
 
 
 def update_db(category, data):
-    db.reference(f"/{category}").set(data)
+    if data != None:
+        db.reference(f"/{category}").set(data)
 
 def read_db(category) -> Any:
     return db.reference(f"/{category}").get()
