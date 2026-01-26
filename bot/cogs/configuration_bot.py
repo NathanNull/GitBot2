@@ -9,26 +9,12 @@ class Configuration(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-        self.configuration: dict[str, dict[str, bool]] = {
-            "asdf": {
-                "level": False,
-                "music": False,
-                "moderation": False,
-                "reaction_roles": False,
-            }
-        }
+        self.configuration: dict[str, dict[str, bool]] = {}
 
         global config
         config = self.configuration
 
         self.save.start()
-    
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.configuration = read_db("config")
-        
-        global config
-        config = self.configuration
 
     @discord.slash_command(name="configure-bot", description="Configure the bot settings", guild_only=True, default_member_permissions=perm_mod)
     async def config_bot(self, ctx: discord.ApplicationContext, *,
@@ -59,7 +45,13 @@ class Configuration(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def save(self):
-        update_db("config", self.configuration)
+        if self.configuration == {}:
+            self.configuration = read_db("config")
+        
+            global config
+            config = self.configuration
+        else:
+            update_db("config", self.configuration)
 
 def check_config(type_: str):
     def decorator(cmd: Callable):
