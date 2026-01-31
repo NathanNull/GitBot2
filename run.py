@@ -9,7 +9,7 @@ bot = [".venv/Scripts/python.exe"
        else "python", "bot/main.py"]
 website = ["flask", "--app=website/website", "run"]\
     if platform not in ["linux", "linux2"]\
-    else ["sudo", ".venv/bin/flask", "--app=website/website.py", "run", "-h", "0.0.0.0", "-p", "80"]
+    else ["sudo", ".venv/bin/flask", "--app=website/website.py", "run", "-h", "0.0.0.0", "-p", "443"]
 
 
 def run_file(input_):
