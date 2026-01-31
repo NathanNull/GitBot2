@@ -54,16 +54,3 @@ def console(serverid):
     return make_page("console", serverid=serverid)
 
 add_backend(app)
-
-if is_prod:
-    print("using production port 443")
-    port = 443
-else:
-    port = 4320
-
-def main():
-    print("using port", port)
-    app.run(host, port=port)
-
-if __name__ == "__main__":
-    main()
