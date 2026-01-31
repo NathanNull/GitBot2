@@ -82,7 +82,7 @@ class Mod(commands.Cog):
 
     @discord.slash_command(guild_only=True, default_member_permissions=perm_mod)
     @requires.moderation
-    async def howmanywarns(self, ctx: discord.ApplicationContext, *, user: discord.User):
+    async def how_many_warns(self, ctx: discord.ApplicationContext, *, user: discord.User):
         gid = str(ctx.guild.id)
         print(user)
         if gid not in self.warns:
