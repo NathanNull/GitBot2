@@ -56,6 +56,7 @@ def console(serverid):
 add_backend(app)
 
 if is_prod:
+    print("using production port 443")
     port = 443
 else:
     port = 4320
