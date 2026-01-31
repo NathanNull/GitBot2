@@ -4,32 +4,21 @@ let token;
 let userdata;
 
 let main = async () => {
-    if ("discord_token" in sessionStorage) // Check if it's stored in sessionStorage, if so then use it.
-    {
-        [token_type, access_token] = sessionStorage.getItem("discord_token").split(" ")
-        return
-    }
-
     // Get URL fragment
     let params = new URLSearchParams(window.location.search.slice(1))
     let code = params.get("code")
     let token_type, access_token
-
-    if (!code) {
-
+    if ("discord_token" in sessionStorage) // Check if it's stored in sessionStorage, if so then use it.
+    {
+        [token_type, access_token] = sessionStorage.getItem("discord_token").split(" ")
+    } else if (!code) {
         document.addEventListener("DOMContentLoaded",
             () => get_element(["#login"]).style.display = "flex"
         )
         return
-
     } else {
-        const data = new URLSearchParams()
-        let host;
-        if (location.host.startsWith("localhost")) {
-            host = location.host
-        } else {
-            host = "surfbot.my.to"
-        }
+        const data = new URLSearchParams();
+        let host = location.host;
         let body = {
             // client_id: window.client_id,
             // client_secret: window.client_secret,
