@@ -62,6 +62,7 @@ else:
     port = 4320
 
 def main():
+    print("using port", port)
     app.run(host, port=port)
 
 if __name__ == "__main__":
