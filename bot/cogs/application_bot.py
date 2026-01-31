@@ -48,7 +48,6 @@ class App(commands.Cog):
     async def apply(self, ctx: discord.ApplicationContext, app_name):
         gid = str(ctx.guild_id)
         await ctx.send_modal(appinput.AnswerInput(cog=self, questions=self.app[gid]["applications"][app_name], title=app_name))
-        await self.channelidstuff(ctx.guild).send('worked')
     
     async def save(self):
         update_db('appchannel', self.app)
