@@ -54,6 +54,7 @@ class AnswerInput(discord.ui.Modal):
 			embed = discord.Embed(title="Your answers")
 			for q, a in self.answers:
 				embed.add_field(name=q, value=a, inline=False)
+			await self.cog.channelidstuff(interaction.guild).send(f'this application is from <@{self.user.id}')
 			await self.cog.channelidstuff(interaction.guild).send(embed=embed)
 
 class NextButton(discord.ui.View):
