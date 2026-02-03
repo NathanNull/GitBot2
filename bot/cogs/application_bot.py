@@ -53,7 +53,7 @@ class App(commands.Cog):
     async def testing(self, ctx):
         uid = ctx.user.id
         try:
-            user = self.fetch_user(uid)
+            user = ctx.fetch_user(uid)
             dmc = await user.create_dm()
             await dmc.send('worked yippee')
             await ctx.respond('worked')
