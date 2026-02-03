@@ -51,14 +51,14 @@ class App(commands.Cog):
 
     @cmd_grp.command()
     async def testing(self, ctx):
-        uid = ctx.user_id
+        uid = ctx.user.id
         try:
             dmc = await uid.create_dm()
             await dmc.send('worked yippee')
             await ctx.respond('worked')
         except discord.Forbidden:
             await ctx.respond('If you would like to apply to the server you ran this in then please unblock the bot and try again')
-            
+
     async def save(self):
         update_db('appchannel', self.app)
     
