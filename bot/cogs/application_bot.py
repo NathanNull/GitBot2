@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from configuration import requires
 import appinput
 import random
-from utils import read_db, update_db
+from utils import read_db, update_db, perm_mod
 
 
 async def autocomplete_app_name(ctx: discord.AutocompleteContext):
@@ -39,7 +39,7 @@ class App(commands.Cog):
 
     cmd_grp = discord.SlashCommandGroup("application")
 
-    @cmd_grp.command(description="Create an application for people to apply")
+    @cmd_grp.command(description="Create an application for people to apply", guild_only=True, default_member_permissions=perm_mod)
     async def create(self, ctx: discord.ApplicationContext, app_name, question_amount: int):
         await ctx.send_modal(appinput.QuestionInput(cog=self, q_amt=question_amount, title=app_name))
 
@@ -48,7 +48,17 @@ class App(commands.Cog):
     async def apply(self, ctx: discord.ApplicationContext, app_name):
         gid = str(ctx.guild_id)
         await ctx.send_modal(appinput.AnswerInput(cog=self, questions=self.app[gid]["applications"][app_name], title=app_name))
-    
+
+    @cmd_grp.command()
+    async def testing(self, ctx):
+        uid = ctx.user_id
+        try:
+            dmc = await uid.create_dm()
+            await dmc.send('worked yippee')
+            await ctx.respond('worked')
+        except discord.Forbidden:
+            await ctx.respond('If you would like to apply to the server you ran this in then please unblock the bot and try again')
+            
     async def save(self):
         update_db('appchannel', self.app)
     
