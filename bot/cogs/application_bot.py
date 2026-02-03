@@ -53,9 +53,7 @@ class App(commands.Cog):
     async def testing(self, ctx):
         uid = ctx.user.id
         try:
-            user = ctx.fetch_user(uid)
-            dmc = await user.create_dm()
-            await dmc.send('worked yippee')
+            await ctx.user.send('worked yippee')
             await ctx.respond('worked')
         except discord.Forbidden:
             await ctx.respond('If you would like to apply to the server you ran this in then please unblock the bot and try again')
