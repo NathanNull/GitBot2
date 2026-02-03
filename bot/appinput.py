@@ -24,6 +24,8 @@ class QuestionInput(discord.ui.Modal):
 			gid = str(interaction.guild_id)
 			if gid not in self.cog.app:
 				self.cog.app[gid] = {"applications": {}, "channel": -1}
+			elif "applications" not in self.cog.app[gid]:
+				self.cog.app[gid]["applications"] = {}
 			self.cog.app[gid]["applications"][self.title] = self.curr_qs
 			await self.cog.save()
 
