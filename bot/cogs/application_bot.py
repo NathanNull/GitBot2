@@ -53,7 +53,8 @@ class App(commands.Cog):
     async def testing(self, ctx):
         uid = ctx.user.id
         try:
-            dmc = await uid.create_dm()
+            user = self.fetch_user(uid)
+            dmc = await user.create_dm()
             await dmc.send('worked yippee')
             await ctx.respond('worked')
         except discord.Forbidden:
