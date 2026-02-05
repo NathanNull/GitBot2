@@ -56,7 +56,7 @@ class App(commands.Cog):
             await ctx.user.send('worked yippee')
             await ctx.respond('worked')
         except discord.Forbidden:
-            await ctx.respond('If you would like to apply to the server you ran this in then please unblock the bot and try again')
+            await ctx.respond(f'<@{uid}>If you would like to apply to the server you ran this in then please unblock the bot and try again')
 
     async def save(self):
         update_db('appchannel', self.app)

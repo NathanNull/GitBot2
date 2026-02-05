@@ -69,7 +69,7 @@ class NextButton(discord.ui.View):
 		await self.message.delete()
 		await i.response.send_modal(self.control_modal)
 
-# Broken, fix maybe
+# Broken, fix maybe how long has this been broken god damn
 # class ReviewScreen(discord.ui.View):
 # 	def __init__(self, control_modal:QuestionInput):
 # 		super().__init__(timeout=None)
