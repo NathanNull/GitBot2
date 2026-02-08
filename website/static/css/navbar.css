@@ -1,12 +1,11 @@
 /* Add a black background color to the top navigation */
 #navbar {
-    background-color: #0e1134;
+    background-color: var(--primary-dark);
     overflow: hidden;
     display: flex;
     vertical-align: middle;
     height: 10%;
     align-items: stretch;
-    padding: 0px 10px;
 }
 
 #navbar #user-details
@@ -19,7 +18,7 @@
 {
     align-items: center;
     display: flex;
-    padding: 0px;
+    padding: 0px 10px;
 }
 
 #navbar #addbot {
@@ -43,9 +42,9 @@
 
 /* Style the links inside the navigation bar */
 #navbar .button {
+    color: inherit;
     display: flex;
     align-items: center;
-    color: #e0e0e0;
     vertical-align: middle;
     padding-left: 16px;
     padding-right: 16px;
@@ -56,7 +55,7 @@
 }
 
 #navbar .text {
-    color: #e0e0e0;
+    color: inherit;
     text-align: center;
     padding: 0px 16px;
     text-decoration: none;
@@ -66,14 +65,12 @@
 
 /* Change the color of links on hover */
 #navbar .button:hover {
-    background-color: #2065a9;
-    color: #ddd;
+    background-color: var(--secondary);
 }
 
 /* Add a color to the active/current link */
 #navbar .button:active {
-    background-color: #0e1134;
-    color: white;
+    background-color: var(--primary-dark);
 }
 
 #pfp {

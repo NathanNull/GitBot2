@@ -1,10 +1,16 @@
 body {
-    background-color: #25273b;
-    color: #ffffff;
+    background-color: var(--primary);
+    color: var(--text);
     font-family: "Lucida Console MS", "Lucida Console", "Arial MS", "Arial";
+    margin: 0px;
+    --primary: #0c0c39;
+    --primary-dark: #314665;
+    --secondary: #79b9bb;
+    --text: #e4f9f9;
 }
 
 #content {
     font-family: "Arial MS", "Arial";
+    padding: 8px;
     /* fixed it */
 }
