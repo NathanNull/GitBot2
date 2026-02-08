@@ -15,6 +15,7 @@ FFMPEG_OPTIONS = {
 }
 
 js_path = "C:\\Program Files\\nodejs\\node.exe" if platform not in ["linux", "linux2"] else "/usr/local/bin/deno"
+js_type = "node" if platform not in ["linux", "linux2"] else "deno"
 
 class Music(pcs.ServerCog):
     def __init__(self, *args):
@@ -110,7 +111,8 @@ class Music(pcs.ServerCog):
             'cookiefile': './cookies.txt',
             'format': 'm4a/bestaudio/best',
             'noplaylist': True,
-            'js_runtimes': {'deno': {'path': js_path}},
+            'js_runtimes': {js_type: {'path': js_path}},
+            'remote_components': ['ejs:github'],
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=3)
