@@ -52,6 +52,9 @@ class Music(pcs.ServerCog):
         print(f"2: {vc.is_connected()=}")
         v_info, url = self.search(query)
 
+        while vc.is_connected() == False:
+            vc = await ctx.author.voice.channel.connect()
+            print(f"3: {vc.is_connected()=}")
         if vc.is_playing():
             self.queue.append((v_info, url))
             await ctx.respond("Song added to queue", ephemeral=True)
