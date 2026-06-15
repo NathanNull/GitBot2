@@ -33,6 +33,41 @@ class Music(pcs.ServerCog):
 
     @pcs.ServerCog.slash_command()
     @requires.music
+    async def play(self, ctx: discord.ApplicationContext, *, query: str):
+        await ctx.defer()
+
+        vc = get(self.bot.voice_clients, guild=self.guild)
+        if not vc and ctx.author.voice:
+            try:
+                vc = await ctx.author.voice.channel.connect()
+            except discord.ClientException:
+                await ctx.respond("Failed to connect to voice channel.", ephemeral=True)
+                return
+        elif not vc:
+            await ctx.respond("Neither of us are in a voice channel.", ephemeral=True)
+            return
+
+        # Quick stability check (no infinite loop)
+        if not vc.is_connected():
+            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            return
+
+        try:
+            v_info, url = self.search(query)
+        except RuntimeError as e:
+            await ctx.respond(str(e), ephemeral=True)
+            return
+
+        if vc.is_playing():
+            self.queue.append((v_info, url))
+            await ctx.respond("Song added to queue", ephemeral=True)
+        else:
+            await self._reset_leave_timer()
+            await self._raw_play(v_info, url, vc, ctx)
+
+
+    '''@pcs.ServerCog.slash_command()
+    @requires.music
     async def play(self, ctx: discord.ApplicationContext, *, query):
         await ctx.defer()
 
@@ -63,7 +98,7 @@ class Music(pcs.ServerCog):
             if self.leave_timer != None:
                 self.leave_timer.cancel()
                 self.leave_timer = None
-            await self.raw_play(v_info, url, vc, ctx)
+            await self.raw_play(v_info, url, vc, ctx)'''
 
     def adjust_volume(self, change):
         self.vol += change
