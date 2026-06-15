@@ -40,12 +40,14 @@ class Music(pcs.ServerCog):
         if not vc and ctx.author.voice:
             try:
                 vc = await ctx.author.voice.channel.connect()
-            except discord.ClientException:
-                await ctx.respond("Failed to connect to voice channel.", ephemeral=True)
+                await asyncio.sleep(1.5)  # ← ADD THIS: Let Discord's voice servers stabilize
+            except discord.ClientException as e:
+                await ctx.respond(f"Failed to connect to voice: {e}", ephemeral=True)
                 return
-        elif not vc:
-            await ctx.respond("Neither of us are in a voice channel.", ephemeral=True)
-            return
+            except discord.HTTPException as e:
+                await ctx.respond("Discord API rate limited or voice connection failed.", ephemeral=True)
+                return
+
 
         # Quick stability check (no infinite loop)
         if not vc.is_connected():
