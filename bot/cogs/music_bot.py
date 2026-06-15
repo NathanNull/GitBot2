@@ -111,11 +111,16 @@ class Music(pcs.ServerCog):
 
     def search(self, query: str) -> tuple[dict, str]:
         with yt_dlp.YoutubeDL({
-            'cookiefile': './cookies.txt',
-            'format': 'm4a/bestaudio/best',
+            'format': 'bestaudio',  # Let yt-dlp pick the best available instead of forcing m4a
             'noplaylist': True,
-            'js_runtimes': {js_type: {'path': js_path}},
-            'remote_components': ['ejs:github'],
+            'default_search': 'auto',
+            'quiet': True,
+            'no_warnings': True,
+            'retries': 3,
+            'socket_timeout': 10,
+            'http_chunk_size': 10485760,
+            'merge_output_format': 'm4a',  # Forces output to m4a even if source is webm
+            'keep_video': False,
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=3)
