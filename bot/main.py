@@ -39,7 +39,6 @@ intents.messages = True
 intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 # Force IPv4 only
-discord.opus.load_library('opus/x86_64/libopus.so') # Ensure opus is loaded
 discord.voice_client.VoiceClient.use_ipv4 = True
 # Slash commands
 
