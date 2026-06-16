@@ -33,7 +33,7 @@ class Music(pcs.ServerCog):
 
     @pcs.ServerCog.slash_command()
     @requires.music
-    async def play(self, ctx: discord.ApplicationContext, *, query: str):
+    async def join(self, ctx: discord.ApplicationContext):
         await ctx.defer()
 
         # 1. SAFE CONNECTION WITH TIMEOUT
