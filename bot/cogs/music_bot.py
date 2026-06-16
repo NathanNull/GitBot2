@@ -33,6 +33,32 @@ class Music(pcs.ServerCog):
 
     @pcs.ServerCog.slash_command()
     @requires.music
+    async def join(self, ctx: discord.ApplicationContext):
+        await ctx.defer()
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
+        print(f"User voice channel: {ctx.author.voice.channel.name}")
+        print(f"Bot voice clients: {self.bot.voice_clients}")
+        vc = await ctx.author.voice.channel.connect()
+        # Wait for the voice client to fully establish the UDP media connection
+        print(f"Connecting to {ctx.author.voice.channel.name}...")
+        for _ in range(20):  # 10 second timeout
+            # Check both the object's internal state AND if it's registered in the bot
+            if vc.is_connected() and vc in self.bot.voice_clients:
+                print("✅ Voice connection established!")
+                break
+            print(vc.is_connected())
+            await asyncio.sleep(0.5)
+            
+        if not vc.is_connected():
+            print("❌ Voice connection timed out. UDP likely blocked.")
+            await ctx.respond("Voice connection failed. Check UDP/network settings.", ephemeral=True)
+            return
+
+    @pcs.ServerCog.slash_command()
+    @requires.music
     async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
         if not ctx.author.voice:
