@@ -36,23 +36,18 @@ class Music(pcs.ServerCog):
     async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
 
-        vc = get(self.bot.voice_clients, guild=self.guild)
-        if not vc and ctx.author.voice:
-            try:
-                vc = await ctx.author.voice.channel.connect()
-                await asyncio.sleep(1.5)  # ← ADD THIS: Let Discord's voice servers stabilize
-            except discord.ClientException as e:
-                await ctx.respond(f"Failed to connect to voice: {e}", ephemeral=True)
-                return
-            except discord.HTTPException as e:
-                await ctx.respond("Discord API rate limited or voice connection failed.", ephemeral=True)
-                return
+        vc = await ctx.author.voice.channel.connect()
 
+        # Wait for the voice client to fully establish the UDP media connection
+        for _ in range(10):  # 5 second timeout
+            if vc.is_connected():
+                break
+            await asyncio.sleep(0.5)
 
-        # Quick stability check (no infinite loop)
         if not vc.is_connected():
             await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
             return
+
 
         try:
             v_info, url = self.search(query)
