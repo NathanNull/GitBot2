@@ -33,29 +33,26 @@ class Music(pcs.ServerCog):
 
     @pcs.ServerCog.slash_command()
     @requires.music
-    async def join(self, ctx: discord.ApplicationContext):
+    async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
-        if not ctx.author.voice:
-            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+
+        # 1. SAFE CONNECTION WITH TIMEOUT
+        try:
+            vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
+        except asyncio.TimeoutError:
+            await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
+            return
+        except discord.ClientException as e:
+            await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
             return
 
-        print(f"User voice channel: {ctx.author.voice.channel.name}")
-        print(f"Bot voice clients: {self.bot.voice_clients}")
-        vc = await ctx.author.voice.channel.connect()
-        # Wait for the voice client to fully establish the UDP media connection
-        print(f"Connecting to {ctx.author.voice.channel.name}...")
-        for _ in range(20):  # 10 second timeout
-            # Check both the object's internal state AND if it's registered in the bot
-            if vc.is_connected() and vc in self.bot.voice_clients:
-                print("✅ Voice connection established!")
-                break
-            print(vc.is_connected())
-            await asyncio.sleep(0.5)
-            
+        # 2. CLEAN UP ZOMBIE VC STATE
         if not vc.is_connected():
-            print("❌ Voice connection timed out. UDP likely blocked.")
-            await ctx.respond("Voice connection failed. Check UDP/network settings.", ephemeral=True)
+            # Remove failed client from bot's registry to prevent state confusion
+            self.bot.voice_clients = [v for v in self.bot.voice_clients if v.guild != self.guild]
+            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
             return
+
 
     @pcs.ServerCog.slash_command()
     @requires.music

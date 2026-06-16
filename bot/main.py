@@ -12,7 +12,8 @@ import discord
 import ensure_libs
 ensure_libs.ready()
 
-
+discord.voice_client.VoiceClient.voice_region = discord.VoiceRegion.us_east
+discord.voice_client.VoiceClient.use_ipv4 = True
 
 # Need this so run.py can log the prints properly.
 # Otherwise subprocess.Popen doesn't count them as
@@ -38,9 +39,6 @@ intents.guilds = True
 intents.messages = True
 intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-# Force IPv4 only
-discord.voice_client.VoiceClient.voice_region = discord.VoiceRegion.us_east
-discord.voice_client.VoiceClient.use_ipv4 = True
 # Slash commands
 
 @bot.slash_command()
