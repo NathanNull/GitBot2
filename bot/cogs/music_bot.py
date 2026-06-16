@@ -49,6 +49,7 @@ class Music(pcs.ServerCog):
             if vc.is_connected() and vc in self.bot.voice_clients:
                 print("✅ Voice connection established!")
                 break
+            print(vc.is_connected())
             await asyncio.sleep(0.5)
             
         if not vc.is_connected():
