@@ -14,5 +14,5 @@ def test_udp(host, port):
         print(f"❌ UDP to {host}:{port} ERROR: {e}")
 
 # Test Discord's media servers (Seattle region from your logs)
-test_udp("c-sea08-cd431db3.discord.media", 50000)
-test_udp("media.discordapp.net", 50000)
+test_udp("c-sea08-cd431db3.discord.media", 2053)
+test_udp("media.discordapp.net", 2053)
