@@ -58,41 +58,42 @@ class Music(pcs.ServerCog):
     @requires.music
     async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
-        if not ctx.author.voice:
-            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
-            return
 
-        print(f"User voice channel: {ctx.author.voice.channel.name}")
-        print(f"Bot voice clients: {self.bot.voice_clients}")
-        vc = await ctx.author.voice.channel.connect()
-        # Wait for the voice client to fully establish the UDP media connection
-        print(f"Connecting to {ctx.author.voice.channel.name}...")
-        for _ in range(20):  # 10 second timeout
-            # Check both the object's internal state AND if it's registered in the bot
-            if vc.is_connected() and vc in self.bot.voice_clients:
-                print("✅ Voice connection established!")
-                break
-            print(vc.is_connected())
-            await asyncio.sleep(0.5)
-            
-        if not vc.is_connected():
-            print("❌ Voice connection timed out. UDP likely blocked.")
-            await ctx.respond("Voice connection failed. Check UDP/network settings.", ephemeral=True)
-            return
-
-
+        # 1. SAFE CONNECTION WITH TIMEOUT
         try:
-            v_info, url = self.search(query)
-        except RuntimeError as e:
-            await ctx.respond(str(e), ephemeral=True)
+            vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
+        except asyncio.TimeoutError:
+            await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
+            return
+        except discord.ClientException as e:
+            await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
             return
 
+        # 2. CLEAN UP ZOMBIE VC STATE
+        if not vc.is_connected():
+            # Remove failed client from bot's registry to prevent state confusion
+            self.bot.voice_clients = [v for v in self.bot.voice_clients if v.guild != self.guild]
+            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            return
+
+        # 3. REST OF YOUR LOGIC (unchanged)
         if vc.is_playing():
+            v_info, url = self.search(query)
             self.queue.append((v_info, url))
             await ctx.respond("Song added to queue", ephemeral=True)
+            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
         else:
-            await self._reset_leave_timer()
-            await self._raw_play(v_info, url, vc, ctx)
+            if self.leave_timer is not None:
+                self.leave_timer.cancel()
+                self.leave_timer = None
+            try:
+                v_info, url = self.search(query)
+                await self.raw_play(v_info, url, vc, ctx)
+            except RuntimeError as e:
+                await ctx.respond(str(e), ephemeral=True)
+                if vc.is_connected():
+                    await vc.disconnect()
+
 
 
     '''@pcs.ServerCog.slash_command()
