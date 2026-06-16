@@ -35,6 +35,12 @@ class Music(pcs.ServerCog):
     @requires.music
     async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
+        print(f"User voice channel: {ctx.author.voice.channel.name}")
+        print(f"Bot voice clients: {self.bot.voice_clients}")
 
         vc = await ctx.author.voice.channel.connect()
 
