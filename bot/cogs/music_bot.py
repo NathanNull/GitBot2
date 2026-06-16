@@ -37,35 +37,93 @@ class Music(pcs.ServerCog):
         await ctx.defer()
 
         vc = get(self.bot.voice_clients, guild=self.guild)
-        if not vc and ctx.author.voice:
+
+        # Connect if not already connected
+        if not vc or not vc.is_connected():
+            if not ctx.author.voice:
+                await ctx.respond("You need to be in a voice channel!", ephemeral=True)
+                return
             try:
                 vc = await ctx.author.voice.channel.connect()
-                await asyncio.sleep(1.5)  # ← ADD THIS: Let Discord's voice servers stabilize
+                await asyncio.sleep(1.0)  # Stabilize voice handshake
             except discord.ClientException as e:
-                await ctx.respond(f"Failed to connect to voice: {e}", ephemeral=True)
+                await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
                 return
             except discord.HTTPException as e:
-                await ctx.respond("Discord API rate limited or voice connection failed.", ephemeral=True)
+                await ctx.respond("Discord voice API error. Try again in a moment.", ephemeral=True)
                 return
 
+        # Check playback state safely
+        is_playing = vc.is_playing() if vc.is_connected() else False
 
-        # Quick stability check (no infinite loop)
+        if is_playing:
+            # Store raw query for later metadata fetch
+            self.queue.append((query, query))
+            await ctx.respond("Added to queue", ephemeral=True)
+            return
+
+        # Start playback
+        await self._reset_leave_timer()
+        try:
+            v_info, url = await self.search(query)
+            await self._raw_play(v_info, url, vc, ctx)
+        except RuntimeError as e:
+            await ctx.respond(str(e), ephemeral=True)
+            # Clean up failed connection attempt
+            if vc and vc.is_connected():
+                await vc.disconnect()
+
+    async def _reset_leave_timer(self):
+        if self.leave_timer:
+            self.leave_timer.cancel()
+        self.leave_timer = self.bot.loop.create_task(self._leave_if_inactive())
+
+    async def _raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
         if not vc.is_connected():
-            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            await ctx.respond("Voice connection lost. Please try again.", ephemeral=True)
             return
 
         try:
-            v_info, url = self.search(query)
-        except RuntimeError as e:
-            await ctx.respond(str(e), ephemeral=True)
+            self.current_song = v_info
+            self.audio = discord.PCMVolumeTransformer(
+                discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
+            
+            vc.play(self.audio, after=lambda e: self.bot.loop.create_task(self._on_song_end(e, ctx, vc)))
+            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
+        except discord.ClientException as e:
+            await ctx.respond(f"Failed to start playback: {e}", ephemeral=True)
+        except Exception as e:
+            await ctx.respond(f"Playback error: {e}", ephemeral=True)
+            if vc.is_connected():
+                await vc.disconnect()
+
+    async def _on_song_end(self, error, ctx, vc):
+        if error:
+            await ctx.respond(f"Playback failed: {error}", ephemeral=True)
+            if vc.is_connected():
+                await vc.disconnect()
             return
 
-        if vc.is_playing():
-            self.queue.append((v_info, url))
-            await ctx.respond("Song added to queue", ephemeral=True)
+        if self.queue:
+            query, _ = self.queue.pop(0)
+            try:
+                v_info, url = await self.search(query)
+                await self._raw_play(v_info, url, vc, ctx)
+            except RuntimeError as e:
+                await ctx.respond(f"Queue error: {e}", ephemeral=True)
+                if vc.is_connected():
+                    await vc.disconnect()
         else:
             await self._reset_leave_timer()
-            await self._raw_play(v_info, url, vc, ctx)
+
+    async def _leave_if_inactive(self):
+        await asyncio.sleep(300)
+        vc = get(self.bot.voice_clients, guild=self.guild)
+        if vc and vc.is_connected() and not vc.is_playing():
+            await vc.disconnect()
+            self.current_song = None
+            self.queue.clear()
+            self.leave_timer = None
 
 
     '''@pcs.ServerCog.slash_command()
