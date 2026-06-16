@@ -45,7 +45,8 @@ class Music(pcs.ServerCog):
         vc = await ctx.author.voice.channel.connect()
 
         # Wait for the voice client to fully establish the UDP media connection
-        for _ in range(10):  # 5 second timeout
+        for _ in range(10):
+            print(f"Bot voice clients: {self.bot.voice_clients}")  # 5 second timeout
             if vc.is_connected():
                 break
             await asyncio.sleep(0.5)
