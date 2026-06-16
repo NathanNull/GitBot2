@@ -41,18 +41,19 @@ class Music(pcs.ServerCog):
 
         print(f"User voice channel: {ctx.author.voice.channel.name}")
         print(f"Bot voice clients: {self.bot.voice_clients}")
-
         vc = await ctx.author.voice.channel.connect()
-
         # Wait for the voice client to fully establish the UDP media connection
-        for _ in range(10):
-            print(f"Bot voice clients: {self.bot.voice_clients}")  # 5 second timeout
-            if vc.is_connected():
+        print(f"Connecting to {ctx.author.voice.channel.name}...")
+        for _ in range(20):  # 10 second timeout
+            # Check both the object's internal state AND if it's registered in the bot
+            if vc.is_connected() and vc in self.bot.voice_clients:
+                print("✅ Voice connection established!")
                 break
             await asyncio.sleep(0.5)
-
+            
         if not vc.is_connected():
-            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            print("❌ Voice connection timed out. UDP likely blocked.")
+            await ctx.respond("Voice connection failed. Check UDP/network settings.", ephemeral=True)
             return
 
 
