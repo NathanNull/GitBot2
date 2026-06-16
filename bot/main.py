@@ -34,7 +34,7 @@ token = decrypt(
 )
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
-
+print(intents)
 # Slash commands
 
 @bot.slash_command()
