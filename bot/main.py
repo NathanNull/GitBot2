@@ -33,8 +33,12 @@ token = decrypt(
     os.environ["KEY" if prod else "DEV_KEY"]
 )
 intents = discord.Intents.all()
+intents.voice_states = True
+intents.guilds = True
+intents.messages = True
+intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-print(intents)
+
 # Slash commands
 
 @bot.slash_command()
