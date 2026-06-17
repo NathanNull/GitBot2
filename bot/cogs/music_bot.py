@@ -65,22 +65,19 @@ class Music(pcs.ServerCog):
             vc = get(self.bot.voice_clients, guild=self.guild)
         else:
             try:
-                vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
+                vc = await ctx.author.voice.channel.connect()
+            # Wait for ACTUAL UDP media handshake, not just gateway join
+                await asyncio.wait_for(vc.wait_until_ready(), timeout=10.0)
             except asyncio.TimeoutError:
-                await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
+            # UDP media failed to establish
+                await vc.disconnect()
+                await ctx.respond("Voice media connection failed. Discord audio is being blocked by your network.", ephemeral=True)
                 return
             except discord.ClientException as e:
                 await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
                 return
 
-        # 2. CLEAN UP ZOMBIE VC STATE
-        if not vc.is_connected():
-            # Remove failed client from bot's registry to prevent state confusion
-            self.bot.voice_clients = [v for v in self.bot.voice_clients if v.guild != self.guild]
-            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
-            return
-
-        # 3. REST OF YOUR LOGIC (unchanged)
+        # Rest of your logic remains exactly the same
         if vc.is_playing():
             v_info, url = self.search(query)
             self.queue.append((v_info, url))
