@@ -60,14 +60,18 @@ class Music(pcs.ServerCog):
         await ctx.defer()
 
         # 1. SAFE CONNECTION WITH TIMEOUT
-        try:
-            vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
-            return
-        except discord.ClientException as e:
-            await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
-            return
+        if get(self.bot.voice_clients, guild=self.guild) is not None:
+            # Bot is in VC in the guild that this command was run in
+            vc = get(self.bot.voice_clients, guild=self.guild)
+        else:
+            try:
+                vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
+            except asyncio.TimeoutError:
+                await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
+                return
+            except discord.ClientException as e:
+                await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
+                return
 
         # 2. CLEAN UP ZOMBIE VC STATE
         if not vc.is_connected():
