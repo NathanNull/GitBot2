@@ -59,25 +59,32 @@ class Music(pcs.ServerCog):
     async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
 
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
+        vc = get(self.bot.voice_clients, guild=self.guild)
+        
         # 1. SAFE CONNECTION WITH TIMEOUT
-        if get(self.bot.voice_clients, guild=self.guild) is not None:
-            # Bot is in VC in the guild that this command was run in
-            vc = get(self.bot.voice_clients, guild=self.guild)
-        else:
+        if not vc or not vc.is_connected():
             try:
-                vc = await ctx.author.voice.channel.connect()
-            # Wait for ACTUAL UDP media handshake, not just gateway join
-                await asyncio.wait_for(vc.wait_until_ready(), timeout=10.0)
+                vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=15.0)
             except asyncio.TimeoutError:
-            # UDP media failed to establish
-                await vc.disconnect()
-                await ctx.respond("Voice media connection failed. Discord audio is being blocked by your network.", ephemeral=True)
+                await ctx.respond("Voice connection timed out. Check firewall/UDP settings.", ephemeral=True)
                 return
             except discord.ClientException as e:
                 await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
                 return
+            except discord.HTTPException as e:
+                await ctx.respond("Discord API error. Try again later.", ephemeral=True)
+                return
 
-        # Rest of your logic remains exactly the same
+        # 2. VERIFY CONNECTION STATE
+        if not vc.is_connected():
+            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            return
+
+        # 3. REST OF YOUR LOGIC (unchanged)
         if vc.is_playing():
             v_info, url = self.search(query)
             self.queue.append((v_info, url))
@@ -94,6 +101,7 @@ class Music(pcs.ServerCog):
                 await ctx.respond(str(e), ephemeral=True)
                 if vc.is_connected():
                     await vc.disconnect()
+
 
 
 
