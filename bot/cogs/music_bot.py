@@ -7,6 +7,7 @@ from discord.utils import get
 import asyncio
 from configuration import requires
 import music_embeds
+import random
 
 FFMPEG_OPTIONS = {
     'before_options':
@@ -77,14 +78,14 @@ class Music(pcs.ServerCog):
                     self.leave_timer.cancel()
                     self.leave_timer = None
                 try:
+                    asyncio.sleep(random.uniform(1.5, 5.0))
                     v_info, url = self.search(query)
                     await self.raw_play(v_info, url, vc, ctx)
                 except RuntimeError as e:
                     await ctx.respond(str(e), ephemeral=True)
                     if vc.is_connected():
                         await vc.disconnect()
-        else:
-            await ctx.respond('to think i thought this would work', ephemeral=True)
+
 
 
 
