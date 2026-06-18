@@ -65,18 +65,22 @@ class Music(pcs.ServerCog):
 
         vc = get(self.bot.voice_clients, guild=self.guild)
         
+        print(vc)
         # 1. SAFE CONNECTION WITH TIMEOUT
         if not vc or not vc.is_connected():
             try:
                 vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=15.0)
             except asyncio.TimeoutError:
                 await ctx.respond("Voice connection timed out. Check firewall/UDP settings.", ephemeral=True)
+                print(vc)
                 return
             except discord.ClientException as e:
                 await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
+                print(vc)
                 return
             except discord.HTTPException as e:
                 await ctx.respond("Discord API error. Try again later.", ephemeral=True)
+                print(vc)
                 return
 
         # 2. VERIFY CONNECTION STATE
