@@ -78,7 +78,7 @@ class Music(pcs.ServerCog):
                     self.leave_timer.cancel()
                     self.leave_timer = None
                 try:
-                    asyncio.sleep(random.uniform(1.5, 5.0))
+                    await asyncio.sleep(random.uniform(1.5, 5.0))
                     v_info, url = self.search(query)
                     await self.raw_play(v_info, url, vc, ctx)
                 except RuntimeError as e:
