@@ -69,6 +69,7 @@ class Music(pcs.ServerCog):
         if vc.is_connected():
 
             if vc.is_playing():
+                await asyncio.sleep(random.uniform(5.0, 15.0))
                 v_info, url = self.search(query)
                 self.queue.append((v_info, url))
                 await ctx.respond("Song added to queue", ephemeral=True)
@@ -78,7 +79,7 @@ class Music(pcs.ServerCog):
                     self.leave_timer.cancel()
                     self.leave_timer = None
                 try:
-                    await asyncio.sleep(random.uniform(1.5, 5.0))
+                    await asyncio.sleep(random.uniform(5.0, 15.0))
                     v_info, url = self.search(query)
                     await self.raw_play(v_info, url, vc, ctx)
                 except RuntimeError as e:
@@ -183,6 +184,7 @@ class Music(pcs.ServerCog):
             'http_chunk_size': 10485760,
             'merge_output_format': 'm4a',  # Keep m4a output preferred
             'keep_video': False,
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0',
             'cookiefile': './cookies.txt'
         }) as ydl:
             try:
