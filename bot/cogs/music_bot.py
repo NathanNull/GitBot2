@@ -31,10 +31,17 @@ class Music(pcs.ServerCog):
     async def on_ready(self):
         pass
 
+
+
     @pcs.ServerCog.slash_command()
     @requires.music
-    async def join(self, ctx: discord.ApplicationContext):
+    async def play(self, ctx: discord.ApplicationContext, *, query: str):
         await ctx.defer()
+
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
         vc = get(self.bot.voice_clients, guild=self.guild)
         # 1. SAFE CONNECTION WITH TIMEOUT
         if not vc or not vc.is_connected():
@@ -57,22 +64,6 @@ class Music(pcs.ServerCog):
         if not vc.is_connected():
             await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
             return
-
-
-    @pcs.ServerCog.slash_command()
-    @requires.music
-    async def play(self, ctx: discord.ApplicationContext, *, query: str):
-        await ctx.defer()
-
-        if not ctx.author.voice:
-            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
-            return
-
-        vc = get(self.bot.voice_clients, guild=self.guild)
-        
-        print(vc)
-
-
         # 3. REST OF YOUR LOGIC (unchanged)
         if vc.is_connected():
 
@@ -177,6 +168,48 @@ class Music(pcs.ServerCog):
         await vc.disconnect()
 
     def search(self, query: str) -> tuple[dict, str]:
+    # Define formats we will try (e.g., best audio, or a specific high-quality one)
+        available_formats = ['bestaudio/best', 'mp4', 'webm'] 
+    
+        with yt_dlp.YoutubeDL({
+            'format': 'bestaudio/best',  # Still start with the best guess
+            'noplaylist': True,
+            'default_search': 'auto',
+            'quiet': True,
+            'no_warnings': True,
+            'retries': 5, # Increased retries for robustness
+            'socket_timeout': 10,
+            'http_chunk_size': 10485760,
+            'merge_output_format': 'm4a',  # Keep m4a output preferred
+            'keep_video': False,
+        }) as ydl:
+            try:
+                r = requests.get(query, stream=True, timeout=10)
+                r.close()
+            except Exception:
+            # Handle case where query isn't a valid URL (search mode)
+                print(f"Query '{query}' treated as search.")
+                try:
+                    info = ydl.extract_info(f"ytsearch:{query}", download=False)[
+                    'entries'][0]
+                except Exception:
+                 # Handle case where the search itself fails
+                    raise Exception("Search failed to return results.")
+
+            else:
+            # Valid URL -> extract directly
+                try:
+                    info = ydl.extract_info(query, download=False)
+                except Exception as e:
+                # This catches the specific DownloadError you are seeing!
+                    print(f"ERROR: yt_dlp failed to extract info for URL {query}. Error: {e}")
+                # Re-raise a custom error or handle it so the main command doesn't crash
+                    raise Exception(f"Could not fetch song information from YouTube.")
+
+
+        return (info, info['url'])
+
+    '''def search(self, query: str) -> tuple[dict, str]:
         with yt_dlp.YoutubeDL({
             'format': 'bestaudio',  # Let yt-dlp pick the best available instead of forcing m4a
             'noplaylist': True,
@@ -186,7 +219,6 @@ class Music(pcs.ServerCog):
             'retries': 3,
             'socket_timeout': 10,
             'http_chunk_size': 10485760,
-            'merge_output_format': 'm4a',  # Forces output to m4a even if source is webm
             'keep_video': False,
         }) as ydl:
             try:
@@ -200,7 +232,7 @@ class Music(pcs.ServerCog):
                 # Valid URL -> extract directly
                 info = ydl.extract_info(query, download=False)
 
-        return (info, info['url'])
+        return (info, info['url'])'''
 
 
 def setup(bot):

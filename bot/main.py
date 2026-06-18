@@ -12,8 +12,7 @@ import discord
 import ensure_libs
 ensure_libs.ready()
 
-discord.voice_client.VoiceClient.voice_region = discord.VoiceRegion.us_east
-discord.voice_client.VoiceClient.use_ipv4 = True
+
 
 # Need this so run.py can log the prints properly.
 # Otherwise subprocess.Popen doesn't count them as
