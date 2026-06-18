@@ -74,22 +74,26 @@ class Music(pcs.ServerCog):
 
 
         # 3. REST OF YOUR LOGIC (unchanged)
-        if vc.is_playing():
-            v_info, url = self.search(query)
-            self.queue.append((v_info, url))
-            await ctx.respond("Song added to queue", ephemeral=True)
-            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
-        else:
-            if self.leave_timer is not None:
-                self.leave_timer.cancel()
-                self.leave_timer = None
-            try:
+        if vc.is_connected():
+
+            if vc.is_playing():
                 v_info, url = self.search(query)
-                await self.raw_play(v_info, url, vc, ctx)
-            except RuntimeError as e:
-                await ctx.respond(str(e), ephemeral=True)
-                if vc.is_connected():
-                    await vc.disconnect()
+                self.queue.append((v_info, url))
+                await ctx.respond("Song added to queue", ephemeral=True)
+                await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
+            else:
+                if self.leave_timer is not None:
+                    self.leave_timer.cancel()
+                    self.leave_timer = None
+                try:
+                    v_info, url = self.search(query)
+                    await self.raw_play(v_info, url, vc, ctx)
+                except RuntimeError as e:
+                    await ctx.respond(str(e), ephemeral=True)
+                    if vc.is_connected():
+                        await vc.disconnect()
+        else:
+            await ctx.respond('to think i thought this would work', ephemeral=True)
 
 
 
