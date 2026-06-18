@@ -35,37 +35,7 @@ class Music(pcs.ServerCog):
     @requires.music
     async def join(self, ctx: discord.ApplicationContext):
         await ctx.defer()
-
-        # 1. SAFE CONNECTION WITH TIMEOUT
-        try:
-            vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.respond("Voice connection timed out. Oracle Cloud UDP is likely blocked.", ephemeral=True)
-            return
-        except discord.ClientException as e:
-            await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
-            return
-
-        # 2. CLEAN UP ZOMBIE VC STATE
-        if not vc.is_connected():
-            # Remove failed client from bot's registry to prevent state confusion
-            self.bot.voice_clients = [v for v in self.bot.voice_clients if v.guild != self.guild]
-            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
-            return
-
-
-    @pcs.ServerCog.slash_command()
-    @requires.music
-    async def play(self, ctx: discord.ApplicationContext, *, query: str):
-        await ctx.defer()
-
-        if not ctx.author.voice:
-            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
-            return
-
         vc = get(self.bot.voice_clients, guild=self.guild)
-        
-        print(vc)
         # 1. SAFE CONNECTION WITH TIMEOUT
         if not vc or not vc.is_connected():
             try:
@@ -87,6 +57,21 @@ class Music(pcs.ServerCog):
         if not vc.is_connected():
             await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
             return
+
+
+    @pcs.ServerCog.slash_command()
+    @requires.music
+    async def play(self, ctx: discord.ApplicationContext, *, query: str):
+        await ctx.defer()
+
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
+        vc = get(self.bot.voice_clients, guild=self.guild)
+        
+        print(vc)
+
 
         # 3. REST OF YOUR LOGIC (unchanged)
         if vc.is_playing():
