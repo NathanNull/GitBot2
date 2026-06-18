@@ -182,6 +182,7 @@ class Music(pcs.ServerCog):
             'http_chunk_size': 10485760,
             'merge_output_format': 'm4a',  # Keep m4a output preferred
             'keep_video': False,
+            'cookiefile': './cookies.txt'
         }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=10)
