@@ -172,7 +172,7 @@ class Music(pcs.ServerCog):
     def search(self, query: str) -> tuple[dict, str]:
     # Define formats we will try (e.g., best audio, or a specific high-quality one)
         available_formats = ['bestaudio/best', 'mp4', 'webm'] 
-    
+        USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
             'format': 'bestaudio/best',  # Still start with the best guess
             'noplaylist': True,
@@ -184,7 +184,7 @@ class Music(pcs.ServerCog):
             'http_chunk_size': 10485760,
             'merge_output_format': 'm4a',  # Keep m4a output preferred
             'keep_video': False,
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0',
+            'user-agent': USER_AGENT,
             'cookiefile': './cookies.txt'
         }) as ydl:
             try:
