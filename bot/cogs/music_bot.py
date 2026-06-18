@@ -174,19 +174,36 @@ class Music(pcs.ServerCog):
         available_formats = ['bestaudio/best', 'mp4', 'webm'] 
         USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
-            'format': 'bestaudio/best',  # Still start with the best guess
-            'noplaylist': True,
-            'default_search': 'auto',
-            'quiet': True,
-            'no_warnings': True,
-            'retries': 5, # Increased retries for robustness
-            'socket_timeout': 10,
-            'http_chunk_size': 10485760,
-            'merge_output_format': 'm4a',  # Keep m4a output preferred
-            'keep_video': False,
-            'user-agent': USER_AGENT,
-            'cookiefile': './cookies.txt'
-        }) as ydl:
+        'format': 'bestaudio/best',
+        'noplaylist': True,
+        'default_search': 'auto',
+        'quiet': True,
+        'no_warnings': True,
+        'retries': 10,
+        'socket_timeout': 15,
+        'http_chunk_size': 10485760,
+        'keep_video': False,
+        
+        # === Most important fixes for 403 ===
+        'cookiefile': './cookies.txt',           # ← Make sure this file exists!
+        # OR better if bot runs on same machine as browser:
+        # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
+        
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['ios', 'android', 'web'],   # Very important in 2026
+                # 'po_token': '...'   # advanced, optional
+            }
+        },
+        
+
+        
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+        },
+        
+        'nocheckcertificate': True,
+    }) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=10)
                 r.close()
