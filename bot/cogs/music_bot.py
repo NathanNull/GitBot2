@@ -183,6 +183,8 @@ class Music(pcs.ServerCog):
         'socket_timeout': 15,
         'http_chunk_size': 10485760,
         'keep_video': False,
+        'js_runtimes': {js_type: {'path': js_path}},
+        'remote_components': ['ejs:github'],
         
         # === Most important fixes for 403 ===
         'cookiefile': './cookies.txt',           # ← Make sure this file exists!
