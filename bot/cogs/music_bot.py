@@ -189,21 +189,21 @@ class Music(pcs.ServerCog):
         # OR better if bot runs on same machine as browser:
         # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
         
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['ios', 'android', 'web'],   # Very important in 2026
+        #'extractor_args': {
+        #    'youtube': {
+        #        'player_client': ['ios', 'android', 'web'],   # Very important in 2026
                 # 'po_token': '...'   # advanced, optional
-            }
-        },
-        
-
-        
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'
-        },
+        #    }
+        #},
         
         'nocheckcertificate': True,
-    }) as ydl:
+        
+        #'http_headers': {
+        #    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'
+        },
+        
+        
+    ) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=10)
                 r.close()
