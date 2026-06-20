@@ -185,7 +185,7 @@ class Music(pcs.ServerCog):
             'remote_components': ['ejs:github'],
         
         # === Most important fixes for 403 ===
-        'cookiefile': 'GitBot2/bot/cogs/cookies.txt',           # ← Make sure this file exists!
+        'cookiefile': './cookies.txt',           # ← Make sure this file exists!
         # OR better if bot runs on same machine as browser:
         # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
         
