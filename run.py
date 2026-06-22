@@ -1,12 +1,10 @@
 from multiprocessing import Pool
 from subprocess import Popen, PIPE, STDOUT
-from sys import platform
+from sys import platform, executable
 
 # requires that you have a venv set up, so
 # the script knows where to run python files from
-bot = [".venv/Scripts/python.exe"
-       if platform not in ["linux", "linux2"]
-       else "python", "bot/main.py"]
+bot = [executable, "bot/main.py"]
 website = ["flask", "--app=website/website", "run"]\
     if platform not in ["linux", "linux2"]\
     else ["sudo", ".venv/bin/flask", "--app=website/website.py", "run", "-h", "0.0.0.0", "-p", "443", "--cert=adhoc"]
