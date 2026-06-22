@@ -40,6 +40,7 @@ def set_hooks(bot: discord.Bot):
     root_ref = db.reference()
 
     def update_bot(gid: str, category: str, diff):
+        #causing syntax error pls fix
         match category:
             case 'config':
                 cog = bot.get_cog("Configuration")
