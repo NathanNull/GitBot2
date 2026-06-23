@@ -70,7 +70,8 @@ class Music(pcs.ServerCog):
 
             if vc.is_playing():
                 await asyncio.sleep(random.uniform(5.0, 15.0))
-                v_info, url = self.search(query)
+                try: v_info, url = self.search(query)
+                except: ctx.respond('An error has occured please try again. Use only youtube links or use regular words.')
                 self.queue.append((v_info, url))
                 await ctx.respond("Song added to queue", ephemeral=True)
                 await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
