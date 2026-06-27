@@ -37,6 +37,7 @@ class App(commands.Cog):
             self.update_info = {}
 
     cmd_grp = discord.SlashCommandGroup("application")
+    cmd_grpti = discord.SlashCommandGroup("Ticket")
 
     @cmd_grp.command(description="Create an application for people to apply", guild_only=True, default_member_permissions=perm_mod)
     async def create(self, ctx: discord.ApplicationContext, app_name, question_amount: int):
@@ -58,10 +59,10 @@ class App(commands.Cog):
             await ctx.respond("Can't start an application while you already have one", ephemeral=True)
         # await ctx.send_modal(appinput.AnswerInput(cog=self, questions=self.app[gid]["applications"][app_name], title=app_name))
     
-    @cmd_grp.command(description="", guild_only=True, default_member_permissions=perm_mod)
+    @cmd_grp.command(description="Select a category you want to use for tickets", guild_only=True, default_member_permissions=perm_mod)
     @discord.option('category', discord.CategoryChannel, description='Select a category for tickets', required=True)
-    async def ticket_category(self, ctx: discord.ApplicationContext, category: discord.CategoryChannel):
-        ctx.respond(f'heres the category{category}')
+    async def category_selection(self, ctx: discord.ApplicationContext, category: discord.CategoryChannel):
+        await ctx.respond(f'heres the category{category}')
 
     async def save(self):
         update_db('appchannel', self.app)
