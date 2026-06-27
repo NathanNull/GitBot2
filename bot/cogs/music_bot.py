@@ -69,7 +69,7 @@ class Music(pcs.ServerCog):
         if vc.is_connected():
 
             if vc.is_playing():
-                await asyncio.sleep(random.uniform(5.0, 15.0))
+                await asyncio.sleep(random.uniform(2,5))
                 try: v_info, url = self.search(query)
                 except: ctx.respond('An error has occured please try again. Use only youtube links or use regular words.')
                 self.queue.append((v_info, url))
@@ -80,7 +80,7 @@ class Music(pcs.ServerCog):
                     self.leave_timer.cancel()
                     self.leave_timer = None
                 try:
-                    await asyncio.sleep(random.uniform(5.0, 15.0))
+                    await asyncio.sleep(random.uniform(2,5))
                     v_info, url = self.search(query)
                     await self.raw_play(v_info, url, vc, ctx)
                 except RuntimeError as e:
