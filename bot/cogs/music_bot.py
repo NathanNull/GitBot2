@@ -139,6 +139,8 @@ class Music(pcs.ServerCog):
 
     def search(self, query: str) -> tuple[dict, str]:
     # Define formats we will try (e.g., best audio, or a specific high-quality one)
+        print(js_type)
+        print(js_path)
         available_formats = ['bestaudio/best', 'mp4', 'webm'] 
         USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
