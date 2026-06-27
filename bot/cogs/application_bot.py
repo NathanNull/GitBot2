@@ -112,5 +112,5 @@ async def dm(ctx: discord.ApplicationContext, user: discord.User, message: str) 
         return True
     except discord.Forbidden:
         uid = user.id
-        await ctx.respond(f'<@{uid}>If you would like to apply to the server you ran this in then please unblock the bot and try again')
+        await ctx.respond(f'<@{uid}>If you would like to apply to {ctx.guild.name} then please unblock the bot and try again')
         return False
