@@ -37,7 +37,7 @@ class App(commands.Cog):
             self.update_info = {}
 
     cmd_grp = discord.SlashCommandGroup("application")
-    cmd_grpti = discord.SlashCommandGroup("Ticket")
+    cmd_grpti = discord.SlashCommandGroup("ticket")
 
     @cmd_grp.command(description="Create an application for people to apply", guild_only=True, default_member_permissions=perm_mod)
     async def create(self, ctx: discord.ApplicationContext, app_name, question_amount: int):
