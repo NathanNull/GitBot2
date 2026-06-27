@@ -59,7 +59,7 @@ class App(commands.Cog):
             await ctx.respond("Can't start an application while you already have one", ephemeral=True)
         # await ctx.send_modal(appinput.AnswerInput(cog=self, questions=self.app[gid]["applications"][app_name], title=app_name))
     
-    @cmd_grp.command(description="Select a category you want to use for tickets", guild_only=True, default_member_permissions=perm_mod)
+    @cmd_grpti.command(description="Select a category you want to use for tickets", guild_only=True, default_member_permissions=perm_mod)
     @discord.option('category', discord.CategoryChannel, description='Select a category for tickets', required=True)
     async def category_selection(self, ctx: discord.ApplicationContext, category: discord.CategoryChannel):
         await ctx.respond(f'heres the category{category}')
