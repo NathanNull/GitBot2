@@ -173,28 +173,19 @@ class Music(pcs.ServerCog):
         
     ) as ydl:
             try:
-                r = requests.get(query, stream=True, timeout=10)
-                r.close()
-            except Exception:
-            # Handle case where query isn't a valid URL (search mode)
-                print(f"Query '{query}' treated as search.")
-                try:
-                    info = ydl.extract_info(f"ytsearch:{query}", download=False)[
-                    'entries'][0]
-                except Exception:
-                 # Handle case where the search itself fails
-                    raise Exception("Search failed to return results.")
-
-            else:
-            # Valid URL -> extract directly
-                try:
+                if query.startswith(('http://', 'https://', 'www.')):
                     info = ydl.extract_info(query, download=False)
-                except Exception as e:
-                # This catches the specific DownloadError you are seeing!
-                    print(f"ERROR: yt_dlp failed to extract info for URL {query}. Error: {e}")
-                # Re-raise a custom error or handle it so the main command doesn't crash
-                    raise Exception(f"Could not fetch song information from YouTube.")
+                else:
+                    info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
 
+                if not info or 'url' not in info:
+                    raise Exception("No audio URL found")
+
+                return info, info['url']
+
+            except Exception as e:
+                print(f"[yt-dlp ERROR] {type(e).__name__}: {str(e)}")
+                raise Exception(f"Could not fetch song: {str(e)}") from e
 
         return (info, info['url'])
 
