@@ -145,6 +145,7 @@ class Music(pcs.ServerCog):
         USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
         'format': 'bestaudio/best',
+        'remote_components': 'ejs:github',
         'noplaylist': True,
         'default_search': 'auto',
         'retries': 10,
