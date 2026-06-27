@@ -88,44 +88,6 @@ class Music(pcs.ServerCog):
                     if vc.is_connected():
                         await vc.disconnect()
 
-
-
-
-
-    '''@pcs.ServerCog.slash_command()
-    @requires.music
-    async def play(self, ctx: discord.ApplicationContext, *, query):
-        await ctx.defer()
-
-        vc: discord.VoiceClient = None
-        if get(self.bot.voice_clients, guild=self.guild) is not None:
-            # Bot is in VC in the guild that this command was run in
-            vc = get(self.bot.voice_clients, guild=self.guild)
-        elif ctx.author.voice != None:
-            # Bot isn't in a vc, but the command's user is, so join that one
-            print("starting vc connect")
-            vc = await ctx.author.voice.channel.connect()
-            print(f"1: {vc.is_connected()=}")
-        else:
-            await ctx.respond("Neither of us are in a voice channel.", ephemeral=True)
-            return
-
-        print(f"2: {vc.is_connected()=}")
-        v_info, url = self.search(query)
-
-        while vc.is_connected() == False:
-            vc = await ctx.author.voice.channel.connect()
-            print(f"3: {vc.is_connected()=}")
-        if vc.is_playing():
-            self.queue.append((v_info, url))
-            await ctx.respond("Song added to queue", ephemeral=True)
-            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
-        else:
-            if self.leave_timer != None:
-                self.leave_timer.cancel()
-                self.leave_timer = None
-            await self.raw_play(v_info, url, vc, ctx)'''
-
     def adjust_volume(self, change):
         self.vol += change
         newvol = max(0, min(1, self.vol))
@@ -203,7 +165,6 @@ class Music(pcs.ServerCog):
         #    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'
         },
         
-        
     ) as ydl:
             try:
                 r = requests.get(query, stream=True, timeout=10)
@@ -230,32 +191,6 @@ class Music(pcs.ServerCog):
 
 
         return (info, info['url'])
-
-    '''def search(self, query: str) -> tuple[dict, str]:
-        with yt_dlp.YoutubeDL({
-            'format': 'bestaudio',  # Let yt-dlp pick the best available instead of forcing m4a
-            'noplaylist': True,
-            'default_search': 'auto',
-            'quiet': True,
-            'no_warnings': True,
-            'retries': 3,
-            'socket_timeout': 10,
-            'http_chunk_size': 10485760,
-            'keep_video': False,
-        }) as ydl:
-            try:
-                r = requests.get(query, stream=True, timeout=3)
-                r.close()
-            except Exception:
-                # Not a valid URL -> treat as search
-                info = ydl.extract_info(f"ytsearch:{query}", download=False)[
-                    'entries'][0]
-            else:
-                # Valid URL -> extract directly
-                info = ydl.extract_info(query, download=False)
-
-        return (info, info['url'])'''
-
 
 def setup(bot):
     bot.add_cog(Music.make_cog(bot))
