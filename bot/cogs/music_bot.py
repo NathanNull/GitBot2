@@ -18,6 +18,11 @@ FFMPEG_OPTIONS = {
 js_path = "C:\\Program Files\\nodejs\\node.exe" if platform not in ["linux", "linux2"] else "/usr/local/bin/deno"
 js_type = "node" if platform not in ["linux", "linux2"] else "deno"
 
+if platform not in ["linux", "linux2"] :
+    print('not linux')
+else:
+    print('is linux')
+
 class Music(pcs.ServerCog):
     def __init__(self, *args):
         super().__init__(*args)
