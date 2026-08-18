@@ -127,8 +127,17 @@ class Music(pcs.ServerCog):
                 self.leave_if_inactive(vc))
 
     async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
+        headers = v_info.get("http_headers", {})
         self.audio = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS), self.vol)
+            discord.FFmpegPCMAudio(url, before_options=(
+                f'-user_agent "{headers["User-Agent"]}" '
+                f'-headers "Accept: {headers.get("Accept", "*/*")}\r\n'
+                f'Accept-Language: {headers.get("Accept-Language", "en-US,en;q=0.9")}\r\n'
+                f'Sec-Fetch-Mode: {headers.get("Sec-Fetch-Mode", "navigate")}\r\n" '
+                '-reconnect 1 '
+                '-reconnect_streamed 1 '
+                '-reconnect_delay_max 5'
+            ), options="-vn"), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(
             self.when_done(ctx, vc)))
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
