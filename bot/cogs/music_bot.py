@@ -181,6 +181,8 @@ class Music(pcs.ServerCog):
 
                 if not info or 'url' not in info:
                     raise Exception("No audio URL found")
+                print("URL: ", info["url"])
+                print("Headers: ", info.get("http_headers"))
 
                 return info, info['url']
 
