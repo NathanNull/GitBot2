@@ -189,12 +189,12 @@ class Music(pcs.ServerCog):
         # OR better if bot runs on same machine as browser:
         # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
         
-        #'extractor_args': {
-        #    'youtube': {
-        #        'player_client': ['ios', 'android', 'web'],   # Very important in 2026
+        'extractor_args': {
+           'youtube': {
+               'player_client': ['default', 'web_embedded'],   # Very important in 2026
                 # 'po_token': '...'   # advanced, optional
-        #    }
-        #},
+           }
+        },
         
         'nocheckcertificate': True,
         
