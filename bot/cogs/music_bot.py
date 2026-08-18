@@ -134,7 +134,8 @@ class Music(pcs.ServerCog):
                 f'-headers "{header_string}" '
                 '-reconnect 1 '
                 '-reconnect_streamed 1 '
-                '-reconnect_delay_max 5'
+                '-reconnect_delay_max 5 '
+                '-seekable 0'
             ), options="-vn"), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(
             self.when_done(ctx, vc)))
