@@ -18,6 +18,11 @@ FFMPEG_OPTIONS = {
 js_path = "C:\\Program Files\\nodejs\\node.exe" if platform not in ["linux", "linux2"] else "/usr/local/bin/deno"
 js_type = "node" if platform not in ["linux", "linux2"] else "deno"
 
+if platform not in ["linux", "linux2"] :
+    print('not linux')
+else:
+    print('is linux')
+
 class Music(pcs.ServerCog):
     def __init__(self, *args):
         super().__init__(*args)
@@ -69,8 +74,9 @@ class Music(pcs.ServerCog):
         if vc.is_connected():
 
             if vc.is_playing():
-                await asyncio.sleep(random.uniform(5.0, 15.0))
-                v_info, url = self.search(query)
+                await asyncio.sleep(random.uniform(2,5))
+                try: v_info, url = self.search(query)
+                except: ctx.respond('An error has occured please try again. Use only youtube links or use regular words.')
                 self.queue.append((v_info, url))
                 await ctx.respond("Song added to queue", ephemeral=True)
                 await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
@@ -79,51 +85,13 @@ class Music(pcs.ServerCog):
                     self.leave_timer.cancel()
                     self.leave_timer = None
                 try:
-                    await asyncio.sleep(random.uniform(5.0, 15.0))
+                    await asyncio.sleep(random.uniform(2,5))
                     v_info, url = self.search(query)
                     await self.raw_play(v_info, url, vc, ctx)
                 except RuntimeError as e:
                     await ctx.respond(str(e), ephemeral=True)
                     if vc.is_connected():
                         await vc.disconnect()
-
-
-
-
-
-    '''@pcs.ServerCog.slash_command()
-    @requires.music
-    async def play(self, ctx: discord.ApplicationContext, *, query):
-        await ctx.defer()
-
-        vc: discord.VoiceClient = None
-        if get(self.bot.voice_clients, guild=self.guild) is not None:
-            # Bot is in VC in the guild that this command was run in
-            vc = get(self.bot.voice_clients, guild=self.guild)
-        elif ctx.author.voice != None:
-            # Bot isn't in a vc, but the command's user is, so join that one
-            print("starting vc connect")
-            vc = await ctx.author.voice.channel.connect()
-            print(f"1: {vc.is_connected()=}")
-        else:
-            await ctx.respond("Neither of us are in a voice channel.", ephemeral=True)
-            return
-
-        print(f"2: {vc.is_connected()=}")
-        v_info, url = self.search(query)
-
-        while vc.is_connected() == False:
-            vc = await ctx.author.voice.channel.connect()
-            print(f"3: {vc.is_connected()=}")
-        if vc.is_playing():
-            self.queue.append((v_info, url))
-            await ctx.respond("Song added to queue", ephemeral=True)
-            await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
-        else:
-            if self.leave_timer != None:
-                self.leave_timer.cancel()
-                self.leave_timer = None
-            await self.raw_play(v_info, url, vc, ctx)'''
 
     def adjust_volume(self, change):
         self.vol += change
@@ -171,21 +139,23 @@ class Music(pcs.ServerCog):
 
     def search(self, query: str) -> tuple[dict, str]:
     # Define formats we will try (e.g., best audio, or a specific high-quality one)
+        print(js_type)
+        print(js_path)
         available_formats = ['bestaudio/best', 'mp4', 'webm'] 
         USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
-        'format': 'bestaudio/best',
+        'format': 'bestaudio[acodec=opus]/bestaudio/best',
+        'remote_components': 'ejs:github',
         'noplaylist': True,
         'default_search': 'auto',
         'retries': 10,
         'socket_timeout': 15,
         'http_chunk_size': 10485760,
-        'keep_video': False,
         'js_runtimes': {js_type: {'path': js_path}},
             'remote_components': ['ejs:github'],
         
         # === Most important fixes for 403 ===
-        'cookiefile': './cookies.txt',           # ← Make sure this file exists!
+        'cookiefile': '/home/opc/GitBot2/cookies.txt',           # ← Make sure this file exists!
         # OR better if bot runs on same machine as browser:
         # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
         
@@ -202,59 +172,23 @@ class Music(pcs.ServerCog):
         #    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'
         },
         
-        
     ) as ydl:
             try:
-                r = requests.get(query, stream=True, timeout=10)
-                r.close()
-            except Exception:
-            # Handle case where query isn't a valid URL (search mode)
-                print(f"Query '{query}' treated as search.")
-                try:
-                    info = ydl.extract_info(f"ytsearch:{query}", download=False)[
-                    'entries'][0]
-                except Exception:
-                 # Handle case where the search itself fails
-                    raise Exception("Search failed to return results.")
-
-            else:
-            # Valid URL -> extract directly
-                try:
+                if query.startswith(('http://', 'https://', 'www.')):
                     info = ydl.extract_info(query, download=False)
-                except Exception as e:
-                # This catches the specific DownloadError you are seeing!
-                    print(f"ERROR: yt_dlp failed to extract info for URL {query}. Error: {e}")
-                # Re-raise a custom error or handle it so the main command doesn't crash
-                    raise Exception(f"Could not fetch song information from YouTube.")
+                else:
+                    info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
 
+                if not info or 'url' not in info:
+                    raise Exception("No audio URL found")
+
+                return info, info['url']
+
+            except Exception as e:
+                print(f"[yt-dlp ERROR] {type(e).__name__}: {str(e)}")
+                raise Exception(f"Could not fetch song: {str(e)}") from e
 
         return (info, info['url'])
-
-    '''def search(self, query: str) -> tuple[dict, str]:
-        with yt_dlp.YoutubeDL({
-            'format': 'bestaudio',  # Let yt-dlp pick the best available instead of forcing m4a
-            'noplaylist': True,
-            'default_search': 'auto',
-            'quiet': True,
-            'no_warnings': True,
-            'retries': 3,
-            'socket_timeout': 10,
-            'http_chunk_size': 10485760,
-            'keep_video': False,
-        }) as ydl:
-            try:
-                r = requests.get(query, stream=True, timeout=3)
-                r.close()
-            except Exception:
-                # Not a valid URL -> treat as search
-                info = ydl.extract_info(f"ytsearch:{query}", download=False)[
-                    'entries'][0]
-            else:
-                # Valid URL -> extract directly
-                info = ydl.extract_info(query, download=False)
-
-        return (info, info['url'])'''
-
 
 def setup(bot):
     bot.add_cog(Music.make_cog(bot))
