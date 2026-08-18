@@ -161,7 +161,7 @@ class Music(pcs.ServerCog):
         
         'extractor_args': {
            'youtube': {
-               'player_client': ['default', 'web_embedded'],
+               'player_client': ['web_embedded'],
                 # 'po_token': '...'   # advanced, optional
            }
         },
