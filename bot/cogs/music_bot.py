@@ -128,12 +128,10 @@ class Music(pcs.ServerCog):
 
     async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
         headers = v_info.get("http_headers", {})
+        header_string = "".join(f"{k}: {v}\r\n" for k, v in headers.items())
         self.audio = discord.PCMVolumeTransformer(
             discord.FFmpegPCMAudio(url, before_options=(
-                f'-user_agent "{headers["User-Agent"]}" '
-                f'-headers "Accept: {headers.get("Accept", "*/*")}\r\n'
-                f'Accept-Language: {headers.get("Accept-Language", "en-US,en;q=0.9")}\r\n'
-                f'Sec-Fetch-Mode: {headers.get("Sec-Fetch-Mode", "navigate")}\r\n" '
+                f'-headers "{header_string}" '
                 '-reconnect 1 '
                 '-reconnect_streamed 1 '
                 '-reconnect_delay_max 5'
