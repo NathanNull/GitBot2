@@ -130,13 +130,15 @@ class Music(pcs.ServerCog):
         headers = v_info.get("http_headers", {})
         header_string = "".join(f"{k}: {v}\r\n" for k, v in headers.items())
         self.audio = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(url, before_options=(
-                f'-headers "{header_string}" '
-                '-reconnect 1 '
-                '-reconnect_streamed 1 '
-                '-reconnect_delay_max 5 '
-                '-http_persistent 0'
-            ), options="-vn"), self.vol)
+            discord.FFmpegPCMAudio(url,
+            # before_options=(
+            #     f'-headers "{header_string}" '
+            #     '-reconnect 1 '
+            #     '-reconnect_streamed 1 '
+            #     '-reconnect_delay_max 5 '
+            #     '-multiple_requests 0'
+            # ),
+            options="-vn"), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(
             self.when_done(ctx, vc)))
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
