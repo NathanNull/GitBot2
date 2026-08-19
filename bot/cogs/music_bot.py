@@ -140,7 +140,7 @@ class Music(pcs.ServerCog):
             # ),
             before_options="-vn",
             options="-loglevel warning"), self.vol)
-        vc.play(self.audio, after=lambda e: [print(e), self.bot.loop.create_task(
+        vc.play(self.audio, after=lambda e: [print("Error: ", e), self.bot.loop.create_task(
             self.when_done(ctx, vc))])
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
 
@@ -155,7 +155,7 @@ class Music(pcs.ServerCog):
         available_formats = ['bestaudio/best', 'mp4', 'webm'] 
         USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
         with yt_dlp.YoutubeDL({
-        'format': 'bestaudio[acodec=opus]/bestaudio/best',
+        'format': 'bestaudio[ext=m4a]/bestaudio',
         'remote_components': 'ejs:github',
         'noplaylist': True,
         'default_search': 'auto',
