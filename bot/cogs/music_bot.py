@@ -171,13 +171,13 @@ class Music(pcs.ServerCog):
             return True
         except subprocess.CalledProcessError as e:
             # This will catch the 403 Forbidden error from yt-dlp!
-            await self.bot.get_channel(123).send(f":x: Download failed (HTTP Error): {e}") # Replace 123 with a channel ID to notify admins
+            await self.bot.get_channel(1467246840134107371).send(f":x: Download failed (HTTP Error): {e}") # Replace 123 with a channel ID to notify admins
             print(f"\n--- CRITICAL DOWNLOAD FAILURE ---")
             print("The download process failed. This is likely due to network access restrictions.")
             print("Solution: Use cookies, or ensure the source website allows automated scraping.")
             return False
         except Exception as e:
-            await self.bot.get_channel(123).send(f":x: An unknown error occurred during download: {e}") # Replace 123 with a channel ID
+            await self.bot.get_channel(1467246840134107371).send(f":x: An unknown error occurred during download: {e}") # Replace 123 with a channel ID
             print(f"\n--- CRITICAL DOWNLOAD FAILURE ---")
             return False
 
@@ -207,7 +207,7 @@ class Music(pcs.ServerCog):
             'http_chunk_size': 10485760,
             'js_runtimes': {js_type: {'path': js_path}},
             'remote_components': ['ejs:github'],
-            'cookiefile': '/home/opc/GitBot2/cookies.txt',
+            'cookiefile': '/home/opc/Surfbot/cookies.txt',
             # You can add headers here if you suspect it's a general header issue, 
             # but this is often complex to pass via yt-dlp options.
         }) as ydl:
