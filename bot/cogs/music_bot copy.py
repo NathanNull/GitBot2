@@ -1,0 +1,208 @@
+from sys import platform
+import pycord_cogsbyserver as pcs
+import discord
+import yt_dlp
+import requests
+from discord.utils import get
+import asyncio
+from configuration import requires
+import music_embeds
+import random
+
+FFMPEG_OPTIONS = {
+    'before_options':
+    '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'options': '-vn'
+}
+
+js_path = "C:\\Program Files\\nodejs\\node.exe" if platform not in ["linux", "linux2"] else "/usr/local/bin/deno"
+js_type = "node" if platform not in ["linux", "linux2"] else "deno"
+
+if platform not in ["linux", "linux2"] :
+    print('not linux')
+else:
+    print('is linux')
+
+class Music(pcs.ServerCog):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        self.do_loop = "none"
+        self.vol = 1.0
+        self.queue = []
+        self.leave_timer = None
+        self.audio = None
+
+    @pcs.ServerCog.listener()
+    async def on_ready(self):
+        pass
+
+
+
+    @pcs.ServerCog.slash_command()
+    @requires.music
+    async def play(self, ctx: discord.ApplicationContext, *, query: str):
+        await ctx.defer()
+
+        if not ctx.author.voice:
+            await ctx.respond("You must be in a voice channel to use this command.", ephemeral=True)
+            return
+
+        vc = get(self.bot.voice_clients, guild=self.guild)
+        # 1. SAFE CONNECTION WITH TIMEOUT
+        if not vc or not vc.is_connected():
+            try:
+                vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=15.0)
+            except asyncio.TimeoutError:
+                await ctx.respond("Voice connection timed out. Check firewall/UDP settings.", ephemeral=True)
+                print(vc)
+                return
+            except discord.ClientException as e:
+                await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
+                print(vc)
+                return
+            except discord.HTTPException as e:
+                await ctx.respond("Discord API error. Try again later.", ephemeral=True)
+                print(vc)
+                return
+
+        # 2. VERIFY CONNECTION STATE
+        if not vc.is_connected():
+            await ctx.respond("Voice connection failed. Please try again.", ephemeral=True)
+            return
+        # 3. REST OF YOUR LOGIC (unchanged)
+        if vc.is_connected():
+
+            if vc.is_playing():
+                await asyncio.sleep(random.uniform(2,5))
+                try: v_info, url = self.search(query)
+                except: ctx.respond('An error has occured please try again. Use only youtube links or use regular words.')
+                self.queue.append((v_info, url))
+                await ctx.respond("Song added to queue", ephemeral=True)
+                await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
+            else:
+                if self.leave_timer is not None:
+                    self.leave_timer.cancel()
+                    self.leave_timer = None
+                try:
+                    await asyncio.sleep(random.uniform(2,5))
+                    v_info, url = self.search(query)
+                    await self.raw_play(v_info, url, vc, ctx)
+                except RuntimeError as e:
+                    await ctx.respond(str(e), ephemeral=True)
+                    if vc.is_connected():
+                        await vc.disconnect()
+
+    def adjust_volume(self, change):
+        self.vol += change
+        newvol = max(0, min(1, self.vol))
+
+        if self.audio is not None:
+            self.audio.volume = newvol
+
+        if newvol != self.vol:
+            self.vol = newvol
+            return False
+        return True
+
+    @pcs.ServerCog.slash_command()
+    @requires.music
+    async def volume(self, ctx: discord.ApplicationContext, *,
+                     vol: discord.Option(
+                         int, min_value=0, max_value=100) = None  # type: ignore
+                     ):
+        if vol is None:
+            await ctx.respond(f"The volume is currently {int(self.vol*100)}%", ephemeral=True)
+        else:
+            dv = (vol/100) - self.vol
+            self.adjust_volume(dv)
+            await ctx.respond(f"Volume set to {vol}%", ephemeral=True)
+
+    async def when_done(self, ctx: discord.ApplicationContext, vc: discord.VoiceClient):
+        if len(self.queue) > 0:
+            v_info, url = self.queue.pop(0)
+            await self.raw_play(v_info, url, vc, ctx)
+        else:
+            self.leave_timer = self.bot.loop.create_task(
+                self.leave_if_inactive(vc))
+
+    async def raw_play(self, v_info, url, vc: discord.VoiceClient, ctx):
+        headers = v_info.get("http_headers", {})
+        header_string = "".join(f"{k}: {v}\r\n" for k, v in headers.items())
+        self.audio = discord.PCMVolumeTransformer(
+            discord.FFmpegPCMAudio(url,
+            # before_options=(
+            #     f'-headers "{header_string}" '
+            #     '-reconnect 1 '
+            #     '-reconnect_streamed 1 '
+            #     '-reconnect_delay_max 5 '
+            #     '-multiple_requests 0'
+            # ),
+            before_options="-vn",
+            options="-loglevel warning"), self.vol)
+        vc.play(self.audio, after=lambda e: [print("Error: ", e), self.bot.loop.create_task(
+            self.when_done(ctx, vc))])
+        await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
+
+    async def leave_if_inactive(self, vc: discord.VoiceClient):
+        await asyncio.sleep(300)
+        await vc.disconnect()
+
+    def search(self, query: str) -> tuple[dict, str]:
+    # Define formats we will try (e.g., best audio, or a specific high-quality one)
+        print(js_type)
+        print(js_path)
+        available_formats = ['bestaudio/best', 'mp4', 'webm'] 
+        USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0'
+        with yt_dlp.YoutubeDL({
+        'format': 'bestaudio[ext=m4a]/bestaudio',
+        'remote_components': 'ejs:github',
+        'noplaylist': True,
+        'default_search': 'auto',
+        'retries': 10,
+        'socket_timeout': 15,
+        'http_chunk_size': 10485760,
+        'js_runtimes': {js_type: {'path': js_path}},
+            'remote_components': ['ejs:github'],
+        
+        # === Most important fixes for 403 ===
+        'cookiefile': '/home/opc/SurfBot/cookies.txt',           # ← Make sure this file exists!
+        # OR better if bot runs on same machine as browser:
+        # 'cookiesfrombrowser': ('chrome',),     # or firefox, edge
+        
+        'extractor_args': {
+           'youtube': {
+               'player_client': ['web_embedded'],
+                # 'po_token': '...'   # advanced, optional
+           }
+        },
+        
+        'nocheckcertificate': True,
+        'source_address': '0.0.0.0',
+        
+        #'http_headers': {
+        #    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'
+        },
+        
+    ) as ydl:
+            try:
+                if query.startswith(('http://', 'https://', 'www.')):
+                    info = ydl.extract_info(query, download=False)
+                else:
+                    info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
+
+                if not info or 'url' not in info:
+                    raise Exception("No audio URL found")
+                print("URL: ", info["url"])
+                print("Headers: ", info.get("http_headers"))
+
+                return info, info['url']
+
+            except Exception as e:
+                print(f"[yt-dlp ERROR] {type(e).__name__}: {str(e)}")
+                raise Exception(f"Could not fetch song: {str(e)}") from e
+
+        return (info, info['url'])
+
+def setup(bot):
+    bot.add_cog(Music.make_cog(bot))

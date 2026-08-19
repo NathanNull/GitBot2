@@ -10,10 +10,12 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        nodes = [wavelink.Node(
-            identifier="Node1",
-            uri="http://0.0.0.0:2333",
-            password="goodpassword")
+        nodes = [
+            wavelink.Node(
+                identifier="Node1", # This identifier must be unique for all the nodes you are going to use
+                uri="http://localhost:443", # Protocol (http/s) is required, port must be 443 as it is the one lavalink uses
+                password="goodpassword"
+            )
         ]
         await wavelink.Pool.connect(nodes=nodes, client=self.bot)
 
@@ -26,13 +28,15 @@ class Music(commands.Cog):
         if ctx.author.voice.channel.id != vc.channel.id:
             return await ctx.respond("must be in same vc")
 
-        song = await wavelink.Playable.search(search)
+        song = await wavelink.Playable.search(search, source=wavelink.TrackSource.SoundCloud)
 
         if not song:
             return await ctx.respond("not found")
 
-        await vc.play(song)
-        await ctx.respond(f'now playing: {song.title}')
+        
+
+        await vc.play(song[0])
+        await ctx.respond(f'now playing: {song[0].title}')
 
 def setup(bot: commands.Bot):
     bot.add_cog(Music(bot))
