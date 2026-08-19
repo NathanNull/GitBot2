@@ -138,7 +138,8 @@ class Music(pcs.ServerCog):
             #     '-reconnect_delay_max 5 '
             #     '-multiple_requests 0'
             # ),
-            options="-vn"), self.vol)
+            before_options="-vn",
+            options="-loglevel warning"), self.vol)
         vc.play(self.audio, after=lambda e: self.bot.loop.create_task(
             self.when_done(ctx, vc)))
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
