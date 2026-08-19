@@ -160,7 +160,7 @@ class Music(pcs.ServerCog):
         print("\n--- Initiating Local Download ---")
         try:
             # Use a temporary path format that FFmpeg likes (.mp3 or .ogg is usually safer than generic temp files)
-            final_download_path = f"{temp_file_path}.mp3" 
+            final_download_path = temp_file_path
             
             subprocess.run(
                 ["yt-dlp", "-f", "bestaudio", "-o", final_download_path, info['webpage_url'] if 'webpage_url' in info else info['url'], "--cookies", "/home/opc/SurfBot/cookies.txt"],
