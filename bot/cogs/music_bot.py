@@ -140,8 +140,8 @@ class Music(pcs.ServerCog):
             # ),
             before_options="-vn",
             options="-loglevel warning"), self.vol)
-        vc.play(self.audio, after=lambda e: self.bot.loop.create_task(
-            self.when_done(ctx, vc)))
+        vc.play(self.audio, after=lambda e: [print(e), self.bot.loop.create_task(
+            self.when_done(ctx, vc))])
         await music_embeds.send_song_embed(v_info, self.queue, vc, ctx, self)
 
     async def leave_if_inactive(self, vc: discord.VoiceClient):
