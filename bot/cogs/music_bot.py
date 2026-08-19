@@ -9,6 +9,7 @@ from configuration import requires
 import music_embeds
 import random
 import subprocess
+import os
 
 FFMPEG_OPTIONS = {
     'before_options':
