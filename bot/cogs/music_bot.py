@@ -207,7 +207,7 @@ class Music(pcs.ServerCog):
             'http_chunk_size': 10485760,
             'js_runtimes': {js_type: {'path': js_path}},
             'remote_components': ['ejs:github'],
-            'cookiefile': '/home/opc/Surfbot/cookies.txt',
+            'cookiefile': '/home/opc/SurfBot/cookies.txt',
             # You can add headers here if you suspect it's a general header issue, 
             # but this is often complex to pass via yt-dlp options.
         }) as ydl:
