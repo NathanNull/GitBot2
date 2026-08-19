@@ -1,5 +1,6 @@
 from typing import Any
 import discord
+from discord.ext import commands
 import os
 import random
 from firebase_admin import db, credentials, initialize_app
@@ -35,7 +36,7 @@ def init_db():
     default_app = initialize_app(cred, {'databaseURL': url})
 
 
-def set_hooks(bot: discord.Bot):
+def set_hooks(bot: commands.Bot):
     init_db()
     root_ref = db.reference()
 
