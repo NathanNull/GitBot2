@@ -8,6 +8,7 @@ import asyncio
 from configuration import requires
 import music_embeds
 import random
+import subprocess
 
 FFMPEG_OPTIONS = {
     'before_options':
