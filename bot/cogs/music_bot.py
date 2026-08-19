@@ -162,7 +162,7 @@ class Music(pcs.ServerCog):
             final_download_path = f"{temp_file_path}.mp3" 
             
             subprocess.run(
-                ["yt-dlp", "-f", "bestaudio", "-o", final_download_path, info['webpage_url'] if 'webpage_url' in info else info['url']],
+                ["yt-dlp", "-f", "bestaudio", "-o", final_download_path, info['webpage_url'] if 'webpage_url' in info else info['url'], "--cookiefile", "/home/opc/SurfBot/cookies.txt"],
                 check=True, # Raises an error if the subprocess fails (e.g., 403)
                 capture_output=False,
                 text=True
