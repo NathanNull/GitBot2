@@ -51,8 +51,20 @@ class Music(pcs.ServerCog):
         # ... (Voice connection logic remains the same up until step 3) ...
         vc = get(self.bot.voice_clients, guild=self.guild)
         if not vc or not vc.is_connected():
-             # ... (Your connection handling code here - unchanged) ...
-             pass # Assume connection successful for brevity
+            try:
+                vc = await asyncio.wait_for(ctx.author.voice.channel.connect(), timeout=15.0)
+            except asyncio.TimeoutError:
+                await ctx.respond("Voice connection timed out. Check firewall/UDP settings.", ephemeral=True)
+                print(vc)
+                return
+            except discord.ClientException as e:
+                await ctx.respond(f"Failed to connect: {e}", ephemeral=True)
+                print(vc)
+                return
+            except discord.HTTPException as e:
+                await ctx.respond("Discord API error. Try again later.", ephemeral=True)
+                print(vc)
+                return
 
 
         if vc.is_connected():
