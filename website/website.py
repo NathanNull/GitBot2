@@ -4,7 +4,7 @@ from w_backend import add_backend
 from flask_cors import CORS
 
 host = "0.0.0.0"
-
+print('uh hi')
 app = Flask(__name__)
 CORS(app)
 
