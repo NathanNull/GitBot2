@@ -17,7 +17,7 @@ class Mod(commands.Cog):
 
         self.check_updates.start()
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=1)
     async def check_updates(self):
         if self.should_save:
             self.should_save = False

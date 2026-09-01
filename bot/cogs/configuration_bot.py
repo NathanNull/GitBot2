@@ -43,7 +43,7 @@ class Configuration(commands.Cog):
             await ctx.respond(f"{setting.capitalize()} is now {'enabled' if enable else 'disabled'} for this server")
             await self.save()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(seconds=1)
     async def save(self):
         if self.configuration == {}:
             self.configuration = read_db("config")
