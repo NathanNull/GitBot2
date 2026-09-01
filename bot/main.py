@@ -89,7 +89,7 @@ all_cogs = [
     "audit_logs_bot",
     "level_bot",
     "mod_bot",
-    "music_bot",
+    # "music_bot",
     "reaction_bot",
     "help_command_bot",
     "application_bot"
