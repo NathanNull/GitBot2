@@ -77,23 +77,44 @@ class AuditLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
-        ENABLED = '✅'
-        DISABLED = '❎'
+        guild = channel.guild
+    
+    # Check if the bot has permission to view audit logs
+        if not guild.me.guild_permissions.view_audit_log:
+            print(f"Missing 'View Audit Log' permission in guild: {guild.name}")
+            return
 
-        name = channel.name
-        catname = channel.category
-        perms = channel.overwrites
-        embed = discord.Embed(
+    # Wait briefly to allow Discord's backend to process and log the event
+        await asyncio.sleep(1)
+
+        creator = None
+    
+    # Fetch the single most recent channel creation log entry
+        async for entry in guild.audit_logs(action=discord.AuditLogAction.channel_create, limit=1):
+        # Verify that this log entry actually belongs to the channel that was just made
+            if entry.target and entry.target.id == channel.id:
+                creator = entry.user
+                break
+
+        if creator:
+            print(f"Channel #{channel.name} was created by {creator.name} ({creator.id})")
+            ENABLED = '✅'
+            DISABLED = '❎'
+
+            name = channel.name
+            catname = channel.category
+            perms = channel.overwrites
+            embed = discord.Embed(
             title="Channel created", description=f"**Channel name:** {name}.\n**Channel Category:** {catname}")
-        for role, overwrites in perms.items():
-            if isinstance(role, discord.Role):
-                writes = ""
-                for perm, value in overwrites:
-                    if value is not None:
-                        writes += (f"{perm}: {ENABLED if value else DISABLED}\n")
-                writes = writes[:-1].replace("_", " ").title()
-                embed.add_field(name=role, value=writes, inline=True)
-        await self.try_send_alc(channel.guild, embed=embed)
+            for role, overwrites in perms.items():
+                if isinstance(role, discord.Role):
+                    writes = ""
+                    for perm, value in overwrites:
+                        if value is not None:
+                            writes += (f"{perm}: {ENABLED if value else DISABLED}\n")
+                    writes = writes[:-1].replace("_", " ").title()
+                    embed.add_field(name=role, value=writes, inline=True)
+            await self.try_send_alc(channel.guild, embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
