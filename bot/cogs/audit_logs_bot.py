@@ -106,7 +106,7 @@ class AuditLogging(commands.Cog):
             catname = channel.category
             perms = channel.overwrites
             embed = discord.Embed(
-            title="Channel created", description=f"**Channel name:** {name}.\n**Channel Category:** {catname}")
+            title="Channel created", description=f"**Channel name:** {name},\n**Channel Category:** {catname},\n**Username:**{creator}.")
             for role, overwrites in perms.items():
                 if isinstance(role, discord.Role):
                     writes = ""
