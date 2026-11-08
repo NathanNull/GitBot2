@@ -37,13 +37,17 @@ class ReactionRoles(commands.Cog):
     @requires.reaction_roles
     @discord.option("role", discord.Role, description="The role to give")
     @discord.option("emoji", EmojiValidator, description="Reaction emoji")
-    @discord.option("channel", discord.TextChannel, description="Message content")
+    @discord.option("channel", discord.TextChannel, description="Message content", required=False, default=None)
     @discord.option("content", str, description="Message content")
     @discord.option("embedtitle", str, description="Embed title", required=False, default=None)
     @discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
     async def reactionsetup(self, ctx: discord.ApplicationContext, *,
-                            role: discord.Role, emoji: str, content: str, embedtitle: str | None, embedcolor: str):  # type: ignore
+                            role: discord.Role, emoji: str, channel: discord.TextChannel | None, content: str, embedtitle: str | None, embedcolor: str):  # type: ignore
         await ctx.defer()
+        if channel is None:
+            channelid = ctx.channel.id
+        else:
+            channelid = channel.id
         message = "dummy message content"
         if embedtitle != None or embedcolor != "default":
             message = discord.Embed(color=getattr(
@@ -51,7 +55,7 @@ class ReactionRoles(commands.Cog):
         else:
             message = content
 
-        await self.rxn_raw(role.id, ctx.channel.id, message, emoji, ctx.respond)
+        await self.rxn_raw(role.id, channelid, message, emoji, ctx.respond)
 
     @reactionsetup.error
     async def reactionsetuperror(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
