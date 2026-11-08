@@ -106,7 +106,7 @@ class AuditLogging(commands.Cog):
             catname = channel.category
             perms = channel.overwrites
             embed = discord.Embed(
-            title="Channel created", description=f"**Channel name:** {name},\n**Channel Category:** {catname},\n**Username:**{creator}.")
+            title="Channel created", description=f"**Channel name:** {name},\n**Channel Category:** {catname},\n**Username:** {creator}.")
             for role, overwrites in perms.items():
                 if isinstance(role, discord.Role):
                     writes = ""
@@ -118,11 +118,31 @@ class AuditLogging(commands.Cog):
             await self.try_send_alc(channel.guild, embed=embed)
 
     @commands.Cog.listener()
-    async def on_guild_channel_delete(self, channel):
-        name = channel.name
-        catname = channel.category
-        await self.try_send_alc(channel.guild, embed=discord.Embed(title='Channel Removed',
-                                                                   description=f'**Channel Name:** {name}\n**Category Name:** {catname}'))
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        guild = channel.guild
+    
+    # Check if the bot has permission to view audit logs
+        if not guild.me.guild_permissions.view_audit_log:
+            print(f"Missing 'View Audit Log' permission in guild: {guild.name}")
+            return
+
+    # Wait briefly to allow Discord's backend to process and log the event
+        await asyncio.sleep(1)
+
+        creator = None
+    
+    # Fetch the single most recent channel creation log entry
+        async for entry in guild.audit_logs(action=discord.AuditLogAction.channel_delete, limit=1):
+        # Verify that this log entry actually belongs to the channel that was just made
+            if entry.target and entry.target.id == channel.id:
+                creator = entry.user
+                break
+
+        if creator:
+            name = channel.name
+            catname = channel.category
+            await self.try_send_alc(channel.guild, embed=discord.Embed(title='Channel Removed',
+                description=f'**Channel Name:** {name},\n**Category Name:** {catname},\n**Username:** {creator}.'))
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.Member):
@@ -136,9 +156,27 @@ class AuditLogging(commands.Cog):
     async def on_message_delete(self, message: discord.Message):
         if message.guild is None:
             return
+        if not message.content:
+            return
+
+        # Default to the message author (in case they deleted it themselves)
+        deleter = message.author
+
+        try:
+            async for entry in message.guild.audit_logs(limit=1, action=discord.AuditLogAction.message_delete):
+                # Check if the audit log entry matches the deleted message's author and channel
+                # and happened within a very short timeframe (e.g., a few seconds)
+                if entry.target.id == message.author.id and entry.extra.channel.id == message.channel.id:
+                    deleter = entry.user
+                    break
+        except discord.Forbidden:
+            pass # Bot lacks 'View Audit Log' permission
+
         await self.try_send_alc(
-            message.guild, embed=discord.Embed(title="Deleted Message",
-                                               description=f"{message.content}, sent by {message.author}, was deleted from {message.channel}")
+            message.guild, embed=discord.Embed(
+                title="Deleted Message",
+                description=f"{message.content}\n**Was deleted from** {message.channel.mention}\n**Sent by:** {message.author}\n**Deleted by:** {deleter}"
+            )
         )
 
     @commands.Cog.listener()
@@ -152,7 +190,7 @@ class AuditLogging(commands.Cog):
         await self.try_send_alc(
             before.guild, embed=discord.Embed(
                 title="Edited Message",
-                description=f"{before.content}\n**was edited to be**\n{after.content}"
+                description=f"{before.content}\n**was edited to be**\n{after.content}\n**Username:** {before.author.name}"
             )
         )
 
