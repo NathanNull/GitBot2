@@ -145,12 +145,42 @@ class AuditLogging(commands.Cog):
                 description=f'**Channel Name:** {name},\n**Category Name:** {catname},\n**Username:** {creator}.'))
 
     @commands.Cog.listener()
-    async def on_member_ban(self, guild: discord.Guild, user: discord.Member):
-        await self.try_send_alc(guild, embed=discord.Embed(title='Member Banned', description=user.name))
+    async def on_member_ban(self, guild: discord.Guild, user: discord.User):
+        banner = "Unknown"
+        try:
+            async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban):
+                if entry.target.id == user.id:
+                    banner = entry.user
+                    break
+        except discord.Forbidden:
+            pass  # Bot lacks 'View Audit Log' permission
+
+        await self.try_send_alc(
+            guild, 
+            embed=discord.Embed(
+                title="Member Banned", 
+                description=f"**User:** {user}\n**Banned by:** {banner}"
+            )
+        )
 
     @commands.Cog.listener()
-    async def on_member_unban(self, guild: discord.Guild, user: discord.Member):
-        await self.try_send_alc(guild, embed=discord.Embed(title='Member Unbanned', description=user.name))
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User):
+        unbanner = "Unknown"
+        try:
+            async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.unban):
+                if entry.target.id == user.id:
+                    unbanner = entry.user
+                    break
+        except discord.Forbidden:
+            pass  # Bot lacks 'View Audit Log' permission
+
+        await self.try_send_alc(
+            guild, 
+            embed=discord.Embed(
+                title="Member Unbanned", 
+                description=f"**User:** {user}\n**Unbanned by:** {unbanner}"
+            )
+        )
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
@@ -175,7 +205,7 @@ class AuditLogging(commands.Cog):
         await self.try_send_alc(
             message.guild, embed=discord.Embed(
                 title="Deleted Message",
-                description=f"{message.content}\n**Was deleted from** {message.channel.mention}\n**Sent by:** {message.author}\n**Deleted by:** {deleter}"
+                description=f"**Deleted Message:** {message.content}\n**Was deleted from:** {message.channel.mention}\n**Sent by:** {message.author}\n**Deleted by:** {deleter}"
             )
         )
 
@@ -190,7 +220,7 @@ class AuditLogging(commands.Cog):
         await self.try_send_alc(
             before.guild, embed=discord.Embed(
                 title="Edited Message",
-                description=f"{before.content}\n**was edited to be**\n{after.content}\n**Username:** {before.author.name}"
+                description=f"**Message Before:** {before.content}\n**Was edited to be:** {after.content}\n**Username:** {before.author.name}"
             )
         )
 
