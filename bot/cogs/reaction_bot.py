@@ -3,6 +3,22 @@ import discord.utils
 from discord.ext import commands, tasks
 from utils import read_db, update_db, perm_mod
 from configuration import requires
+import re
+
+EMOJI_REGEX = re.compile(r"<(a?):([a-zA-Z0-9_]+):([0-9]+)>")
+class EmojiValidator(commands.Converter):
+	async def convert(self, ctx: commands.Context, argument: str) -> str:
+		if not EMOJI_REGEX.fullmatch(argument):
+			raise commands.BadArgument("Not a valid emoji!")
+		return argument
+
+colours = [
+	"teal","dark_teal","brand_green","green","dark_green","blue","dark_blue","purple",
+	"dark_purple","magenta","dark_magenta","gold","dark_gold","orange","dark_orange",
+	"brand_red","red","dark_red","lighter_grey","dark_grey","light_grey","darker_grey",
+	"og_blurple","blurple","greyple","light_theme","ash_theme","dark_theme","onyx_theme",
+	"fuchsia","yellow","nitro_pink"
+]
 
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot:discord.Bot):
@@ -14,43 +30,48 @@ class ReactionRoles(commands.Cog):
 
 	@discord.slash_command(name="add-reaction-roles",description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
 	@requires.reaction_roles
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *, messageopt: discord.Option(str,
-                    "Would you like to use a Message ID or have the bot send a message?", 
-                    choices=["Send Message", "Message ID"], 
-                    required=True), emoji, theroleid, channel: discord.TextChannel, textmessageorid): # type: ignore
+	@discord.option("role", discord.Role, description="The role to give")
+	@discord.option("emoji", EmojiValidator, description="Reaction emoji")
+	@discord.option("content", str, description="Message content")
+	@discord.option("embedtitle", str, description="Embed title", required=False, default=None)
+	@discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
+	async def reactionsetup(self, ctx: discord.ApplicationContext, *,
+	                        role: discord.Role, emoji: str, content: str, embedtitle: str | None, embedcolor: str): # type: ignore
 		await ctx.defer()
-		theroleid = int(theroleid)
-		if messageopt == "Send Message":
-			themessage = str(textmessageorid)
-
-		elif messageopt == "Message ID":
-			themessage = int(textmessageorid)
-
-		await self.rxn_raw(theroleid, channel.id, themessage, emoji, ctx.respond)
+		message = "dummy message content"
+		if embedtitle != None or embedcolor != "default":
+			message = discord.Embed(color=getattr(discord.Colour, embedcolor)(), title=embedtitle, description=content)
+		else:
+			message = content
+		
+		await self.rxn_raw(role.id, ctx.channel.id, message, emoji, ctx.respond)
 	
-	async def rxn_raw(self, rid:int, cid:int, themessage, emoji:str, send=None):
+	async def rxn_raw(self, rid:int, cid:int, themessage: str | int | discord.Embed, emoji:str, send=None):
 		print(rid, cid, themessage)
 		print(cid)
-		channel = self.bot.get_channel(cid)
+		channel: discord.TextChannel = self.bot.get_channel(cid)
 		print(channel)
 		if send is None:
 			send = channel.send
 		gid = str(channel.guild.id)
+		mid = ""
 		if isinstance(themessage, int):
-			mid = themessage
+			mid = str(themessage)
 			print(mid)
 		elif isinstance(themessage, str):
 			message = await channel.send(themessage)
-			mid = message.id
+			mid = str(message.id)
+		elif isinstance(themessage, discord.Embed):
+			message = await channel.send(embed=themessage)
+			mid = str(message.id)
 		if gid not in self.reaction:
 			self.reaction[gid] = {}
 		if mid not in self.reaction[gid]:
 			self.reaction[gid][mid] = {}
 		if emoji not in self.reaction[gid][mid]:
-			message = await channel.fetch_message(mid)
+			message = await channel.fetch_message(int(mid))
 			await message.add_reaction(emoji) 
 			self.reaction[gid][mid][emoji] = rid
-
 		else:
 			await send('that is already a reaction role')
 			return
