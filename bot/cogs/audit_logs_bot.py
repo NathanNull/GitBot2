@@ -151,6 +151,7 @@ class AuditLogging(commands.Cog):
             async for entry in guild.audit_logs(limit=5, action=discord.AuditLogAction.ban):
                 if entry.target.id == user.id:
                     banner = entry.user
+                    print(banner)
                     break
         except discord.Forbidden:
             pass  # Bot lacks 'View Audit Log' permission
