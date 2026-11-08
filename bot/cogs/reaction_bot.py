@@ -6,133 +6,139 @@ from configuration import requires
 import re
 
 EMOJI_REGEX = re.compile(r"<(a?):([a-zA-Z0-9_]+):([0-9]+)>")
+
+
 class EmojiValidator(commands.Converter):
-	async def convert(self, ctx: commands.Context, argument: str) -> str:
-		if not EMOJI_REGEX.fullmatch(argument):
-			raise commands.BadArgument("Not a valid emoji!")
-		return argument
+    async def convert(self, ctx: commands.Context, argument: str) -> str:
+        if not EMOJI_REGEX.fullmatch(argument):
+            raise commands.BadArgument("Not a valid emoji!")
+        return argument
+
 
 colours = [
-	"teal","dark_teal","brand_green","green","dark_green","blue","dark_blue","purple",
-	"dark_purple","magenta","dark_magenta","gold","dark_gold","orange","dark_orange",
-	"brand_red","red","dark_red","lighter_grey","dark_grey","light_grey","darker_grey",
-	"og_blurple","blurple","greyple","light_theme","ash_theme","dark_theme","onyx_theme",
-	"fuchsia","yellow","nitro_pink"
+    "teal", "dark_teal", "green", "dark_green", "blue", "dark_blue", "purple",
+    "dark_purple", "magenta", "dark_magenta", "gold", "orange",
+    "red", "dark_grey", "light_grey", "darker_grey",
+    "og_blurple", "blurple", "greyple",
+    "fuchsia", "yellow", "nitro_pink"
 ]
 
+
 class ReactionRoles(commands.Cog):
-	def __init__(self, bot:discord.Bot):
-		self.bot = bot
-		self.utils = discord.utils
-		self.reaction : dict[str, dict[str, dict[str, int]]] = {}
-		self.update_info = {}
-		self.check_updates.start()
+    def __init__(self, bot: discord.Bot):
+        self.bot = bot
+        self.utils = discord.utils
+        self.reaction: dict[str, dict[str, dict[str, int]]] = {}
+        self.update_info = {}
+        self.check_updates.start()
 
-	@discord.slash_command(name="add-reaction-roles",description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
-	@requires.reaction_roles
-	@discord.option("role", discord.Role, description="The role to give")
-	@discord.option("emoji", EmojiValidator, description="Reaction emoji")
-	@discord.option("content", str, description="Message content")
-	@discord.option("embedtitle", str, description="Embed title", required=False, default=None)
-	@discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
-	async def reactionsetup(self, ctx: discord.ApplicationContext, *,
-	                        role: discord.Role, emoji: str, content: str, embedtitle: str | None, embedcolor: str): # type: ignore
-		await ctx.defer()
-		message = "dummy message content"
-		if embedtitle != None or embedcolor != "default":
-			message = discord.Embed(color=getattr(discord.Colour, embedcolor)(), title=embedtitle, description=content)
-		else:
-			message = content
-		
-		await self.rxn_raw(role.id, ctx.channel.id, message, emoji, ctx.respond)
-	
-	async def rxn_raw(self, rid:int, cid:int, themessage: str | int | discord.Embed, emoji:str, send=None):
-		print(rid, cid, themessage)
-		print(cid)
-		channel: discord.TextChannel = self.bot.get_channel(cid)
-		print(channel)
-		if send is None:
-			send = channel.send
-		gid = str(channel.guild.id)
-		mid = ""
-		if isinstance(themessage, int):
-			mid = str(themessage)
-			print(mid)
-		elif isinstance(themessage, str):
-			message = await channel.send(themessage)
-			mid = str(message.id)
-		elif isinstance(themessage, discord.Embed):
-			message = await channel.send(embed=themessage)
-			mid = str(message.id)
-		if gid not in self.reaction:
-			self.reaction[gid] = {}
-		if mid not in self.reaction[gid]:
-			self.reaction[gid][mid] = {}
-		if emoji not in self.reaction[gid][mid]:
-			message = await channel.fetch_message(int(mid))
-			await message.add_reaction(emoji) 
-			self.reaction[gid][mid][emoji] = rid
-		else:
-			await send('that is already a reaction role')
-			return
-		await self.save()
-		await send(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
-	
-	@tasks.loop(seconds=1)
-	async def check_updates(self):
-		if len(self.update_info) != 0 and self.bot.is_ready():
-			for _, val in self.update_info.items():
-				await self.rxn_raw(*val)
-			self.update_info = {}
+    @discord.slash_command(name="add-reaction-roles", description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
+    @requires.reaction_roles
+    @discord.option("role", discord.Role, description="The role to give")
+    @discord.option("emoji", EmojiValidator, description="Reaction emoji")
+    @discord.option("content", str, description="Message content")
+    @discord.option("embedtitle", str, description="Embed title", required=False, default=None)
+    @discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
+    async def reactionsetup(self, ctx: discord.ApplicationContext, *,
+                            role: discord.Role, emoji: str, content: str, embedtitle: str | None, embedcolor: str):  # type: ignore
+        await ctx.defer()
+        message = "dummy message content"
+        if embedtitle != None or embedcolor != "default":
+            message = discord.Embed(color=getattr(
+                discord.Colour, embedcolor)(), title=embedtitle, description=content)
+        else:
+            message = content
 
-	@commands.Cog.listener()
-	async def on_ready(self):
-		self.reaction = read_db("reaction")
+        await self.rxn_raw(role.id, ctx.channel.id, message, emoji, ctx.respond)
 
-	@commands.Cog.listener()
-	async def on_raw_reaction_add(self, reaction: discord.Reaction):
-		mid = str(reaction.message_id)
-		emoji = reaction.emoji.name
-		gid = str(reaction.guild_id)
-		uid = reaction.user_id
-		guildw = self.bot.get_guild(int(reaction.guild_id))
-		membera = guildw.get_member(int(uid))
-		if gid in self.reaction:
-			if mid in self.reaction[gid]:
-				if str(emoji) in self.reaction[gid][mid]:
-					rid = self.reaction[gid][mid][emoji]
-					therole = guildw.get_role(int(rid))
-					await membera.add_roles(therole, reason=None, atomic=True)
-			elif int(mid) in self.reaction[gid]:
-				mid = int(mid)
-				if emoji in self.reaction[gid][mid]:
-					rid = self.reaction[gid][mid][emoji]
-					therole = guildw.get_role(int(rid))
-					await membera.add_roles(therole, reason=None, atomic=True)
-	
-	@commands.Cog.listener()
-	async def on_raw_reaction_remove(self, reaction: discord.Reaction):
-		mid = str(reaction.message_id)
-		emoji = reaction.emoji.name
-		gid = str(reaction.guild_id)
-		uid = reaction.user_id
-		guildw = self.bot.get_guild(int(reaction.guild_id))
-		membera = guildw.get_member(int(uid))
-		if gid in self.reaction:
-			if mid in self.reaction[gid]:
-				if str(emoji) in self.reaction[gid][mid]:
-					rid = self.reaction[gid][mid][emoji]
-					therole = guildw.get_role(int(rid))
-					await membera.remove_roles(therole, reason=None, atomic=True)
-			elif int(mid) in self.reaction[gid]:
-				mid = int(mid)
-				if emoji in self.reaction[gid][mid]:
-					rid = self.reaction[gid][mid][emoji]
-					therole = guildw.get_role(int(rid))
-					await membera.remove_roles(therole, reason=None, atomic=True)
+    async def rxn_raw(self, rid: int, cid: int, themessage: str | int | discord.Embed, emoji: str, send=None):
+        print(rid, cid, themessage)
+        print(cid)
+        channel: discord.TextChannel = self.bot.get_channel(cid)
+        print(channel)
+        if send is None:
+            send = channel.send
+        gid = str(channel.guild.id)
+        mid = ""
+        if isinstance(themessage, int):
+            mid = str(themessage)
+            print(mid)
+        elif isinstance(themessage, str):
+            message = await channel.send(themessage)
+            mid = str(message.id)
+        elif isinstance(themessage, discord.Embed):
+            message = await channel.send(embed=themessage)
+            mid = str(message.id)
+        if gid not in self.reaction:
+            self.reaction[gid] = {}
+        if mid not in self.reaction[gid]:
+            self.reaction[gid][mid] = {}
+        if emoji not in self.reaction[gid][mid]:
+            message = await channel.fetch_message(int(mid))
+            await message.add_reaction(emoji)
+            self.reaction[gid][mid][emoji] = rid
+        else:
+            await send('that is already a reaction role')
+            return
+        await self.save()
+        await send(f'added {mid} to be monitered by reactions\nemoji being watched is{emoji}\nrole being given is {rid}')
 
-	async def save(self):
-		update_db("reaction", self.reaction)
+    @tasks.loop(seconds=1)
+    async def check_updates(self):
+        if len(self.update_info) != 0 and self.bot.is_ready():
+            for _, val in self.update_info.items():
+                await self.rxn_raw(*val)
+            self.update_info = {}
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.reaction = read_db("reaction")
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, reaction: discord.Reaction):
+        mid = str(reaction.message_id)
+        emoji = reaction.emoji.name
+        gid = str(reaction.guild_id)
+        uid = reaction.user_id
+        guildw = self.bot.get_guild(int(reaction.guild_id))
+        membera = guildw.get_member(int(uid))
+        if gid in self.reaction:
+            if mid in self.reaction[gid]:
+                if str(emoji) in self.reaction[gid][mid]:
+                    rid = self.reaction[gid][mid][emoji]
+                    therole = guildw.get_role(int(rid))
+                    await membera.add_roles(therole, reason=None, atomic=True)
+            elif int(mid) in self.reaction[gid]:
+                mid = int(mid)
+                if emoji in self.reaction[gid][mid]:
+                    rid = self.reaction[gid][mid][emoji]
+                    therole = guildw.get_role(int(rid))
+                    await membera.add_roles(therole, reason=None, atomic=True)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, reaction: discord.Reaction):
+        mid = str(reaction.message_id)
+        emoji = reaction.emoji.name
+        gid = str(reaction.guild_id)
+        uid = reaction.user_id
+        guildw = self.bot.get_guild(int(reaction.guild_id))
+        membera = guildw.get_member(int(uid))
+        if gid in self.reaction:
+            if mid in self.reaction[gid]:
+                if str(emoji) in self.reaction[gid][mid]:
+                    rid = self.reaction[gid][mid][emoji]
+                    therole = guildw.get_role(int(rid))
+                    await membera.remove_roles(therole, reason=None, atomic=True)
+            elif int(mid) in self.reaction[gid]:
+                mid = int(mid)
+                if emoji in self.reaction[gid][mid]:
+                    rid = self.reaction[gid][mid][emoji]
+                    therole = guildw.get_role(int(rid))
+                    await membera.remove_roles(therole, reason=None, atomic=True)
+
+    async def save(self):
+        update_db("reaction", self.reaction)
+
 
 def setup(bot):
     bot.add_cog(ReactionRoles(bot))
