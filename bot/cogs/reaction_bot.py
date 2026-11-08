@@ -42,7 +42,7 @@ class ReactionRoles(commands.Cog):
     @discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
     @discord.option("channel", discord.TextChannel, description="Message content", required=False, default=None)
     async def reactionsetup(self, ctx: discord.ApplicationContext, *,
-                            role: discord.Role, emoji: str, channel: discord.TextChannel | None, content: str, embedtitle: str | None, embedcolor: str):  # type: ignore
+                            role: discord.Role, emoji: str, content: str, embedtitle: str | None, embedcolor: str, channel: discord.TextChannel | None):  # type: ignore
         await ctx.defer()
         if channel is None:
             channelid = ctx.channel.id
