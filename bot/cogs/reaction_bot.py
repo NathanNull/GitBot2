@@ -10,8 +10,9 @@ EMOJI_REGEX = re.compile(r"<(a?):([a-zA-Z0-9_]+):([0-9]+)>")
 
 class EmojiValidator(commands.Converter):
     async def convert(self, ctx: commands.Context, argument: str) -> str:
-        if not EMOJI_REGEX.fullmatch(argument):
-            raise commands.BadArgument("Not a valid emoji!")
+        partial = discord.PartialEmoji.from_str(argument)
+        if not partial.is_custom_emoji() and not partial.is_unicode_emoji():
+            raise commands.BadArgument(f"Not a valid emoji! {argument}")
         return argument
 
 
@@ -36,6 +37,7 @@ class ReactionRoles(commands.Cog):
     @requires.reaction_roles
     @discord.option("role", discord.Role, description="The role to give")
     @discord.option("emoji", EmojiValidator, description="Reaction emoji")
+    @discord.option("channel", discord.TextChannel, description="Message content")
     @discord.option("content", str, description="Message content")
     @discord.option("embedtitle", str, description="Embed title", required=False, default=None)
     @discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
@@ -50,6 +52,13 @@ class ReactionRoles(commands.Cog):
             message = content
 
         await self.rxn_raw(role.id, ctx.channel.id, message, emoji, ctx.respond)
+
+    @reactionsetup.error
+    async def reactionsetuperror(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.ConversionError) and isinstance(error.original, commands.BadArgument):
+            await ctx.respond(f"Invalid argument: {error.original}", ephemeral=True)
+        else:
+            await ctx.respond(f"Something went wrong: {error}", ephemeral=True)
 
     async def rxn_raw(self, rid: int, cid: int, themessage: str | int | discord.Embed, emoji: str, send=None):
         print(rid, cid, themessage)
