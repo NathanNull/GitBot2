@@ -37,10 +37,10 @@ class ReactionRoles(commands.Cog):
     @requires.reaction_roles
     @discord.option("role", discord.Role, description="The role to give")
     @discord.option("emoji", EmojiValidator, description="Reaction emoji")
-    @discord.option("channel", discord.TextChannel, description="Message content", required=False, default=None)
     @discord.option("content", str, description="Message content")
     @discord.option("embedtitle", str, description="Embed title", required=False, default=None)
     @discord.option("embedcolor", str, description="Embed color", choices=colours, required=False, default="default")
+    @discord.option("channel", discord.TextChannel, description="Message content", required=False, default=None)
     async def reactionsetup(self, ctx: discord.ApplicationContext, *,
                             role: discord.Role, emoji: str, channel: discord.TextChannel | None, content: str, embedtitle: str | None, embedcolor: str):  # type: ignore
         await ctx.defer()
