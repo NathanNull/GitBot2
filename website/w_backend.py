@@ -50,7 +50,9 @@ def add_backend(app):
     @cross_origin()
     def get_env():
         print('getting thing')
-        return api_get_request("https://discord.com/api/users/@me/guilds")
+        res = api_get_request("https://discord.com/api/users/@me/guilds")
+        print("got thing")
+        return res
 
     @app.route("/api/server/<gid>")
     @cross_origin()
@@ -60,7 +62,10 @@ def add_backend(app):
     @app.route("/api/channels/<gid>")
     @cross_origin()
     def get_channels(gid):
-        return api_get_request(f"https://discord.com/api/guilds/{gid}/channels")
+        print("getting channels")
+        res = api_get_request(f"https://discord.com/api/guilds/{gid}/channels")
+        print("got channels")
+        return res
 
     @app.route("/api/roles/<gid>")
     @cross_origin()
