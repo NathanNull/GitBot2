@@ -49,9 +49,7 @@ def add_backend(app):
     @app.route("/api/botservers")
     @cross_origin()
     def get_env():
-        print('getting thing')
         res = api_get_request("https://discord.com/api/users/@me/guilds")
-        print("got thing")
         return res
 
     @app.route("/api/server/<gid>")
@@ -62,9 +60,7 @@ def add_backend(app):
     @app.route("/api/channels/<gid>")
     @cross_origin()
     def get_channels(gid):
-        print("getting channels")
         res = api_get_request(f"https://discord.com/api/guilds/{gid}/channels")
-        print("got channels")
         return res
 
     @app.route("/api/roles/<gid>")
@@ -96,21 +92,23 @@ def add_backend(app):
     @app.route("/api/bot-info/<guildid>/<infotype>")
     @cross_origin()
     def bot_info(guildid: str, infotype: str):
+        print(f"getting bot info {infotype}@{guildid}")
         match infotype:
             case "config":
-                def process(c): return c
+                process = lambda c: c
                 default = {"music": True, "moderation": True,
                            "level": True, "reaction_roles": True}
             case "auditchannel":
-                def process(c): return f'"{str(c)}"'
+                process = lambda c: f'"{str(c)}"'
                 default = "NotSet"
             case "bannedwords":
-                def process(w): return w
+                process = lambda w: w
                 default = []
             case _:
                 return "Invalid info type", 400
         ref = db.reference(f"/{infotype}/{guildid}")
         data: dict[str, Any] = ref.get()
+        print(f"got bot info {infotype}@{guildid}")
         if data is not None:
             return process(data)
         else:
