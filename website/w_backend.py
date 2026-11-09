@@ -106,7 +106,9 @@ def add_backend(app):
                 default = []
             case _:
                 return "Invalid info type", 400
+        print("making reference")
         ref = db.reference(f"/{infotype}/{guildid}")
+        print("reading data")
         data: dict[str, Any] = ref.get()
         print(f"got bot info {infotype}@{guildid}")
         if data is not None:
