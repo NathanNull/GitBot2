@@ -37,7 +37,7 @@ class ReactionRoles(commands.Cog):
         self.update_info = {}
         self.check_updates.start()
 
-    @discord.slash_command(name="create-reaction-roles", description="adds reaction roles to specified message", guild_only=True, default_member_permissions=perm_mod)
+    @discord.slash_command(name="create-reaction-roles", description="Sends a message with text or embed to a specfied channel with a reaction role", guild_only=True, default_member_permissions=perm_mod)
     @requires.reaction_roles
     @discord.option("role", discord.Role, description="The role to give")
     @discord.option("emoji", EmojiValidator, description="Reaction emoji")
