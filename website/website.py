@@ -1,3 +1,12 @@
+import os
+import sys
+
+basedir = os.path.dirname(__file__)
+basepath = os.path.abspath(os.path.join(basedir, os.pardir))
+
+# Add the project root directory to Python's path
+sys.path.insert(0, basepath)
+
 from flask import Flask, url_for, render_template
 from check_prod import is_prod
 from w_backend import add_backend
