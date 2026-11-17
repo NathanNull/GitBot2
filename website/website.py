@@ -10,8 +10,8 @@ if basepath not in sys.path:
     print(basedir)
     print(basepath)
 from flask import Flask, url_for, render_template
-from check_prod import is_prod
-from w_backend import add_backend
+from .check_prod import is_prod
+from .w_backend import add_backend
 from flask_cors import CORS
 
 host = "0.0.0.0"

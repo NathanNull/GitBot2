@@ -1,4 +1,4 @@
-from check_prod import is_prod
+from .check_prod import is_prod
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from typing import Any
